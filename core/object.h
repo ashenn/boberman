@@ -23,6 +23,22 @@ struct Object {
 	void* (*hover)(Object* obj);	// Hover Callback
 };
 
+
+struct Player {
+	int id;
+	short z;
+	char* name;
+
+	SDL_Rect pos;
+
+	char* imgPath;
+	Object* imgObj;
+
+	SDL_Surface* sprite;
+	SDL_Surface* component;
+};
+
+
 ListManager* getObjectList();	// List Of all visual Objects
 Object* addSimpleObject(char* name, void* comp, SDL_Rect* pos, short z); // Add Object No Click / Hover / Container
 Object* addObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, void* hover, void* container);

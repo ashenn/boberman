@@ -27,15 +27,8 @@ struct Button {
 	void* (*click)(Object* obj);
 	void* (*hover)(Object* obj);
 
-	AnimParam anim;
-
 	short hasAnim;
-	
-	int x;
-	int y;
-
-	float time;
-	float delay;
+	AnimParam* anim;
 };
 
 
@@ -45,9 +38,10 @@ short setObjectLayer(Object* obj, short z);
 short isHovered(Object* obj, int x, int y);
 Object* getClicked(int x, int y, short hover);
 void render();
-void buttonUnHover();
+void buttonUnHover(Object* obj);
 void buttonHover(Object* obj);
 void deleteBtn(Button* btn);
 Object** getHovered();
+//void printObject(Object* obj);
 
 #endif

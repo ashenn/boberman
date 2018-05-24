@@ -105,20 +105,30 @@ Object* getClicked(int x, int y, short hover) {
 }
 
 void printObject(Object* obj) {
-	// logger->war("-- %s", obj->name);
-	// logger->war("-- X=%d | Y=%d", obj->pos.x, obj->pos.y);
+	logger->war("-- %s", obj->name);
+	logger->war("-- X=%d | Y=%d", obj->pos.x, obj->pos.y);
 	
+	logger->war("-- Gettong Screen");
 	SDL_Surface* screen = getScreen();
 
 	int tmpx = obj->pos.x;
 	int tmpy = obj->pos.y;
     
-    SDL_Surface* surf = (SDL_Surface*) obj->component;
-    SDL_BlitSurface (surf, NULL, screen, &obj->pos);
+    if (obj->component != NULL) {
+		logger->war("-- Casting Surface");
+	    SDL_Surface* surf = (SDL_Surface*) obj->component;
+		logger->war("-- Blitting Surface");
+		logger->war("-- Pos: %d, %d, %d, %d", obj->pos.x, obj->pos.y, obj->pos.w, obj->pos.h);
+	    SDL_BlitSurface (surf, NULL, screen, &obj->pos);
+	    
+	    obj->pos.x = tmpx;
+	    obj->pos.y = tmpy;
+		logger->war("-- X=%d | Y=%d", obj->pos.x, obj->pos.y);
+    }
+    else{
+		logger->war("-- Surface Is NULL");
+    }
 
-    obj->pos.x = tmpx;
-    obj->pos.y = tmpy;
-	// logger->war("-- X=%d | Y=%d", obj->pos.x, obj->pos.y);
 }
 
 void render() {
@@ -155,42 +165,63 @@ void render() {
 	// logger->war("-- Rendering DONE-- ");
 }
 
-void buttonUnHover() {
-	Object** obj = getHovered();
-	Button* btn = (Button*)(*obj)->container;
-	
-	if (*obj == NULL){
+void buttonUnHover(Object* obj) {
+	logger->err("Button Un-Hover");
+	if (obj == NULL){
+		logger->err("-- Object Is Null");
 		return;
 	}
+	logger->err("-- %s", obj->name);
+	
+	//Object** obj = getHovered();
+	
+	Button* btn = (Button*) obj->container;
 
 	char imgPath[30];
 	sprintf(imgPath, "asset/%s.png", btn->imgPath);
-	//logger->dbg("IMG Path: %s", imgPath);
+	logger->dbg("IMG Path: %s", imgPath);
 	
 	SDL_Surface* img = IMG_Load(imgPath);
 	if (img == NULL){
-		//logger->err("Fail to get Image: %s", imgPath);
+		logger->err("Fail to get Image: %s", imgPath);
 		return;
 	}
 
-	SDL_FreeSurface((*obj)->component);
-	(*obj)->component = img;
+	if (obj->component != NULL) {
+		logger->err("Free Old Surface");
+		SDL_FreeSurface(obj->component);
+		obj->component = NULL;
+	}
+	
+	obj->component = img;
 }
 
 void buttonHover(Object* obj) {
+	logger->err("Button Hover");
+	if (obj == NULL){
+		logger->err("Object Is Null");
+		return;
+	}
+
+	logger->err("-- %s", obj->name);
 	Button* btn = (Button*)obj->container;
 
 	char imgPath[35];
 	sprintf(imgPath, "asset/%s-hover.png", btn->imgPath);
-	//logger->dbg("IMG Path: %s", imgPath);
+	logger->dbg("IMG Path: %s", imgPath);
 	
 	SDL_Surface* img = IMG_Load(imgPath);
 	if (img == NULL){
-		//logger->err("Fail to get Image: %s", imgPath);
+		logger->err("Fail to get Image: %s", imgPath);
 		return;
 	}
 
-	SDL_FreeSurface(obj->component);
+	if (obj->component != NULL) {
+		logger->err("Free Old Surface");
+		SDL_FreeSurface(obj->component);
+		obj->component = NULL;
+	}
+
 	obj->component = img;
 }
 
