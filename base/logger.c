@@ -42,11 +42,12 @@ void logg(short lvl, char* msg, va_list* args){
 		fprintf(stdout, "%s[%s] ", logger->lvlColors[lvl], l);
 		printf("%s", message);
 		fprintf(stdout, "%s\n\n\n", KNRM);
+
+		if (logger->f > 0)	{
+			log2file(l, message);
+		}
 	}
 
-	if (logger->f > 0)	{
-		log2file(l, message);
-	}
 }
 
 

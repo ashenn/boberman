@@ -23,6 +23,11 @@
 #define SCREEN_H 600
 #define SCREEN_W 800
 
+#define FONT_XS 16
+#define FONT_SM 20
+#define FONT_MD 24
+#define FONT_LG 28
+
 #define LG_BTN_H 45
 #define LG_BTN_W 200
 

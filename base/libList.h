@@ -14,6 +14,8 @@ struct Node{
 
 	Node* next;
 	Node* prev;
+
+	void* (*del)(void*);
 };
 
 struct ListManager
@@ -47,4 +49,5 @@ Node* listIterate(ListManager* list, Node* n);
 Node* listRevIterate(ListManager* list, Node* n);
 short listInsertAfter(ListManager* lst, Node* n, short id);
 
+void sortList(ListManager * lst, short (*fnc)(void*, void*));
 #endif

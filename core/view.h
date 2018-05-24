@@ -17,6 +17,9 @@ struct Button {
 	short z;
 	char* name;
 	char* text;
+	
+	short fontSize;
+
 	SDL_Rect pos;
 	char* imgPath;
 	char* imgHoverPath;

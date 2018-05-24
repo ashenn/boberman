@@ -3,6 +3,13 @@
 
 #include "../common.h"
 
+struct Collision {
+	SDL_Rect pos;
+	short enabled;
+
+	void* (*fnc)(Object* obj, Object* target);	// Hit
+};
+
 /**
  * Visual Object
  */
@@ -10,32 +17,21 @@ struct Object {
 	int id;
 	short z;	// z-index
 	char* name;
-	SDL_Rect pos;	// Poition / site
+	
 	short visible;	// Displayed
 	short enabled;	// Clickable / Hoverable
+	
+	SDL_Rect pos;	// Poition / site
+	SDL_Rect hitbox;
 
 	void* container;	// Custom Struc ex: Button
-	Object* childObj;	// Linked Object, will be diplayed / animated with parent
+	ListManager* childs;	// Linked Objects, will be diplayed / animated with parent
 
 	SDL_Surface* component;	// SDL Visual
 
 	void* (*click)(Object* obj);	// Click CallBack
 	void* (*hover)(Object* obj);	// Hover Callback
-};
-
-
-struct Player {
-	int id;
-	short z;
-	char* name;
-
-	SDL_Rect pos;
-
-	char* imgPath;
-	Object* imgObj;
-
-	SDL_Surface* sprite;
-	SDL_Surface* component;
+	void* (*hit)(Object* obj, Object* target);	// Collision Callback
 };
 
 
@@ -45,5 +41,6 @@ Object* addObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 
 void deleteObject(Object* obj);
 Object* generateButton(Button* btn);
+short layerSort(void* a, void* b);
 
 #endif

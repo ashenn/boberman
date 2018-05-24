@@ -42,6 +42,7 @@ void* addNode(ListManager* lstMgr, void* params){
 	newNode->lstMgr = lstMgr;
 	newNode->name = name;
 	newNode->value = NULL;
+	newNode->del = NULL;
 
 	if (!lstMgr->nodeCount) // Is the first node
 	{
@@ -276,12 +277,16 @@ Node* deleteNodeNoFree(ListManager* lstMgr, int id){
  * @param id     Id
  */
 void* deleteNode(ListManager* lstMgr, int id){
+	printf("DELETING NODE: %d\n", id);
 	Node* node = deleteNodeNoFree(lstMgr, id);
 	if (node == NULL) {
 		return NULL;
 	}
 
-	if (node->valIsAlloc){
+	if (node->del != NULL) {
+		node->del(node->value);
+	}
+	else if (node->valIsAlloc){
 		free(node->value);
 	}
 
@@ -298,7 +303,7 @@ void* deleteNode(ListManager* lstMgr, int id){
  * @return         1
  */
 int setValue(Node* node, void* value, short asAlloc){
-	if (node->value != NULL){
+	if (node->valIsAlloc && node->value != NULL){
 		free(node->value);
 	}
 
@@ -424,4 +429,63 @@ short listInsertAfter(ListManager* lst, Node* n, short id) {
 	lst->nodeCount++;
 
 	return 1;
+}
+
+void sortList(ListManager * lst, short (*fnc)(void*, void*)) {
+	fprintf(stdout, "==== SORTING LIST ====\n");
+	if (lst->nodeCount < 2) {
+		fprintf(stdout, "==== Too Short ====\n");
+		return;
+	}
+
+	int i;
+	short sort = 0;
+	Node* tmp = NULL;
+	Node* comp = NULL;
+	for (i = 1; i < lst->nodeCount; i++) {
+		Node* key = lst->first->next;
+		printf("-- k: %d\n", key->id);
+
+    	comp = key->prev;
+        do {
+			printf("-- c: %d\n", comp->id);
+    		sort = (*fnc)(comp->value, key->value);
+			
+			printf("-- s: %d\n", sort);
+
+    		if (sort < 0) {
+    			tmp = NULL;
+    			while((tmp = listIterate(lst, tmp)) != NULL) {
+    				if (tmp == comp) {
+    					break;
+    				}
+
+					printf("++++ t: %d\n", tmp->id);
+
+					sort = fnc(comp->value, tmp->value);
+    			    if (sort < 0) {
+						printf("Inserting %d Before %d\n", comp->id, tmp->id);
+						listInsertAfter(lst, comp, tmp->id);
+						listInsertAfter(lst, tmp, comp->id);
+    			    }
+					printf("+++++++++++++++++++++++++\n");
+    			}
+    		}
+	
+    		comp = comp->next;
+			printf("================================================\n");
+        } while (comp != NULL);
+
+		printf("--------------------------------------------------------------------\n");
+   		key = key->next;
+        if (key == NULL) {
+        	break;
+        }
+	}	
+	
+	printf("==== Sort Completed ====\n");
+	tmp = NULL;
+	while((tmp = listIterate(lst, tmp)) != NULL) {
+		printf("-- %d\n", tmp->id);
+	}
 }

@@ -8,7 +8,8 @@ Game* getGame() {
 	if (game != NULL) {
 		return game;
 	}
-	
+
+	logger->inf("==== INIT GAME ====");	
 	game = malloc(sizeof(game));
 	game->status = GAME_MENU;
 
@@ -16,25 +17,28 @@ Game* getGame() {
 }
 
 void* closeApp() {
-	logger->war("Closing App");
+	logger->inf("==== Closing App ====");	
 	Game* game = getGame();
 
 	// Cleaning Objects
 	Node* obj = NULL;
 	ListManager* objects = getObjectList();
 
-	logger->war("Cleaning Objects");
+	logger->dbg("-- Cleaning Objects");
 	while((obj = listIterate(objects, obj)) != NULL) {
-		logger->war("Obj: %s", obj->name);
+		logger->dbg("-- Obj: %s", obj->name);
 		deleteObject(obj->value);
 	}
 
-	logger->war("Kill");
+	logger->dbg("-- Quit SDL");
 	game->status = GAME_QUIT;
 	SDL_Quit();
+	
+	logger->dbg("==== Killing Game Proccess ====");
 }
 
 void quitGame() {
+	logger->inf("==== Quitting Game ====");	
 	Game* game = getGame();
 	game->status = GAME_QUIT;
 }
@@ -48,11 +52,13 @@ void* sayGoodbye() {
 }
 
 Button** getMenu() {
+	logger->inf("==== Getting Menu ====");	
 	
 	static Button btnJoin = {
 		.z = 2,
 		.name = "Find",
 		.text = "Find",
+		.fontSize = FONT_LG,
 		.imgPath = "lg-button-green",
 		.imgHoverPath = NULL,
 		.imgObj = NULL,
@@ -74,15 +80,30 @@ Button** getMenu() {
 	
 	// Define Animation Position
 	btnJoin.anim = malloc(sizeof(AnimParam));
-	btnJoin.anim->time = 0.4f;
+	btnJoin.anim->time = 1.5f;
 	btnJoin.anim->delay = 0;
 	btnJoin.anim->pos.x = percent(50, SCREEN_W) - (LG_BTN_W / 2);
 	btnJoin.anim->pos.y = percent(45, SCREEN_H);
+	
+	btnJoin.anim->pos.w = 0;
+	btnJoin.anim->pos.h = 0;
+	
+	logger->dbg(
+		"-- Button: %s\n--pos: x: %d | y: %d | w: %d | h: %d\n--anim: x: %d | y: %d | w: %d | h: %d\n",
+		btnJoin.name,
+		btnJoin.pos.x,
+		btnJoin.pos.y,
+		btnJoin.pos.w,
+		btnJoin.pos.h,
+		btnJoin.anim->pos.x,
+		btnJoin.anim->pos.y
+	);
 
 	static Button btnHost = {
 		.z = 2,
 		.name = "Host",
 		.text = "Host",
+		.fontSize = FONT_LG,
 		.imgPath = "lg-button-green",
 		.imgHoverPath = NULL,
 		.imgObj = NULL,
@@ -104,15 +125,30 @@ Button** getMenu() {
 
 	// Define Animation Position
 	btnHost.anim = malloc(sizeof(AnimParam));
-	btnHost.anim->time = 0.4f;
+	btnHost.anim->time = 1.5f;
 	btnHost.anim->delay = 0.2f;
 	btnHost.anim->pos.x = percent(50, SCREEN_W) - (LG_BTN_W / 2);
 	btnHost.anim->pos.y = btnJoin.anim->pos.y + (LG_BTN_H  * 1.25);
+	
+	btnHost.anim->pos.w = 0;
+	btnHost.anim->pos.h = 0;
+
+	logger->dbg(
+		"-- Button: %s\n--pos: x: %d | y: %d | w: %d | h: %d\n--anim: x: %d | y: %d | w: %d | h: %d\n",
+		btnHost.name,
+		btnHost.pos.x,
+		btnHost.pos.y,
+		btnHost.pos.w,
+		btnHost.pos.h,
+		btnHost.anim->pos.x,
+		btnHost.anim->pos.y
+	);
 
 	static Button btnQuit = {
 		.z = 2,
 		.name = "Quit",
 		.text = "Quit",
+		.fontSize = FONT_LG,
 		.imgPath = "lg-button-red",
 		.imgHoverPath = NULL,
 		.imgObj = NULL,
@@ -135,10 +171,25 @@ Button** getMenu() {
 
 	// Define Animation Position
 	btnQuit.anim = malloc(sizeof(AnimParam));
-	btnQuit.anim->time = 0.4f;
+	btnQuit.anim->time = 1.5f;
 	btnQuit.anim->delay = 0.4f;
 	btnQuit.anim->pos.x = percent(50, SCREEN_W) - (LG_BTN_W / 2);
 	btnQuit.anim->pos.y = btnHost.anim->pos.y + (LG_BTN_H  * 1.25);
+
+	btnQuit.anim->pos.w = 0;
+	btnQuit.anim->pos.h = 0;
+
+	logger->dbg(
+		"-- Button: %s\n--pos: x: %d | y: %d | w: %d | h: %d\n--anim: x: %d | y: %d | w: %d | h: %d\n",
+		btnQuit.name,
+		btnQuit.pos.x,
+		btnQuit.pos.y,
+		btnQuit.pos.w,
+		btnQuit.pos.h,
+		btnQuit.anim->pos.x,
+		btnQuit.anim->pos.y
+	);
+
 
 	static Button* btns[] = {
 		&btnJoin,
@@ -165,17 +216,16 @@ void handleEvents() {
 		game = getGame();
 	}
 
-	logger->err("While EVENTS");
+	logger->inf("==== EVENTS ====");
 	while (SDL_PollEvent(&event)) {
-		logger->err("While LOOP");
 		switch (event.type) {
 			case SDL_QUIT:
-				logger->err("EVT QUIT");
+				logger->dbg("-- EVT QUIT");
 				game->status = GAME_QUIT;
 				break;
 
 			case SDL_KEYDOWN:
-				logger->err("EVT KEY DOWN");
+				logger->dbg("-- EVT KEY DOWN");
 				switch (event.key.keysym.sym) {
 					case SDLK_ESCAPE:
 					case SDLK_q:
@@ -188,7 +238,7 @@ void handleEvents() {
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
-				logger->err("EVT KEY BUTTON");
+				logger->dbg("-- EVT KEY BUTTON");
 
 				clicked = getClicked(event.button.x, event.button.y, 0);
 				if (clicked != NULL && clicked->enabled && clicked->click != NULL) {
@@ -197,7 +247,7 @@ void handleEvents() {
             	break;
 
 			case SDL_MOUSEMOTION:
-				logger->err("EVT KEY MOVE");
+				logger->dbg("-- EVT KEY MOVE");
 
 				if (lastX == event.button.x && lastY == event.button.y) {
 					break;
@@ -221,13 +271,15 @@ void handleEvents() {
 
 				if (hovered != NULL && hovered->enabled && hovered->hover != NULL) {
 
-					logger->inf("Calling hover For: %s", hovered->name);
+					logger->inf("-- Calling hover For: %s", hovered->name);
 					hovered->hover(hovered);
 				}
 
             	break;
 		}
 	}
+
+	logger->dbg("==== DONE ====");
 }
 
 int main(int argc, char *argv[])
@@ -276,14 +328,13 @@ int main(int argc, char *argv[])
 
 	Game* game = getGame();
 	while (game->status == GAME_MENU){
-		// logger->err("Frame: #%d", i++);
+		logger->inf("==== Tick #%d ====", i++);
 		int now = SDL_GetTicks(); 
 		handleEvents();
 
 		render();
     	animate();
 
-		//logger->war("-- Tick Calculation -- ");
 		t_fin = SDL_GetTicks();
         if (t_fin - t_deb < t_boucle) {
 		
@@ -291,20 +342,19 @@ int main(int argc, char *argv[])
 
 			delay = t_boucle - (t_fin - t_deb);
 			if (delay > 0){
-				//logger->war("Tick Wait: %d", t_boucle - (t_fin - t_deb));
         		SDL_Delay(t_boucle - (t_fin - t_deb));
 			}
         };
         t_deb = SDL_GetTicks();
 
-        if (i++ == 5){
-			//deleteObject(btns[0]->imgObj);
-			//break;
-        }
-		logger->war("-- Tick END -- ");
+		logger->inf("==== Tick END ====");
+
+//		break;
 	}
 
+	
 	closeApp();
+	logger->err("Good Bye ! :)");
 
 	return 0;
 }
