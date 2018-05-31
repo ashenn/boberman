@@ -1,5 +1,28 @@
 #include "object.h"
 
+void clearObjects() {
+	Node* n = NULL;
+	logger->dbg("-- Getting Objects");
+	ListManager* objects = getObjectList();
+
+	logger->dbg("-- Cleaning Hover");
+	Object** curHover = getHovered();
+	*curHover = NULL;
+
+	if (objects != NULL){
+		logger->dbg("-- Len: %d", objects->nodeCount);
+
+		while((n = listIterate(objects, n)) != NULL) {
+			logger->dbg("-- Deleting");
+			logger->dbg("-- Deleting: %s", n->name);
+		    deleteObject(n->value);
+		    n = NULL;
+		}
+	}
+
+	clearScreen();
+}
+
 /* Function to sort an array using insertion sort*/
 short layerSort(void* a, void* b) {
 	Object* ao = (Object*)a;
@@ -56,6 +79,7 @@ ListManager* getObjectList() {
 Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, void* hover, void* container) {
 	Object* obj = malloc(sizeof(Object));
 	
+	obj->z = z;
 	obj->visible = 1;
 	obj->enabled = 1;
 
@@ -64,6 +88,7 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 	obj->container = container;
 	
 	obj->hit = NULL;
+	obj->clip = NULL;
 	obj->click = click;
 	obj->hover = hover;
 	
@@ -78,7 +103,10 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 		obj->pos.h = pos->h;
 	}
 	else{
-		obj->pos.x = obj->pos.y = obj->pos.w = obj->pos.h = 0;
+		obj->pos.x = 0;
+		obj->pos.y = 0;
+		obj->pos.w = SCREEN_W; 
+		obj->pos.h = SCREEN_H;
 	}
 
 
@@ -105,7 +133,7 @@ Object* addObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 	ListManager* objects = getObjectList();
 	logger->dbg("-- Adding Node");
 	
-	Node* n = addNodeV(objects, name, obj, 0);
+	Node* n = addNodeV(objects, name, obj, 1);
 	if (n == NULL) {
 		logger->err("==== Fail to insert object in list ====");
 		return NULL;
@@ -130,7 +158,6 @@ Object* addSimpleObject(char* name, void* comp, SDL_Rect* pos, short z) {
 	return addObject(name, comp, pos, z, NULL, NULL, NULL);
 }
 
-
 void deleteObject(Object* obj) {
 	logger->inf("===== Deleting Object ====");
 	logger->inf("--name: %s", obj->name);
@@ -142,6 +169,10 @@ void deleteObject(Object* obj) {
 		Node* childNode = NULL;
 		while((childNode = listIterate(obj->childs, childNode)) != NULL) {
 			Object* child = (Object*) childNode->value;
+			
+			if (child->clip != NULL) {
+				free(child->clip);
+			}
 			
 			logger->dbg("-- child: %s", child->name);
 			deleteObject(child);
@@ -157,33 +188,26 @@ void deleteObject(Object* obj) {
 	if (layer != NULL) {
 		logger->dbg("-- Deleting From : %s", layer->name);
 		deleteNodeByName(layer->value, obj->name);
+
+		logger->dbg("-- Remove From Anim");
+		animRemoveObject(obj);
 	}
 
-	if (obj->component != NULL) {
-		logger->dbg("-- Free Button Surface");
-		SDL_FreeSurface(obj->component);
-		obj->component = NULL;
-	}
+	//if (obj->clip != NULL) {
+	//	logger->dbg("-- Free Clip Rect");
+	//	free(obj->clip);
+	//}
 
-	logger->dbg("-- Remove From Anim");
-	animRemoveObject(obj);
-
-	logger->dbg("-- test ");
-	logger->dbg("-- Delete Object ++ ");
+	logger->dbg("-- Delete Object");
 	ListManager* objects = getObjectList();
 	deleteNode(objects, obj->id);
 	
-	logger->inf("===== Deleting Button DONE ====");
+	logger->inf("===== DELETE OBJECT DONE ====");
 }
 
 Object* generateButton(Button* btn) {
+	AssetMgr* ast = getAssets();
 	logger->inf("===== Generating Button ====");
-	
-	char imgPath[25];
-	sprintf(imgPath, "asset/%s.png", btn->imgPath);
-
-	SDL_Color text_color = {255,255,255};
-	char fontpath[] = "font/pf.ttf";
 	
 	logger->dbg(
 		"--name: %s\n--text: %s\n--click: %d\n--hover: %d\n--image: %s\n--font: %s\n--pos: x: %d | y:%d | w:%d | h:%d",
@@ -191,8 +215,8 @@ Object* generateButton(Button* btn) {
 		btn->text,
 		(btn->click != NULL),
 		(btn->hover != NULL),
-		imgPath,
-		fontpath,
+		btn->imgPath,
+		btn->font,
 		btn->pos.x,
 		btn->pos.y,
 		btn->pos.w,
@@ -201,18 +225,18 @@ Object* generateButton(Button* btn) {
 
 
 	logger->dbg("-- Loading Image");
-	SDL_Surface* img = IMG_Load(imgPath);
+	SDL_Surface* img = ast->getImg(btn->imgPath);
 	if (img == NULL){
-		logger->err("-- Fail to get Image: %s", imgPath);
+		logger->err("-- Fail to get Image: %s", btn->imgPath);
 		logger->dbg("==== BUTTON DONE ====");
 		return NULL;
 	}
 
 
 	logger->dbg("-- Loading Font");
-	TTF_Font* font = TTF_OpenFont(fontpath, FONT_LG);
+	TTF_Font* font = ast->getFont("pf", FONT_LG);
 	if (font == NULL) {
-	    logger->err("Fail to load Font: %s", fontpath);
+	    logger->err("Fail to load Font: %s", btn->font);
 	    logger->err("Sdl err: %s", TTF_GetError());
 		logger->err("==== BUTTON DONE ====");
 	    return NULL;
@@ -220,7 +244,7 @@ Object* generateButton(Button* btn) {
 
 
 	logger->dbg("-- Generating Text");
-	SDL_Surface* txt = TTF_RenderText_Solid(font, btn->text, text_color);
+	SDL_Surface* txt = TTF_RenderText_Solid(font, btn->text, btn->color);
 	if (txt == NULL) {
 	    logger->err("Fail to Render Text");
 		logger->err("==== BUTTON DONE ====");

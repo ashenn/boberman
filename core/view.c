@@ -14,6 +14,15 @@ SDL_Surface* getScreen() {
 	return screen;
 }
 
+void clearScreen() {
+	logger->dbg("==== Clearing Screen ==== ");
+
+	SDL_Surface* screen = getScreen();
+	SDL_FillRect(screen, NULL, 0x000000);
+
+    SDL_Flip(screen);
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
+}
 
 ListManager* getLayers() {
 	static ListManager* layers = NULL;
@@ -35,31 +44,18 @@ short setObjectLayer(Object* obj, short z) {
 	Node* layer = getNode(layers, z);
 
 	if (layer == NULL){
-		char* layerName = malloc(10);
-		sprintf(layerName, "#Layer-%d", z);
+		char layerName[12];
+		snprintf(layerName, 12, "#Layer-%d", z);
+		
 		logger->dbg("-- Creating Layer: %s", layerName);
 		
-		if (!layers->nodeCount){
-			logger->dbg("-- Is First Layer");
-			layer = addNodeV(layers, layerName, initListMgr(), 0);
+		layer = addNodeV(layers, layerName, initListMgr(), 0);
 
-			if (layer == NULL){
-				logger->err("==== FAIL TO ADD FIRST LAYER: %s ====", layerName);
-				return 0;
-			}
+		if (layer == NULL){
+			logger->err("==== FAIL TO ADD LAYER: %s ====", layerName);
+			return 0;
 		}
-		else{
-			layer = malloc(sizeof(Node));
-			layer->id = z;
-			layer->name = layerName;
-			layer->value = initListMgr();
-
-			short success = listInsertAfter(layers, layer, layers->last->id);
-			if (!success){
-				logger->err("==== FAIL TO ADD LAYER: %s ====", layerName);
-				return 0;
-			}
-		}
+		
 	}
 
 	ListManager* layerObjs = (ListManager*)layer->value;
@@ -118,9 +114,6 @@ Object* getClicked(int x, int y, short hover) {
 				continue;
 			}
 
-			//logger->dbg("Object: %s", objectNode->name);
-			//logger->dbg("%d | %d | %d | %d", o->pos.x, o->pos.y, o->pos.x + o->pos.w, o->pos.y + o->pos.h);
-
 			if (isHovered(o, x, y)) {
 				logger->inf("==== Object Found: %s ====", o->name);
 				return o;
@@ -147,8 +140,12 @@ void printObject(Object* obj) {
 	    SDL_Surface* surf = (SDL_Surface*) obj->component;
 		
 		logger->dbg("-- Blitting Surface");
-		logger->dbg("-- Pos: %d, %d, %d, %d", obj->pos.x, obj->pos.y, obj->pos.w, obj->pos.h);
-	    SDL_BlitSurface (surf, NULL, screen, &obj->pos);
+		logger->dbg("-- Pos: x: %d, y: %d, w: %d, h: %d", obj->pos.x, obj->pos.y, obj->pos.w, obj->pos.h);
+
+		if (obj->clip != NULL) {
+			logger->dbg("-- Clip: x: %d, y: %d, w: %d, h: %d", obj->clip->x, obj->clip->y, obj->clip->w, obj->clip->h);
+		}
+	    SDL_BlitSurface (surf, obj->clip, screen, &obj->pos);
 	    
 	    obj->pos.x = tmpx;
 	    obj->pos.y = tmpy;
@@ -170,15 +167,20 @@ void render() {
 	Node* childNode = NULL;
 	Node* layerNode = NULL;
 
+	if (!layers->nodeCount) {
+		return;
+	}
 
 	while((layerNode = listIterate(layers, layerNode)) != NULL) {
 		ListManager* objects = (ListManager*) layerNode->value;
 		logger->dbg("-- #%d -- %s", layerNode->id, layerNode->name);
 
-		if (layerNode->id > 1) {
+		if (!objects->nodeCount) {
+			continue;
+		}
+		else if (layerNode->id > 1) {
 			logger->dbg("Sorting List");
 			sortList(objects, &layerSort);
-			//return;
 		}
 
 		objNode = NULL;
@@ -219,20 +221,16 @@ void buttonUnHover(Object* obj) {
 	
 	Button* btn = (Button*) obj->container;
 
+	AssetMgr* ast = getAssets();
+
 	char imgPath[30];
 	sprintf(imgPath, "asset/%s.png", btn->imgPath);
 	logger->dbg("-- image: %s", imgPath);
 
-	SDL_Surface* img = IMG_Load(imgPath);
+	SDL_Surface* img = ast->getImg(btn->imgPath);
 	if (img == NULL){
 		logger->err("==== Fail to get Image: %s ====", imgPath);
 		return;
-	}
-
-	if (obj->component != NULL) {
-		logger->dbg("-- Free Old Surface");
-		SDL_FreeSurface(obj->component);
-		obj->component = NULL;
 	}
 	
 	obj->component = img;
@@ -249,20 +247,16 @@ void buttonHover(Object* obj) {
 	logger->dbg("-- %s", obj->name);
 	Button* btn = (Button*)obj->container;
 
+	AssetMgr* ast = getAssets();
+
 	char imgPath[35];
-	sprintf(imgPath, "asset/%s-hover.png", btn->imgPath);
+	sprintf(imgPath, "%s-hover", btn->imgPath);
 	logger->dbg("-- image: %s", imgPath);
 	
-	SDL_Surface* img = IMG_Load(imgPath);
+	SDL_Surface* img = ast->getImg(imgPath);
 	if (img == NULL){
 		logger->err("==== Fail to get Image: %s ====", imgPath);
 		return;
-	}
-
-	if (obj->component != NULL) {
-		logger->dbg("-- Free Old Surface");
-		SDL_FreeSurface(obj->component);
-		obj->component = NULL;
 	}
 
 	obj->component = img;
@@ -271,7 +265,6 @@ void buttonHover(Object* obj) {
 
 
 void deleteBtn(Button* btn) {
-	//logger->inf("Deleting Button: %s", btn->name);
 	deleteObject(btn->txtObj);
 	deleteObject(btn->imgObj);
 }
@@ -279,4 +272,8 @@ void deleteBtn(Button* btn) {
 Object** getHovered() {
 	static Object* obj = NULL;
 	return &obj;
+}
+
+void showGame() {
+	
 }

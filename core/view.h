@@ -17,15 +17,19 @@ struct Button {
 	short z;
 	char* name;
 	char* text;
+	char* font;
 	
 	short fontSize;
 
 	SDL_Rect pos;
+	SDL_Color color;
+	
 	char* imgPath;
 	char* imgHoverPath;
 
 	Object* imgObj;
 	Object* txtObj;
+
 
 	void* (*click)(Object* obj);
 	void* (*hover)(Object* obj);
@@ -45,6 +49,6 @@ void buttonUnHover(Object* obj);
 void buttonHover(Object* obj);
 void deleteBtn(Button* btn);
 Object** getHovered();
-//void printObject(Object* obj);
+void clearScreen();
 
 #endif

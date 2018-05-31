@@ -20,8 +20,10 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 
-#define SCREEN_H 600
+#define CELL_SIZE 55
+
 #define SCREEN_W 800
+#define SCREEN_H 600
 
 #define FONT_XS 16
 #define FONT_SM 20
@@ -40,20 +42,27 @@
 #define true 1
 #define false 0
 
-#define GAME_MENU 0
-#define GAME_LOBY 1
-#define GAME_READY 2
-#define GAME_SART 3
-#define GAME_RUNNING 4
-#define GAME_END 5
-#define GAME_QUIT 6
-
 #define FPS 60
 
-typedef struct Game Game;
-struct Game {
-	short status;
-};
+#define PLAYER_W 55
+#define PLAYER_H 83
+
+#define PLAYER_ANIM_LEN 3
+
+#define MAP_X 42
+#define MAP_Y 76
+
+#define MAP_SIZE_X 13
+#define MAP_SIZE_Y 9
+
+#define UP 0
+#define DOWN 1
+#define RIGHT 2
+#define LEFT 3
+
+#define WALK_FRAMES 2
+
+#include "core/asset.h"
 
 typedef struct Button Button;
 typedef struct Object Object;
@@ -78,12 +87,18 @@ struct AnimParam {
 	AnimDistance yDist;
 
 	short init;
+	short deleteObject;
 	void* (*fnc)();
+	void (*callBack	)(AnimParam*);
 	
 	Object* obj;
 	SDL_Rect* target;
 };
 
+#include "core/player.h"
+#include "core/event.h"
+#include "main.h"
+#include "core/game.h"
 #include "core/object.h"
 #include "core/view.h"
 

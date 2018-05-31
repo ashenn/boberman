@@ -138,7 +138,7 @@ void animRemoveObject(Object* obj) {
 	logger->dbg("==== Removing Anim %s DONE ====", obj->name);
 }
 
-void animAddObject(Object* obj, AnimParam* param) {
+AnimParam* animAddObject(Object* obj, AnimParam* param) {
 	logger->inf("==== Adding Anim Object: %s ====", obj->name);
 	Animator* animator = getAnimator();
 
@@ -155,9 +155,11 @@ void animAddObject(Object* obj, AnimParam* param) {
 	param->id = paramNode->id;
 	
 	logger->dbg("==== Animation: Added %s #%d ====", param->obj->name, paramNode->id);
+
+	return param;
 }
 
-void moveTo(Object* obj, int x, int y, float time, float delay) {
+AnimParam* moveTo(Object* obj, int x, int y, float time, float delay) {
 	logger->inf("==== Animation: Moving: %s to %d | %d (%fs) ====", obj->name, x, y, time);
 	SDL_Rect target;
 	target.x = x;
@@ -172,6 +174,9 @@ void moveTo(Object* obj, int x, int y, float time, float delay) {
 	param->time = time;
 	param->delay = delay * FPS;
 	param->frames = FPS * time;
+	param->callBack = NULL;
+	param->deleteObject = 0;
+	
 	logger->dbg("-- frames: %d", param->frames);
 	logger->dbg("-- time: %f", time);
 
@@ -190,6 +195,7 @@ void moveTo(Object* obj, int x, int y, float time, float delay) {
 	animAddObject(obj, param);
 	
 	logger->dbg("==== Animation Added ====");
+	return param;
 }
 
 
@@ -200,7 +206,10 @@ void animate() {
 	Animator* animator = getAnimator(); 
 	ListManager* objList = NULL;
 
+	Object* objDel = NULL;
+
 	while((objNode = listIterate(animator->objects, objNode)) != NULL) {
+		objDel = NULL;
 	    objList = (ListManager*) objNode->value;
 		logger->dbg("-- Object: %s", objNode->name);
 
@@ -220,19 +229,40 @@ void animate() {
 
 	    	param->frames--;
 			logger->dbg("-- Frames Left: %d", param->frames);
-			// logger->inf("Animation: Frames Left: %d", param->frames);
-	    	if (param->frames <= 0){
-				logger->dbg("-- Animation: #%d END", paramNode->id);
-	    		deleteNode(objNode->value, param->id);
 
-	    		if (!objList->nodeCount) {
-					logger->dbg("-- Animation: No More Anim For Object: %s", objNode->name);
-	    			deleteNode(animator->objects, objNode->id);
+	    	if (param->frames <= 0){
+	    		if (param->callBack != NULL){
+					logger->dbg("-- Animation: #%d CallBack", paramNode->id);
+	    			param->callBack(param);
 	    		}
+	    		
+	    		if (param->deleteObject) {
+	    			objDel = param->obj;
+	    		}
+
+				logger->dbg("-- Animation: #%d END", paramNode->id);
+	    		deleteNode(objList, param->id);
 	    	}
 
 	    	break;
 	    }
+
+		if (!objList->nodeCount) {
+			logger->dbg("-- Animation: No More Anim For Object: %s", objNode->name);
+
+			deleteList(objList);
+			
+			int id = objNode->id;
+			objNode = objNode->prev;
+			deleteNode(animator->objects, id);
+			
+    		if (objDel != NULL) {
+				logger->dbg("-- Deleting Object");
+				logger->dbg("-- Deleting Object: %s", objDel->name);
+    			deleteObject(objDel);
+    			objDel = NULL;
+    		}
+		}
 	}
 
 	logger->dbg("==== Animating DONE ====");

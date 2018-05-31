@@ -37,10 +37,12 @@ void* addNode(ListManager* lstMgr, void* params){
 		return NULL;
 	}
 
+	newNode->name = malloc(strlen(name)+1);
+	strcpy(newNode->name, name);
+
 	id = ++lstMgr->lastId;
 	newNode->id = id;
 	newNode->lstMgr = lstMgr;
-	newNode->name = name;
 	newNode->value = NULL;
 	newNode->del = NULL;
 
@@ -246,8 +248,11 @@ Node* deleteNodeNoFree(ListManager* lstMgr, int id){
 	Node* prev = node->prev;
 	Node* next = node->next;
 
-	if (prev != NULL && next != NULL){
+	if (prev != NULL) {
 		prev->next = next;
+	}
+
+	if (next != NULL){
 		next->prev = prev;
 	}
 
@@ -263,9 +268,9 @@ Node* deleteNodeNoFree(ListManager* lstMgr, int id){
 		lstMgr->first->next = NULL;
 		lstMgr->first->prev = NULL;
 	}
-	else if (lstMgr->nodeCount == 0){
+	else if (!lstMgr->nodeCount){
 		lstMgr->first = NULL;
-		lstMgr->first = NULL;
+		lstMgr->last = NULL;
 	}
 
 	return node;
@@ -277,7 +282,7 @@ Node* deleteNodeNoFree(ListManager* lstMgr, int id){
  * @param id     Id
  */
 void* deleteNode(ListManager* lstMgr, int id){
-	printf("DELETING NODE: %d\n", id);
+	//printf("DELETING NODE: %d\n", id);
 	Node* node = deleteNodeNoFree(lstMgr, id);
 	if (node == NULL) {
 		return NULL;
@@ -290,6 +295,7 @@ void* deleteNode(ListManager* lstMgr, int id){
 		free(node->value);
 	}
 
+	free(node->name);
 	free(node);
 
 	return NULL;
@@ -432,26 +438,19 @@ short listInsertAfter(ListManager* lst, Node* n, short id) {
 }
 
 void sortList(ListManager * lst, short (*fnc)(void*, void*)) {
-	fprintf(stdout, "==== SORTING LIST ====\n");
-	if (lst->nodeCount < 2) {
-		fprintf(stdout, "==== Too Short ====\n");
-		return;
-	}
-
 	int i;
 	short sort = 0;
 	Node* tmp = NULL;
 	Node* comp = NULL;
 	for (i = 1; i < lst->nodeCount; i++) {
 		Node* key = lst->first->next;
-		printf("-- k: %d\n", key->id);
 
     	comp = key->prev;
         do {
-			printf("-- c: %d\n", comp->id);
+			// printf("-- c: %d\n", comp->id);
     		sort = (*fnc)(comp->value, key->value);
 			
-			printf("-- s: %d\n", sort);
+			// printf("-- s: %d\n", sort);
 
     		if (sort < 0) {
     			tmp = NULL;
@@ -460,32 +459,32 @@ void sortList(ListManager * lst, short (*fnc)(void*, void*)) {
     					break;
     				}
 
-					printf("++++ t: %d\n", tmp->id);
+					// printf("++++ t: %d\n", tmp->id);
 
 					sort = fnc(comp->value, tmp->value);
     			    if (sort < 0) {
-						printf("Inserting %d Before %d\n", comp->id, tmp->id);
+						// printf("Inserting %d Before %d\n", comp->id, tmp->id);
 						listInsertAfter(lst, comp, tmp->id);
 						listInsertAfter(lst, tmp, comp->id);
     			    }
-					printf("+++++++++++++++++++++++++\n");
+					// printf("+++++++++++++++++++++++++\n");
     			}
     		}
 	
     		comp = comp->next;
-			printf("================================================\n");
+			// printf("================================================\n");
         } while (comp != NULL);
 
-		printf("--------------------------------------------------------------------\n");
+		// printf("--------------------------------------------------------------------\n");
    		key = key->next;
         if (key == NULL) {
         	break;
         }
 	}	
 	
-	printf("==== Sort Completed ====\n");
+	// printf("==== Sort Completed ====\n");
 	tmp = NULL;
 	while((tmp = listIterate(lst, tmp)) != NULL) {
-		printf("-- %d\n", tmp->id);
+		// printf("-- %d\n", tmp->id);
 	}
 }

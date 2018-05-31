@@ -11,7 +11,7 @@ struct Animator {
 };
 
 void animate();
-void moveTo(Object* obj, int x, int y, float time, float delay);
+AnimParam* moveTo(Object* obj, int x, int y, float time, float delay);
 void animRemoveObject(Object* obj);
 
 #endif

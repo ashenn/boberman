@@ -21,7 +21,10 @@ struct Object {
 	short visible;	// Displayed
 	short enabled;	// Clickable / Hoverable
 	
+	int* clipIndex;
 	SDL_Rect pos;	// Poition / site
+	SDL_Rect* clip;	// Image Clip
+	
 	SDL_Rect hitbox;
 
 	void* container;	// Custom Struc ex: Button
@@ -42,5 +45,8 @@ Object* addObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 void deleteObject(Object* obj);
 Object* generateButton(Button* btn);
 short layerSort(void* a, void* b);
+void clearObjects();
+Object* genSimpleObject(char* name, void* comp, SDL_Rect* pos, short z);
+short addChild(Object* obj, Object* child);
 
 #endif

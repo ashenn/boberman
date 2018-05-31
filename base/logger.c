@@ -174,7 +174,6 @@ void parseLogArgs(){
 		NULL
 	};
 
-	logger->args = malloc(sizeof(ListManager));
 	logger->args = defineArgs(args);
 }
 
@@ -243,8 +242,7 @@ void* closeLogger(){
 	clearLoglvls();
 	clearLoglvlColors();
 
-	clearList(logger->args);
-	free(logger->args);
+	deleteList(logger->args);
 	free(logger);
 }
 
