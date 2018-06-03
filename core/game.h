@@ -11,8 +11,12 @@
 #define GAME_END 5
 #define GAME_QUIT 6
 
+#define No_FLAG 0
+#define DBG_HIT 1
+
 typedef struct Game Game;
 struct Game {
+	unsigned int flags;
 	short status;
 };
 

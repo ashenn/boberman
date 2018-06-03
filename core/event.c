@@ -18,14 +18,21 @@ void EventKeyUp(int key, int curKey) {
 }
 
 int EventKeyDown(int key, int curKey) {
+	if (key == SDLK_ESCAPE || key == SDLK_q) {
+		EventQuit();
+		return curKey;
+	}
+
 	Player* p = getPlayer();
+	if (p == NULL) {
+		return curKey;
+	}
+
+	if (!p->alive) {
+		return curKey;
+	}
 
 	switch (key) {
-		case SDLK_ESCAPE:
-		case SDLK_q:
-			EventQuit();
-			break;
-
 		case SDLK_UP:
 			curKey = SDLK_UP;
 
@@ -68,14 +75,20 @@ int EventKeyDown(int key, int curKey) {
 
 		case SDLK_SPACE:
 			if (p) {
-				logger->err("-- Placing Bomb");
+				logger->dbg("-- Placing Bomb");
 				placeBomb(p);
+			}
+			break;
+
+		case SDLK_p:
+		case SDLK_k:
+			if (p) {
+				killPlayer(p);
 			}
 			break;
 		
 		default:
-			logger->err("-- UN HANDEL %d", key);
-			logger->err("-- TEST %d", SDLK_SPACE);
+			logger->dbg("-- UN HANDEL %d", key);
 			break;
 	}
 
@@ -164,8 +177,8 @@ void handleEvents() {
 
 			case SDL_KEYDOWN:
 				key = event.key.keysym.sym;
-				logger->err("-- EVT KEY DOWN: %s", SDL_GetKeyName(key));
-				logger->err("-- EVT KEY VALUE: %d", key);
+				logger->dbg("-- EVT KEY DOWN: %s", SDL_GetKeyName(key));
+				logger->dbg("-- EVT KEY VALUE: %d", key);
 
 				curKey = EventKeyDown(key, curKey);
 				break;

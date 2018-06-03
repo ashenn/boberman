@@ -2,6 +2,22 @@
 #include <stdio.h>
 #include <math.h>
 
+AnimParam* initAnimParam(Object* obj, float time, float delay, void* fnc) {
+	AnimParam* param = malloc(sizeof(AnimParam));
+
+	param->obj = obj;
+	param->fnc = fnc;
+	param->time = time;
+	param->boolean = 0;
+	param->custFnc = NULL;
+	param->callBack = NULL;
+	param->deleteObject = 0;
+	param->delay = delay * FPS;
+	param->frames = time * FPS;
+
+	return param;
+}
+
 Animator* getAnimator() {
 	static Animator* animator = NULL;
 
@@ -168,14 +184,7 @@ AnimParam* moveTo(Object* obj, int x, int y, float time, float delay) {
 	vector vec = getVector(obj->pos, target);
 	logger->dbg("-- Vector: %d | %d", vec.x, vec.y);
 
-	AnimParam* param = malloc(sizeof(AnimParam));
-
-	param->obj = obj;
-	param->time = time;
-	param->delay = delay * FPS;
-	param->frames = FPS * time;
-	param->callBack = NULL;
-	param->deleteObject = 0;
+	AnimParam* param = initAnimParam(obj, time, delay, animMoveTo);
 	
 	logger->dbg("-- frames: %d", param->frames);
 	logger->dbg("-- time: %f", time);
@@ -198,6 +207,59 @@ AnimParam* moveTo(Object* obj, int x, int y, float time, float delay) {
 	return param;
 }
 
+void* spriteChange(AnimParam* param) {
+	Object* obj = param->obj;
+	Bomb* bomb = NULL;
+	SDL_Rect diff = {0,0,0,0};
+
+	switch(obj->containerType) {
+		case BOMB:
+			bomb = (Bomb*) obj->container;
+			diff.x = param->target.x - bomb->clip.x;
+			diff.y = param->target.y - bomb->clip.y;
+			diff.w = param->target.w - bomb->clip.w;
+			diff.h = param->target.h - bomb->clip.h;
+			
+			bomb->clip = param->target;
+			break;
+	}
+	
+	if (!param->boolean){
+		return NULL;
+	}
+
+	Node* n = NULL;
+	while(n = listIterate(obj->childs, n)) {
+	    Object* child = (Object*) n->value;
+	    child->clip->x += diff.x;
+	    child->clip->y += diff.y;
+	    child->clip->w += diff.w;
+	    child->clip->h += diff.h;
+	}
+}
+
+AnimParam* spriteAnim(Object* obj, SDL_Rect clip, float time, float delay, short applyToChilds) {
+	AnimParam* param = initAnimParam(obj, time, delay, spriteChange);
+
+	param->target = clip;
+	param->boolean = applyToChilds;
+
+	animAddObject(obj, param);
+
+	return param;
+}
+
+AnimParam* customAnim(Object* obj, float loopTime, float delay, short (*fnc) (AnimParam*)) {
+	logger->err("==== Adding Custom Anim ====");
+	logger->err("-- Object: %s", obj->name);
+	AnimParam* param = initAnimParam(obj, loopTime, delay, NULL);
+
+	param->custFnc = fnc;	
+	animAddObject(obj, param);
+
+	logger->err("==== Custom Anim Added ====");
+	return param;
+}
 
 void animate() {
 	logger->inf("==== Animating Objects ====");
@@ -224,13 +286,23 @@ void animate() {
 	    		break;
 	    	}
 
-			logger->dbg("-- calling Anim Function");
-	    	param->fnc(param);
+	    	if (param->fnc != NULL) {
+				logger->dbg("-- calling Anim Function");
+	    		param->fnc(param);
+	    	}
 
 	    	param->frames--;
 			logger->dbg("-- Frames Left: %d", param->frames);
 
 	    	if (param->frames <= 0){
+	    		if (param->custFnc != NULL) {
+	    			short loop = param->custFnc(param);
+	    			if (loop) {
+	    				param->frames = param->time * FPS;
+	    				break;
+	    			}
+	    		}
+
 	    		if (param->callBack != NULL){
 					logger->dbg("-- Animation: #%d CallBack", paramNode->id);
 	    			param->callBack(param);
@@ -257,8 +329,7 @@ void animate() {
 			deleteNode(animator->objects, id);
 			
     		if (objDel != NULL) {
-				logger->dbg("-- Deleting Object");
-				logger->dbg("-- Deleting Object: %s", objDel->name);
+				logger->dbg("-- Anim Deleting Object: %s", objDel->name);
     			deleteObject(objDel);
     			objDel = NULL;
     		}

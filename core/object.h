@@ -15,6 +15,7 @@ struct Collision {
  */
 struct Object {
 	int id;
+	int layerId;
 	short z;	// z-index
 	char* name;
 	
@@ -28,13 +29,17 @@ struct Object {
 	SDL_Rect hitbox;
 
 	void* container;	// Custom Struc ex: Button
+	ObjContType containerType; //
 	ListManager* childs;	// Linked Objects, will be diplayed / animated with parent
+	Object* hitObj;
+
+	unsigned int color;
 
 	SDL_Surface* component;	// SDL Visual
 
 	void* (*click)(Object* obj);	// Click CallBack
 	void* (*hover)(Object* obj);	// Hover Callback
-	void* (*hit)(Object* obj, Object* target);	// Collision Callback
+	void (*hit)(Object* obj, Object* target);	// Collision Callback
 };
 
 
@@ -48,5 +53,8 @@ short layerSort(void* a, void* b);
 void clearObjects();
 Object* genSimpleObject(char* name, void* comp, SDL_Rect* pos, short z);
 short addChild(Object* obj, Object* child);
-
+void setHitBox(Object* obj, SDL_Rect rect);
+void setHitBox(Object* obj, SDL_Rect rect);
+void handleHits();
+ListManager* getHitObjectList();
 #endif

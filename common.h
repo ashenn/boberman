@@ -55,6 +55,8 @@
 #define MAP_SIZE_X 13
 #define MAP_SIZE_Y 9
 
+#define BOMB_SIZE 36
+
 #define UP 0
 #define DOWN 1
 #define RIGHT 2
@@ -63,6 +65,15 @@
 #define WALK_FRAMES 2
 
 #include "core/asset.h"
+
+typedef enum ObjContType ObjContType;
+enum ObjContType
+{
+	NONE,
+	BUTTON,
+	PLAYER,
+	BOMB
+};
 
 typedef struct Button Button;
 typedef struct Object Object;
@@ -88,11 +99,14 @@ struct AnimParam {
 
 	short init;
 	short deleteObject;
+	
 	void* (*fnc)();
+	short (*custFnc)();
 	void (*callBack	)(AnimParam*);
 	
 	Object* obj;
-	SDL_Rect* target;
+	SDL_Rect target;
+	short boolean;
 };
 
 #include "core/player.h"

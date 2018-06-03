@@ -4,12 +4,24 @@
 #include "../common.h"
 
 
+typedef enum ExplosionPart ExplosionPart;
+enum ExplosionPart
+{
+	EXPL_CENTER,
+	EXPL_MID_H,
+	EXPL_MID_V,
+	EXPL_END_TOP,
+	EXPL_END_DOWN,
+	EXPL_END_LEFT,
+	EXPL_END_RIGHT,
+};
+
 typedef struct Bomb Bomb;
 struct Bomb {
 	int id;
 	short z;	// z-index
-	short power;
 	short state;
+	short power;
 	char* name;
 	
 	SDL_Rect clip;
@@ -24,6 +36,7 @@ struct Player {
 	int id;
 	char* name;
 	short alive;
+	short bombPower;
 
 	int clipIndex;
 
@@ -32,9 +45,6 @@ struct Player {
 	short direction;
 
 	Object* object;
-
-	SDL_Surface* sprite;
-	SDL_Surface* component;
 };
 
 ListManager* getPlayerList();
@@ -49,5 +59,6 @@ void playerMove(Player* p, short direction);
 void updatePlayerClip(Player* p);
 
 void placeBomb(Player* p );
+void killPlayer(Player* p);
 
 #endif

@@ -145,11 +145,15 @@ void printObject(Object* obj) {
 		if (obj->clip != NULL) {
 			logger->dbg("-- Clip: x: %d, y: %d, w: %d, h: %d", obj->clip->x, obj->clip->y, obj->clip->w, obj->clip->h);
 		}
+		
 	    SDL_BlitSurface (surf, obj->clip, screen, &obj->pos);
 	    
 	    obj->pos.x = tmpx;
 	    obj->pos.y = tmpy;
 		logger->dbg("-- X=%d | Y=%d", obj->pos.x, obj->pos.y);
+    }
+    else if(obj->color) {
+    	SDL_FillRect(screen, &obj->pos, obj->color);
     }
     else{
 		logger->war("-- Surface Is NULL");
@@ -166,6 +170,7 @@ void render() {
 	Node* objNode = NULL;
 	Node* childNode = NULL;
 	Node* layerNode = NULL;
+	Game* game = getGame();
 
 	if (!layers->nodeCount) {
 		return;
@@ -178,10 +183,10 @@ void render() {
 		if (!objects->nodeCount) {
 			continue;
 		}
-		else if (layerNode->id > 1) {
-			logger->dbg("Sorting List");
-			sortList(objects, &layerSort);
-		}
+		//else if (layerNode->id > 1) {
+			//logger->dbg("Sorting List");
+			//sortList(objects, &layerSort);
+		//}
 
 		objNode = NULL;
 	    while((objNode = listIterate(objects, objNode)) != NULL) {

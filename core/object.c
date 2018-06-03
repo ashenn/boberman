@@ -1,5 +1,116 @@
 #include "object.h"
 
+ListManager* getHitObjectList() {
+	static ListManager* objects = NULL;
+	
+	if (objects != NULL){
+		return objects;
+	}
+
+	logger->inf("==== Init Object Hit List ====");
+	objects = initListMgr();
+	return objects;
+}
+
+void handleHits() {
+	logger->err("==== Verifying Hits ====");
+	Node* n = NULL;
+	Node* n2 = NULL;
+	ListManager* objects = getHitObjectList();
+
+	Object* o = NULL;
+	Object* o2 = NULL;
+	while((n = listIterate(objects, n)) != NULL) {
+	    o = (Object*) n->value;
+	    if (o->hit == NULL) {
+	    	continue;
+	    }
+		logger->err("-- Object: %s", o->name);
+
+		while((n2 = listIterate(objects, n2)) != NULL) {
+		    o2 = (Object*) n2->value;
+			logger->err("-- Checking: %s", o2->name);
+
+		    if (o2->hit == NULL || o2 == o) {
+				logger->err("-- Skipping");
+		    	continue;
+		    }
+
+		    short collides =
+		    	(
+			    	(o2->hitbox.x + o2->pos.x) + o2->hitbox.w >= (o->hitbox.x + o->pos.x) &&
+			    	(o2->hitbox.x + o2->pos.x) + o2->hitbox.w <= (o->hitbox.x + o->pos.x) + o->hitbox.w
+			    	||
+			    	(o->hitbox.x + o->pos.x) + o->hitbox.w >= (o2->hitbox.x + o2->pos.x) &&
+			    	(o->hitbox.x + o->pos.x) + o->hitbox.w <= (o2->hitbox.x + o2->pos.x) + o2->hitbox.w
+		    	)
+		    	&&
+		    	(
+			    	(o2->hitbox.y + o2->pos.y) + o2->hitbox.h >= (o->hitbox.y + o->pos.y) &&
+			    	(o2->hitbox.y + o2->pos.y) + o2->hitbox.h <= (o->hitbox.y + o->pos.y) + o->hitbox.h
+			    	||
+			    	(o->hitbox.y + o->pos.y) + o->hitbox.h >= (o2->hitbox.y + o2->pos.y) &&
+			    	(o->hitbox.y + o->pos.y) + o->hitbox.h <= (o2->hitbox.y + o2->pos.y) + o2->hitbox.h
+		    	)
+		    ;
+
+		    if (collides){
+				logger->err("-- COLLISION!!!!!!");
+		    }
+		}
+
+		n2 = NULL;
+		o2 = NULL;
+	}
+}
+
+void getContainerType(ObjContType type, char* name) {
+	switch (type) {
+		case BUTTON:
+			snprintf(name, 15, "BUTTON");
+			break;
+		case PLAYER:
+			snprintf(name, 15, "PLAYER");
+			break;
+		case BOMB:
+			snprintf(name, 15, "BOMB");
+			break;
+		
+		default:
+			snprintf(name, 15, "BAD CONT_INDEX");
+			break;
+	}
+}
+
+void deleteContainer(void* container, ObjContType type) {
+	logger->inf("=== DELETING CONTAINER ===");
+	
+	char contType[15];
+	getContainerType(type, contType);
+	logger->dbg("-- Type % s", contType);
+
+	Bomb* bmb;
+	Player* p;
+	Button* btn;
+	switch (type) {
+		case BUTTON:
+			btn = (Button*) container;
+			free(btn->anim);
+			break;
+
+		case PLAYER:
+			deletePlayer(container);
+			break;
+
+		default:
+			break;
+	}
+
+	logger->dbg("-- Free");
+	free(container);
+	logger->dbg("=== DELETING CONTAINER DONE ===");
+}
+
 void clearObjects() {
 	Node* n = NULL;
 	logger->dbg("-- Getting Objects");
@@ -48,11 +159,14 @@ short addChild(Object* obj, Object* child) {
 		logger->dbg("-- Init child list");
 		obj->childs = initListMgr();
 	}
+	
 
+	logger->err("-- Child Pos: x: %d + %d, y: %d + %d", child->pos.x, obj->pos.x, child->pos.y, obj->pos.y);
 	child->pos.x += obj->pos.x;
 	child->pos.y += obj->pos.y;
+	logger->err("-- Child Pos: x: %d, y: %d", child->pos.x, child->pos.y);
 
-	Node* n = addNodeV(obj->childs, child->name, child, 0);
+	Node* n = addNodeV(obj->childs, child->name, child, 1);
 	if (n == NULL) {
 		logger->err("==== FAIL TO ADD CHILD NODE =====");
 		return 0;
@@ -83,15 +197,19 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 	obj->visible = 1;
 	obj->enabled = 1;
 
-	obj->name = name;
+	obj->name = malloc(strlen(name)+1);
+	strcpy(obj->name, name);
+
 	obj->component = comp;
 	obj->container = container;
 	
 	obj->hit = NULL;
 	obj->clip = NULL;
+	obj->hitObj = NULL;
 	obj->click = click;
 	obj->hover = hover;
 	
+	obj->color = 0;
 	obj->childs = NULL;
 	obj->hitbox.x = obj->hitbox.y = obj->hitbox.w = obj->hitbox.h = 0;
 
@@ -160,7 +278,7 @@ Object* addSimpleObject(char* name, void* comp, SDL_Rect* pos, short z) {
 
 void deleteObject(Object* obj) {
 	logger->inf("===== Deleting Object ====");
-	logger->inf("--name: %s", obj->name);
+	logger->dbg("--name: %s", obj->name);
 	Node* layer = getNode(getLayers(), obj->z);
 
 	if (obj->childs != NULL) {
@@ -179,6 +297,7 @@ void deleteObject(Object* obj) {
 
 			logger->dbg("-- delete Node");
 			deleteNode(obj->childs, childNode->id);
+			childNode = NULL;
 		}
 
 		deleteList(obj->childs);
@@ -187,22 +306,25 @@ void deleteObject(Object* obj) {
 
 	if (layer != NULL) {
 		logger->dbg("-- Deleting From : %s", layer->name);
-		deleteNodeByName(layer->value, obj->name);
+		deleteNode(layer->value, obj->id);
 
 		logger->dbg("-- Remove From Anim");
 		animRemoveObject(obj);
 	}
 
-	//if (obj->clip != NULL) {
-	//	logger->dbg("-- Free Clip Rect");
-	//	free(obj->clip);
-	//}
+	if (obj->container != NULL) {
+		deleteContainer(obj->container, obj->containerType);
+		obj->container = NULL;
+	}
 
 	logger->dbg("-- Delete Object");
+	free(obj->name);
+	obj->name = NULL;
+
 	ListManager* objects = getObjectList();
 	deleteNode(objects, obj->id);
 	
-	logger->inf("===== DELETE OBJECT DONE ====");
+	logger->dbg("===== DELETE OBJECT DONE ====");
 }
 
 Object* generateButton(Button* btn) {
@@ -253,6 +375,9 @@ Object* generateButton(Button* btn) {
 
 	logger->dbg("-- Adding Button");
 	btn->imgObj = addObject(btn->name, img, &btn->pos, btn->z, btn->click, btn->hover, btn);
+	
+	btn->imgObj->container = btn;
+	btn->imgObj->containerType = BUTTON;
 
 	logger->dbg("-- Adding Text");
 	SDL_Rect rect = {
@@ -276,4 +401,50 @@ Object* generateButton(Button* btn) {
 
 	logger->dbg("==== BUTTON DONE ====");
 	return btn->imgObj;
+}
+
+void setHitBox(Object* obj, SDL_Rect rect) {
+	logger->err("===== Setting Hiy Box ====");
+	logger->err("-- Object: %s", obj->name);
+
+	//rect.x += obj->pos.w / 1.3;
+	logger->err("-- x: %d, y: %d, w: %d, h: %d", rect.x, rect.y, rect.w, rect.h);
+
+	obj->hitbox.x = rect.x;
+	obj->hitbox.y = rect.y;
+	obj->hitbox.w = rect.w;
+	obj->hitbox.h = rect.h;
+
+	Game* game = getGame();
+	logger->err("-- Debug_Hit %d", (game->flags & DBG_HIT) !=0);
+	if (!(game->flags & DBG_HIT)) {
+		return;
+	}
+
+	char boxName[35];
+	snprintf(boxName, 35, "hitBox-%s", obj->name);
+
+	Node* n = NULL;	
+	Object* hitObj = NULL;
+	if (obj->childs != NULL) {
+		n = getNodeByName(obj->childs, boxName);
+	}
+
+	if (n != NULL){
+		hitObj = (Object*) n->value;
+		hitObj->pos.x = rect.x + obj->pos.x;
+		hitObj->pos.y = rect.y + obj->pos.y;
+		hitObj->pos.w = rect.w;
+		hitObj->pos.h = rect.h;
+
+	}
+	else if(hitObj == NULL){
+		logger->err("-- Creating Hit Object: %s", boxName);
+		hitObj = genSimpleObject(boxName, NULL, &rect, 3);
+		hitObj->color = 0x006363EE;
+		addChild(obj, hitObj);
+
+		ListManager* objects = getHitObjectList();
+		addNodeV(objects, boxName, obj, 0);
+	}
 }

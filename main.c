@@ -12,10 +12,14 @@ void* closeApp() {
 	ListManager* players = getPlayerList();
 	free(players);
 
+
+	ListManager* hitObjects = getHitObjectList();
+	logger->dbg("-- Cleaning Hit Objects");
+	deleteList(hitObjects);
+
 	// Cleaning Objects	
 	logger->dbg("-- Cleaning Objects");
 	clearObjects();
-
 
 	ListManager* objects = getObjectList();
 	if (objects != NULL) {
@@ -45,6 +49,8 @@ int main(int argc, char *argv[])
 	SDL_Surface* screen = getScreen();
 
 	Game* game = getGame();
+	game->flags = DBG_HIT;
+
 	mainMenu();
 	while(game->status != GAME_QUIT) {
 		switch (game->status) {
