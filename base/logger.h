@@ -20,6 +20,7 @@
 typedef struct Log{
 	short lvl;	// Output min lvl
 	short isInit;
+	short enabled;
 
 	char* file;	// LogFile Path
 	int f;

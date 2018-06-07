@@ -33,6 +33,10 @@ void log2file(char* lvl, char* msg){
 
 void logg(short lvl, char* msg, va_list* args){
 	Log* logger = getLogger();
+	if (!logger->enabled) {
+		return;
+	}
+
 	char* l = logger->lvls[lvl];
 
 	char message[10000];
@@ -196,6 +200,7 @@ Log* initLogger(int argc, char *argv[]){
 	setLoggerFuncs(logger);
 
 	logger->isInit = 1;
+	logger->enabled = 1;
 
 	parseLogArgs();
 	parseArgs(logger->args, argc, argv);

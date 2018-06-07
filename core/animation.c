@@ -176,6 +176,10 @@ AnimParam* animAddObject(Object* obj, AnimParam* param) {
 }
 
 AnimParam* moveTo(Object* obj, int x, int y, float time, float delay) {
+	if (!canMoveTo(obj, x, y)) {
+		return NULL;
+	}
+
 	logger->inf("==== Animation: Moving: %s to %d | %d (%fs) ====", obj->name, x, y, time);
 	SDL_Rect target;
 	target.x = x;

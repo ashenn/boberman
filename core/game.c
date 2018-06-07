@@ -56,7 +56,9 @@ void launchSate(short status) {
 
 		render();
     	animate();
-    	handleHits();
+    	if (game->status == GAME_LOBY) {
+    		handleHits();
+    	}
 
 		handleEvents();
     	tickWait(now);
@@ -73,14 +75,10 @@ void renderMap() {
 	SDL_Surface* bg = ast->getImg("map");
 	addSimpleObject("Background", bg, NULL, 1);
 
-	Player* p = genPlayer("TEST-PLAYER");
-	initPlayer(p);
-	
-	Player* p2 = genPlayer("TEST-Hit Player");
-	p2->pos.y = 0;
-	p2->pos.x = 12;
+	generateWalls();
 
-	moveTo(p2->object, CELL_SIZE * 12, CELL_SIZE, 0.3, 0);
+	Player* p = genPlayer("PLAYER");
+	initPlayer(p);
 
 	launchSate(GAME_LOBY);
 }
@@ -94,6 +92,7 @@ Game* getGame() {
 
 	logger->inf("==== INIT GAME ====");	
 	game = malloc(sizeof(game));
+	game->flags = NO_FLAG;
 	game->status = GAME_MENU;
 
 	return game;
@@ -285,7 +284,47 @@ void mainMenu() {
 void changeGameStatus(short status) {
 	logger->inf("==== Changing Status: %d ====", status);
 	Game* game = getGame();
-
 	game->status = status;
 }
 
+void* addDebugFlag(char* flag) {
+	Game* game = getGame();
+	if (!strcmp("hit", flag)) {
+		game->flags = game->flags | DBG_HIT;
+	}
+	else if(!strcmp("events", flag)) {
+		game->flags = game->flags | DBG_EVNT;
+	}
+	else if(!strcmp("move", flag)) {
+		game->flags = game->flags | DBG_MOVE;
+	}
+	else if(!strcmp("view", flag)) {
+		game->flags = game->flags | DBG_VIEW;
+	}
+	else if(!strcmp("bomb", flag)) {
+		game->flags = game->flags | DBG_BOMB;
+	}
+	else if(!strcmp("mouse", flag)) {
+		game->flags = game->flags | DBG_MOUSE;
+	}
+}
+
+void parseGameArgs(int argc, char* argv[]){
+	static Arg arg1 = {
+		.name = "-dbg", 
+		.function = addDebugFlag, 
+		.hasParam = 1, 
+		.defParam = NULL, 
+		.asInt = 0,
+		.type="alpha"
+	};
+
+	static  Arg* args[] = {
+		&arg1,
+		NULL
+	};
+
+	ListManager* lst = defineArgs(args);
+	parseArgs(lst, argc, argv);
+	deleteList(lst);
+}

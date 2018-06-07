@@ -79,19 +79,15 @@ int parseArgs(ListManager* lstMgr, int argc, char* argv[]){
 	Arg* val = NULL;
 	int v;
 
+
 	Node* n = getNode(lstMgr, 1);
-	for (i = 0; i < argc; ++i){
-		if (i==0){
-			continue;
-		}
-
-		len = strlen(argv[i]);	
-		arg = malloc((len) * sizeof(char*));
-
+	for (i = 1; i < argc; ++i){
 		if (!isArgument(argv[i])){
 			continue;		
 		}
 
+		len = strlen(argv[i]);	
+		arg = malloc(len+1);
 		substr(argv[i], 1, len, &arg);
 		
 		node = getNodeByName(lstMgr, arg);

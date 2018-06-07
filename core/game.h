@@ -11,13 +11,18 @@
 #define GAME_END 5
 #define GAME_QUIT 6
 
-#define No_FLAG 0
+#define NO_FLAG 0
 #define DBG_HIT 1
+#define DBG_EVNT 2
+#define DBG_MOVE 4
+#define DBG_VIEW 8
+#define DBG_BOMB 16
+#define DBG_MOUSE 32
 
 typedef struct Game Game;
 struct Game {
-	unsigned int flags;
 	short status;
+	unsigned int flags;
 };
 
 Game* getGame();
@@ -27,5 +32,6 @@ void mainMenu();
 void changeGameStatus(short status);
 void renderMap();
 void* loadMap();
+void parseGameArgs(int argc, char* argv[]);
 
 #endif

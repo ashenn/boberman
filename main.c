@@ -12,14 +12,13 @@ void* closeApp() {
 	ListManager* players = getPlayerList();
 	free(players);
 
+	// Cleaning Objects	
+	logger->dbg("-- Cleaning Objects");
+	clearObjects();
 
 	ListManager* hitObjects = getHitObjectList();
 	logger->dbg("-- Cleaning Hit Objects");
 	deleteList(hitObjects);
-
-	// Cleaning Objects	
-	logger->dbg("-- Cleaning Objects");
-	clearObjects();
 
 	ListManager* objects = getObjectList();
 	if (objects != NULL) {
@@ -34,23 +33,24 @@ void* closeApp() {
 	SDL_Quit();
 	
 	logger->dbg("==== Killing Game Proccess ====");
+	logger->close;
 }
 
 int main(int argc, char *argv[])
 {
 	logger = initLogger(argc, argv);
-	//logger->inf("=== Starting App ===");
+	logger->inf("##### START GAME #####");
 
-	//logger->inf("-- Init: SDL");
 	TTF_Init();
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
-	//logger->inf("-- Init: Window");
+	logger->inf("-- Init: Window");
 	SDL_Surface* screen = getScreen();
-
+	
 	Game* game = getGame();
-	game->flags = DBG_HIT;
+	parseGameArgs(argc, argv);
 
+	logger->enabled = 0;
 	mainMenu();
 	while(game->status != GAME_QUIT) {
 		switch (game->status) {

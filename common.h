@@ -52,8 +52,8 @@
 #define MAP_X 42
 #define MAP_Y 76
 
-#define MAP_SIZE_X 13
-#define MAP_SIZE_Y 9
+#define MAP_H 9
+#define MAP_W 13
 
 #define BOMB_SIZE 36
 
@@ -67,53 +67,57 @@
 #include "core/asset.h"
 
 typedef enum ObjContType ObjContType;
-enum ObjContType
-{
-	NONE,
-	BUTTON,
-	PLAYER,
-	BOMB
-};
 
 typedef struct Button Button;
+typedef struct Collision Collision;
 typedef struct Object Object;
 
-typedef struct AnimDistance AnimDistance;
-struct AnimDistance {
-	int perFrame;
-	int rest;
-};
-
-
+typedef struct Animator Animator;
 typedef struct AnimParam AnimParam;
-struct AnimParam {
+typedef struct AnimDistance AnimDistance;
+typedef enum ExplosionPart ExplosionPart;
+
+typedef struct Bomb Bomb;
+struct Bomb {
 	int id;
-	float time;
-	float delay;
+	short z;	// z-index
+	short state;
+	short power;
+	char* name;
 	
-	SDL_Rect pos;
+	SDL_Rect clip;
+	int* clipIndex;
 
-	int frames;
-	AnimDistance xDist;
-	AnimDistance yDist;
-
-	short init;
-	short deleteObject;
-	
-	void* (*fnc)();
-	short (*custFnc)();
-	void (*callBack	)(AnimParam*);
-	
 	Object* obj;
-	SDL_Rect target;
-	short boolean;
+	SDL_Rect pos;
 };
+
+typedef struct Player Player;
+struct Player {
+	int id;
+	char* name;
+	short alive;
+	short bombPower;
+
+	int clipIndex;
+
+	SDL_Rect pos;
+	SDL_Rect clip;
+	short direction;
+
+	Object* object;
+};
+
+void killPlayer(Player* p);
 
 #include "core/player.h"
+#include "core/bomb.h"
 #include "core/event.h"
 #include "main.h"
-#include "core/game.h"
+#include "core/map.h"
+#include "core/collision.h"
 #include "core/object.h"
+#include "core/game.h"
 #include "core/view.h"
 
 #include "base/math.h"

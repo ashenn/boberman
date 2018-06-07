@@ -146,7 +146,7 @@ void printObject(Object* obj) {
 			logger->dbg("-- Clip: x: %d, y: %d, w: %d, h: %d", obj->clip->x, obj->clip->y, obj->clip->w, obj->clip->h);
 		}
 		
-	    SDL_BlitSurface (surf, obj->clip, screen, &obj->pos);
+    	SDL_BlitSurface (surf, obj->clip, screen, &obj->pos);
 	    
 	    obj->pos.x = tmpx;
 	    obj->pos.y = tmpy;
@@ -155,11 +155,29 @@ void printObject(Object* obj) {
     else if(obj->color) {
     	SDL_FillRect(screen, &obj->pos, obj->color);
     }
-    else{
+    else if(obj->childs == NULL || !obj->childs->nodeCount){
 		logger->war("-- Surface Is NULL");
     }
 
 	logger->dbg("==== Printing Object: %s DONE ====", obj->name);
+}
+
+void renderObject(Object* obj) {
+	logger->dbg("-- Object: %s", obj->name);
+	printObject(obj);
+
+	if (obj->childs != NULL) {
+		Node* childNode = NULL;
+		
+		while((childNode = listIterate(obj->childs, childNode)) != NULL) {
+			Object* child = (Object*) childNode->value;
+			logger->dbg("---- Child: %s", child->name);
+
+			if (child->visible) {
+				renderObject(child);
+			}
+		}
+	}
 }
 
 void render() {
@@ -168,7 +186,6 @@ void render() {
 	ListManager* layers = getLayers();
 
 	Node* objNode = NULL;
-	Node* childNode = NULL;
 	Node* layerNode = NULL;
 	Game* game = getGame();
 
@@ -195,19 +212,7 @@ void render() {
     			continue;
     		}
     		
-			logger->dbg("-- Object: %s", obj->name);
-	    	printObject(obj);
-
-	    	if (obj->childs != NULL) {
-	    		while((childNode = listIterate(obj->childs, childNode)) != NULL) {
-	    			Object* child = (Object*) childNode->value;
-					logger->dbg("---- Child: %s", child->name);
-
-	    			if (child->visible) {
-	    				printObject(child);
-	    			}
-	    		}
-	    	}
+			renderObject(obj);
 	    }
 	}
 

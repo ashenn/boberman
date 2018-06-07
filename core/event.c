@@ -1,7 +1,6 @@
 #include "event.h"
 
 void EventQuit() {
-	logger->dbg("-- EVT QUIT");
 	changeGameStatus(GAME_QUIT);
 }
 
@@ -18,25 +17,33 @@ void EventKeyUp(int key, int curKey) {
 }
 
 int EventKeyDown(int key, int curKey) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_EVNT;
+	logger->err("=== Key Event ===");
+
 	if (key == SDLK_ESCAPE || key == SDLK_q) {
+		logger->dbg("-- Event: Quit");
 		EventQuit();
 		return curKey;
 	}
 
 	Player* p = getPlayer();
 	if (p == NULL) {
+		logger->err("-- No Player For Event");
 		return curKey;
 	}
 
+		logger->err("-- Player is Dead");
 	if (!p->alive) {
 		return curKey;
 	}
 
 	switch (key) {
 		case SDLK_UP:
+			logger->err("-- Player Move UP");
 			curKey = SDLK_UP;
 
-			if (p) {
+			if (p && p->alive) {
 				animRemoveObject(p->object);
 				p->clipIndex = 0;
 				playerMove(p, UP);
@@ -44,9 +51,10 @@ int EventKeyDown(int key, int curKey) {
 			break;
 
 		case SDLK_DOWN:
+			logger->err("-- Player Move DOWN");
 			curKey = SDLK_DOWN;
 
-			if (p) {
+			if (p && p->alive) {
 				animRemoveObject(p->object);
 				p->clipIndex = 0;
 				playerMove(p, DOWN);
@@ -54,9 +62,10 @@ int EventKeyDown(int key, int curKey) {
 			break;
 
 		case SDLK_LEFT:
+			logger->err("-- Player Move LEFT");
 			curKey = SDLK_LEFT;
 
-			if (p) {
+			if (p && p->alive) {
 				animRemoveObject(p->object);
 				p->clipIndex = 0;
 				playerMove(p, LEFT);
@@ -64,9 +73,10 @@ int EventKeyDown(int key, int curKey) {
 			break;
 
 		case SDLK_RIGHT:
+			logger->err("-- Player Move RIGHT");
 			curKey = SDLK_RIGHT;
 
-			if (p) {
+			if (p && p->alive) {
 				animRemoveObject(p->object);
 				p->clipIndex = 0;
 				playerMove(p, RIGHT);
@@ -74,21 +84,21 @@ int EventKeyDown(int key, int curKey) {
 			break;
 
 		case SDLK_SPACE:
-			if (p) {
-				logger->dbg("-- Placing Bomb");
+			logger->err("-- Player Place Bomb");
+			if (p && p->alive) {
 				placeBomb(p);
 			}
 			break;
 
 		case SDLK_p:
 		case SDLK_k:
-			if (p) {
+			logger->err("-- Player KILL");
+			if (p && p->alive) {
 				killPlayer(p);
 			}
 			break;
 		
 		default:
-			logger->dbg("-- UN HANDEL %d", key);
 			break;
 	}
 
@@ -98,6 +108,9 @@ int EventKeyDown(int key, int curKey) {
 void EventMouseClick(SDL_Event* event) {
 	Object* clicked = NULL;
 	
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_EVNT;
+
 	logger->dbg("-- EVT KEY BUTTON");
 
 	clicked = getClicked(event->button.x, event->button.y, 0);
@@ -110,6 +123,9 @@ void EventMouseMove(SDL_Event* event) {
 	static int lastX = 0;
 	static int lastY = 0;
 	
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_EVNT;
+
 	Object* hovered = NULL;
 	Object** curHovered = getHovered();
 
@@ -145,8 +161,9 @@ void EventMouseMove(SDL_Event* event) {
 
 void handleEvents() {
 	SDL_Event event;
-	Game* game = NULL;
-	
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_EVNT;
+
 	static int lastX = 0;
 	static int lastY = 0;
 	static int curKey = -1;
@@ -154,10 +171,6 @@ void handleEvents() {
 	Object* clicked = NULL;
 	Object* hovered = NULL;
 	Object** curHovered = getHovered();
-
-	if (game == NULL) {
-		game = getGame();
-	}
 
 	int key;
 	Player* p = getPlayer();
