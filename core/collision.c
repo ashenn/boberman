@@ -144,8 +144,8 @@ void handleHits() {
 		    collides = collides || objCollide;
 
 		    if (objCollide){
-				logger->err("Collision %s | %s", o->name, o2->name);
-				logger->err("Collision Function: %p", col->fnc);
+				logger->dbg("Collision %s | %s", o->name, o2->name);
+				logger->dbg("Collision Function: %p", col->fnc);
 		    	col->fnc(o, o2);
 		    }
 		}
@@ -167,7 +167,7 @@ void handleHits() {
 	logger->dbg("==== Verifying Hits DONE ====");
 }
 
-void setHitBox(Object* obj, SDL_Rect rect, short blocking) {
+void setHitBox(Object* obj, SDL_Rect rect, short blocking, short addToHit) {
 	Game* game = getGame();
 
 	logger->enabled = game->flags & DBG_HIT;
@@ -195,10 +195,12 @@ void setHitBox(Object* obj, SDL_Rect rect, short blocking) {
 
 	char boxName[35];
 	snprintf(boxName, 35, "hitBox-%s", obj->name);
-	ListManager* objects = getHitObjectList();
 	
-	Node* hitNode = addNodeV(objects, boxName, obj, 0);
-	col->id = hitNode->id;
+	if (addToHit) {
+		ListManager* objects = getHitObjectList();
+		Node* hitNode = addNodeV(objects, boxName, obj, 0);
+		col->id = hitNode->id;
+	}
 
 	if (!(game->flags & DBG_HIT)) {
 		logger->enabled = 0;

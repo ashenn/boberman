@@ -42,7 +42,7 @@
 #define true 1
 #define false 0
 
-#define FPS 60
+#define FPS 45
 
 #define PLAYER_W 55
 #define PLAYER_H 83

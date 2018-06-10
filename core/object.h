@@ -41,6 +41,9 @@ struct Object {
 
 	void* (*click)(Object* obj);	// Click CallBack
 	void* (*hover)(Object* obj);	// Hover Callback
+
+	//pthread_cond_t threadCond;
+	//pthread_mutex_t threadMutex;
 };
 
 

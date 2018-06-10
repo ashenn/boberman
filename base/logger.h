@@ -16,6 +16,7 @@
 #define ERROR 3
 
 #include "libParse.h"
+#include <pthread.h>
 
 typedef struct Log{
 	short lvl;	// Output min lvl
@@ -38,6 +39,9 @@ typedef struct Log{
 	char** lvlColors; // Existing debug lvl colors
 
 	ListManager* args;
+
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
 } Log;
 
 

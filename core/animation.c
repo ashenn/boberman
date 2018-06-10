@@ -3,6 +3,9 @@
 #include <math.h>
 
 AnimParam* initAnimParam(Object* obj, float time, float delay, void* fnc) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	AnimParam* param = malloc(sizeof(AnimParam));
 
 	param->obj = obj;
@@ -25,6 +28,9 @@ Animator* getAnimator() {
 		return animator;
 	}
 
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	logger->inf("==== Init Animator ====");
 	animator = malloc(sizeof(Animator));
 	animator->objects = initListMgr();
@@ -33,6 +39,9 @@ Animator* getAnimator() {
 }
 
 AnimDistance animDistanceByFrame(int dist, float time) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	logger->inf("==== Calculation Animation Distance Per Frame ====");
 	logger->dbg("-- dist: %dpx\n--time: %fs", dist, time);
 
@@ -62,12 +71,18 @@ AnimDistance animDistanceByFrame(int dist, float time) {
 }
 
 void animSetPostion(Object* obj, int x, int y) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	logger->inf("==== Set Object Position %s =>  x: %d  | y: %d", obj->name, x, y);
 	obj->pos.x = x;
 	obj->pos.y = y;
 }
 
 void* animMoveTo(AnimParam* param) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	logger->inf("==== Anim Move %s ====", param->obj->name);
 	Object* obj = param->obj;
 
@@ -136,6 +151,9 @@ void* animMoveTo(AnimParam* param) {
 }
 
 void animRemoveObject(Object* obj) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	logger->inf("==== Removing Anim Object: %s ====", obj->name);
 	
 	Animator* animator = getAnimator();
@@ -155,6 +173,9 @@ void animRemoveObject(Object* obj) {
 }
 
 AnimParam* animAddObject(Object* obj, AnimParam* param) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	logger->inf("==== Adding Anim Object: %s ====", obj->name);
 	Animator* animator = getAnimator();
 
@@ -179,6 +200,9 @@ AnimParam* moveTo(Object* obj, int x, int y, float time, float delay) {
 	if (!canMoveTo(obj, x, y)) {
 		return NULL;
 	}
+
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
 
 	logger->inf("==== Animation: Moving: %s to %d | %d (%fs) ====", obj->name, x, y, time);
 	SDL_Rect target;
@@ -212,6 +236,9 @@ AnimParam* moveTo(Object* obj, int x, int y, float time, float delay) {
 }
 
 void* spriteChange(AnimParam* param) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	Object* obj = param->obj;
 	Bomb* bomb = NULL;
 	SDL_Rect diff = {0,0,0,0};
@@ -243,6 +270,9 @@ void* spriteChange(AnimParam* param) {
 }
 
 AnimParam* spriteAnim(Object* obj, SDL_Rect clip, float time, float delay, short applyToChilds) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	AnimParam* param = initAnimParam(obj, time, delay, spriteChange);
 
 	param->target = clip;
@@ -254,6 +284,9 @@ AnimParam* spriteAnim(Object* obj, SDL_Rect clip, float time, float delay, short
 }
 
 AnimParam* customAnim(Object* obj, float loopTime, float delay, short (*fnc) (AnimParam*)) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	logger->err("==== Adding Custom Anim ====");
 	logger->err("-- Object: %s", obj->name);
 	AnimParam* param = initAnimParam(obj, loopTime, delay, NULL);
@@ -266,6 +299,9 @@ AnimParam* customAnim(Object* obj, float loopTime, float delay, short (*fnc) (An
 }
 
 void animate() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ANIM;
+
 	logger->inf("==== Animating Objects ====");
 	Node* objNode = NULL; 
 	Node* paramNode = NULL; 

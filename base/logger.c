@@ -33,23 +33,25 @@ void log2file(char* lvl, char* msg){
 
 void logg(short lvl, char* msg, va_list* args){
 	Log* logger = getLogger();
-	if (!logger->enabled) {
+
+	if (!logger->enabled && lvl < WARNING) {
 		return;
 	}
 
-	char* l = logger->lvls[lvl];
+	if (lvl < logger->lvl){
+		return;
+	}
 
 	char message[10000];
+	char* l = logger->lvls[lvl];
 	vsprintf(message, msg, *args);
 
-	if (lvl >= logger->lvl){
-		fprintf(stdout, "%s[%s] ", logger->lvlColors[lvl], l);
-		printf("%s", message);
-		fprintf(stdout, "%s\n\n\n", KNRM);
+	fprintf(stdout, "%s[%s] ", logger->lvlColors[lvl], l);
+	printf("%s", message);
+	fprintf(stdout, "%s\n\n\n", KNRM);
 
-		if (logger->f > 0)	{
-			log2file(l, message);
-		}
+	if (logger->f > 0)	{
+		log2file(l, message);
 	}
 
 }
@@ -215,6 +217,9 @@ Log* initLogger(int argc, char *argv[]){
 		logger->lvl = 2;
 		logger->inf("No Log lvl: Lvl is set to WARNING");
 	}
+
+	logger->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
+	logger->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 	return logger;
 }

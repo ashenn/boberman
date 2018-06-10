@@ -21,25 +21,17 @@ void* sayGoodbye() {
 }
 
 
-void tickWait(int now) {
-	int delay = 0;
-	int t_deb = 0;
-	int t_fin = 0;
-	int t_boucle = 1000 / FPS;
+void tickWait(int next) {
+	int now = SDL_GetTicks();
+	//logger->dbg("NEXT: %d", next);
+	//logger->dbg("NOW: %d", now);
 
-	t_fin = SDL_GetTicks();
-    if (t_fin - t_deb < t_boucle) {
-	
-		t_fin = SDL_GetTicks();
+	//logger->dbg("DELAY: %d\n", next - now);
+    if(next <= now){
+        return;
+    }
 
-		delay = t_boucle - (t_fin - t_deb);
-		if (delay > 0){
-    		SDL_Delay(t_boucle - (t_fin - t_deb));
-		}
-    };
-
-	//logger->err("DELAY: %d", delay);
-    t_deb = SDL_GetTicks();
+	SDL_Delay(next - now);
 }
 
 void* loadMap() {
@@ -47,27 +39,56 @@ void* loadMap() {
 }
 
 void launchSate(short status) {
+	int y = 0;
 	int i = 0;
 	int now = 0;
+	int add = 0;
+	int nextFrame = 0;
 	Game* game = getGame();
-	while(game->status == status) {
-	    logger->inf("==== Map Tick #%d ====", i++);
-		now = SDL_GetTicks(); 
 
-		render();
-    	animate();
-    	if (game->status == GAME_LOBY) {
+	//logger->err("GAME: Un-Lock");
+	unlock(DBG_VIEW);
+
+	while(game->status == status) {
+		//logger->err("GAME: Ask-Lock");
+		lock(DBG_VIEW);
+		//logger->err("GAME: Lock");
+
+		logger->enabled = game->flags & DBG_STATE;
+
+		now = SDL_GetTicks();
+		add = (int)(1000 / (float)FPS);
+	    
+	    nextFrame = now + add;
+
+		handleEvents();
+    	
+    	if (game->status == GAME_LOBY) {    		
     		handleHits();
     	}
 
-		handleEvents();
-    	tickWait(now);
-
+		logger->enabled = game->flags & DBG_STATE;
 		logger->inf("==== Tick END ====");
+
+
+		//logger->err("GAME: Un-Lock");
+		unlock(DBG_VIEW);
+
+		SDL_Delay(5);
 	}
+
+	logger->err("===== STATE END =====");
 }
 
 void renderMap() {
+	//logger->err("MAP: Ask-Lock");
+	lock(DBG_STATE);
+	//logger->err("MAP: Lock");
+
+	Game* game = getGame();
+
+	logger->enabled = game->flags & DBG_MAP;
+
 	logger->inf("==== LOADING MAP ====");
 	clearObjects();
 
@@ -90,22 +111,32 @@ Game* getGame() {
 		return game;
 	}
 
-	logger->inf("==== INIT GAME ====");	
+	logger->enabled = 1;
+	logger->inf("==== INIT Game* game ====");	
 	game = malloc(sizeof(game));
+
 	game->flags = NO_FLAG;
 	game->status = GAME_MENU;
+	game->renderThread = NULL;
+
+	game->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
+	game->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 	return game;
 }
 
 void quitGame() {
-	logger->inf("==== Quitting Game ====");	
+	logger->enabled = 1;
+	logger->inf("==== Quitting Game* game ====");	
 	Game* game = getGame();
 	game->status = GAME_QUIT;
 }
 
 
 Button** getMenu() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_MENU;
+
 	logger->inf("==== Getting Menu ====");	
 	
 
@@ -265,6 +296,9 @@ Button** getMenu() {
 }
 
 void mainMenu() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_MENU;
+
 	clearObjects();
 	AssetMgr* ast = getAssets();
 
@@ -282,17 +316,20 @@ void mainMenu() {
 }
 
 void changeGameStatus(short status) {
-	logger->inf("==== Changing Status: %d ====", status);
 	Game* game = getGame();
+	logger->enabled = game->flags & DBG_STATE;
+
+	logger->inf("==== Changing Status: %d ====", status);
 	game->status = status;
 }
 
 void* addDebugFlag(char* flag) {
 	Game* game = getGame();
+
 	if (!strcmp("hit", flag)) {
 		game->flags = game->flags | DBG_HIT;
 	}
-	else if(!strcmp("events", flag)) {
+	else if(!strcmp("evnt", flag)) {
 		game->flags = game->flags | DBG_EVNT;
 	}
 	else if(!strcmp("move", flag)) {
@@ -306,6 +343,27 @@ void* addDebugFlag(char* flag) {
 	}
 	else if(!strcmp("mouse", flag)) {
 		game->flags = game->flags | DBG_MOUSE;
+	}
+	else if(!strcmp("asset", flag)) {
+		game->flags = game->flags | DBG_ASSET;
+	}
+ 	else if(!strcmp("anim", flag)) {
+		game->flags = game->flags | DBG_ANIM;
+	}
+	else if(!strcmp("map", flag)) {
+		game->flags = game->flags | DBG_MAP;
+	}
+	else if(!strcmp("obj", flag)) {
+		game->flags = game->flags | DBG_OBJ;
+	}
+	else if(!strcmp("player", flag)) {
+		game->flags = game->flags | DBG_PLAYER;
+	}
+	else if(!strcmp("state", flag)) {
+		game->flags = game->flags | DBG_STATE;
+	}
+	else if(!strcmp("menu", flag)) {
+		game->flags = game->flags | DBG_MENU;
 	}
 }
 

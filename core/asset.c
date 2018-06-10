@@ -1,6 +1,9 @@
 #include "asset.h"
 
 void* getImg(char* name) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
+
 	logger->inf("=== GETTING IMG: %s ===", name);
 	AssetMgr* ast = getAssets();
 	SDL_Surface* img = (SDL_Surface*) ast->isCached(name, ast->imgs);
@@ -29,6 +32,9 @@ void* getImg(char* name) {
 }
 
 void* getFont(char* name, short size) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
+
 	logger->inf("=== GETTING FONT: %s ===", name);
 	AssetMgr* ast = getAssets();
 
@@ -61,6 +67,9 @@ void* getFont(char* name, short size) {
 }
 
 void clearAssets() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
+
 	logger->inf("=== CLEAR ASSETS ===");
 
 	AssetMgr* ast = getAssets();
@@ -71,6 +80,9 @@ void clearAssets() {
 }
 
 void clearImgs() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
+
 	logger->inf("=== CLEAR IMAGES ===");
 	AssetMgr* ast = getAssets();
 
@@ -96,6 +108,9 @@ void clearImgs() {
 }
 
 void clearFonts() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
+
 	logger->inf("=== CLEAR FONTS ===");
 	AssetMgr* ast = getAssets();
 
@@ -121,6 +136,9 @@ void clearFonts() {
 }
 
 void* assetIsCached(char* name, ListManager* cont) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
+
 	logger->dbg("-- Search Cache: %s", name);
 	Node* n = getNodeByName(cont, name);
 	
@@ -133,6 +151,9 @@ void* assetIsCached(char* name, ListManager* cont) {
 }
 
 void* cacheAsset(char* name, ListManager* cont, void* data) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
+
 	logger->dbg("-- Caching: %s", name);
 	Node* n =  addNodeV(cont, name, data, 0);
 	
@@ -144,6 +165,9 @@ void* cacheAsset(char* name, ListManager* cont, void* data) {
 }
 
 void destroyAssets() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
+
 	logger->inf("=== DESTROY ASSESTS ===");
 	AssetMgr* ast = getAssets();
 	
@@ -161,6 +185,9 @@ AssetMgr* getAssets() {
 	if (ast != NULL) {
 		return ast;
 	}
+
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_ASSET;
 
 	logger->inf("=== INIT ASSEST MANAGER ===");
 	ast = malloc(sizeof(AssetMgr));

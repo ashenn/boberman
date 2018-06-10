@@ -24,12 +24,18 @@ ListManager* getPlayerList() {
 		return players;
 	}
 
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_PLAYER;
+
 	logger->inf("==== Init Object List ====");
 	players = initListMgr();
 	return players;
 }
 
 void clearPlayers() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_PLAYER;
+
 	logger->inf("==== CLEAR PLAYER LIST ====");
 	ListManager* players = getPlayerList();
 	Node* n = NULL;
@@ -80,6 +86,9 @@ void* updatePlayers() {
 }
 
 void* deletePlayer(Player* p) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_PLAYER;
+
 	logger->inf("==== DELETING PLAYER: %s ====", p->name);
 	free(p->name);
 
@@ -128,16 +137,21 @@ void updatePlayerClip(Player* p) {
 		}
 	}
 
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_PLAYER;
+
 	logger->dbg("Player Clip Index: %d", p->clipIndex);
 	logger->dbg("Player Clip: x: %d, y: %d, w: %d, h: %d, ", p->clip.x, p->clip.y, p->clip.w, p->clip.h);
 }
 
 Player* genPlayer(char* name) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_PLAYER;
+
 	logger->inf("==== GEN PLAYER: %s ====", name);
 	Player* p = malloc(sizeof(Player));
 
-	logger->enabled = 1;
-	logger->err("-- Player Address %p", p);
+	logger->dbg("-- Player Address %p", p);
 	
 	if (p == NULL) {
 		logger->err("#### Fail To Malloc Player");
@@ -178,7 +192,7 @@ Player* genPlayer(char* name) {
 	updatePlayerClip(p);
 	
 	SDL_Rect hitrect = {18, 60, 20, 15};
-	setHitBox(obj, hitrect, 1);
+	setHitBox(obj, hitrect, 1, 1);
 
 	ListManager* players = getPlayerList();
 	Node* n = addNodeV(players, name, p, 0);
@@ -195,6 +209,9 @@ void playerTickMove(AnimParam* anim) {
 }
 
 void playerMove(Player* p, short direction) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_PLAYER;
+
 	p->direction = direction;
 
 	logger->dbg("Player: %s", p->name);
@@ -225,7 +242,7 @@ void playerMove(Player* p, short direction) {
 	updatePlayerClip(p);
 
 	logger->dbg("Moving To x:%d, y:%d", p->object->pos.x + moveX, p->object->pos.y + moveY);
-	AnimParam* anim = moveTo(p->object, p->object->pos.x + moveX, p->object->pos.y + moveY, 0.15f, 0);
+	AnimParam* anim = moveTo(p->object, p->object->pos.x + moveX, p->object->pos.y + moveY, 0.07f, 0);
 
 	if (anim == NULL) {
 		logger->dbg("CANT MOVE TO POS: x:%d, y:%d", p->object->pos.x + moveX, p->object->pos.y + moveY);
@@ -236,7 +253,9 @@ void playerMove(Player* p, short direction) {
 }
 
 short iteratePlayerKill(AnimParam* anim) {
-	logger->enabled = 1;
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_PLAYER;
+
 	logger->err("==== Iterate Player Kill ====");
 	Object* obj = (Object*) anim->obj;
 	Player* p = (Player*) obj->container;
@@ -257,7 +276,9 @@ short iteratePlayerKill(AnimParam* anim) {
 }
 
 void killPlayer(Player* p) {
-	logger->enabled = 1;
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_PLAYER;
+
 	logger->err("==== KILL PLAYER ====");
 	logger->err("-- Player: %p", p);
 	logger->err("-- Player: %s", p->name);
@@ -267,5 +288,5 @@ void killPlayer(Player* p) {
 	updatePlayerClip(p);
 	p->object->collision->enabled = 0;
 
-	AnimParam* anim = customAnim(p->object, 0.3f, 0, iteratePlayerKill);
+	AnimParam* anim = customAnim(p->object, 0.1f, 0, iteratePlayerKill);
 }

@@ -18,11 +18,23 @@
 #define DBG_VIEW 8
 #define DBG_BOMB 16
 #define DBG_MOUSE 32
+#define DBG_ASSET 64
+#define DBG_MAP 128
+#define DBG_OBJ 256
+#define DBG_PLAYER 512
+#define DBG_STATE 1024
+#define DBG_MENU 2048
+#define DBG_ANIM 4096
 
 typedef struct Game Game;
 struct Game {
 	short status;
 	unsigned int flags;
+
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
+
+	void* renderThread;
 };
 
 Game* getGame();

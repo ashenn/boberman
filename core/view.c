@@ -7,6 +7,9 @@ SDL_Surface* getScreen() {
 		return screen;
 	}
 
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_VIEW;
+
 	logger->inf("==== Init Window ====");
 	SDL_WM_SetCaption("Bomberman", "Bomberman");
 	screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 0, 0);
@@ -15,6 +18,10 @@ SDL_Surface* getScreen() {
 }
 
 void clearScreen() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_VIEW;
+
+
 	logger->dbg("==== Clearing Screen ==== ");
 
 	SDL_Surface* screen = getScreen();
@@ -31,12 +38,20 @@ ListManager* getLayers() {
 		return layers;
 	}
 
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_VIEW;
+
+
 	logger->inf("==== Init Layers ====");
 	layers = initListMgr();
 	return layers;
 }
 
 short setObjectLayer(Object* obj, short z) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_VIEW;
+
+
 	logger->inf("==== Setting Object %s To Layer %d ====", obj->name, z);
 	obj->z = z;
 	
@@ -82,6 +97,10 @@ short isHovered(Object* obj, int x, int y) {
 }
 
 Object* getClicked(int x, int y, short hover) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_MOUSE;
+
+
 	if (!hover) {
 		logger->inf("==== Find Hover ====");
 	}
@@ -127,6 +146,10 @@ Object* getClicked(int x, int y, short hover) {
 }
 
 void printObject(Object* obj) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_VIEW;
+
+
 	logger->inf("==== Printing Object: %s ====", obj->name);
 	logger->dbg("-- x=%d | y=%d", obj->pos.x, obj->pos.y);
 	
@@ -156,14 +179,18 @@ void printObject(Object* obj) {
     	SDL_FillRect(screen, &obj->pos, obj->color);
     }
     else if(obj->childs == NULL || !obj->childs->nodeCount){
-		logger->war("-- Surface Is NULL");
+		logger->war("-- Surface Is NULL for object: %s", obj->name);
     }
 
 	logger->dbg("==== Printing Object: %s DONE ====", obj->name);
 }
 
 void renderObject(Object* obj) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_VIEW;
+
 	logger->dbg("-- Object: %s", obj->name);
+	//pthread_cond_wait (&obj->threadCond, &obj->threadMutex);
 	printObject(obj);
 
 	if (obj->childs != NULL) {
@@ -180,15 +207,11 @@ void renderObject(Object* obj) {
 	}
 }
 
-void render() {
-	logger->inf("==== Rendering ==== ");
-	SDL_Surface* screen = getScreen();
-	ListManager* layers = getLayers();
-
+void renderObjectList() {
 	Node* objNode = NULL;
-	Node* layerNode = NULL;
-	Game* game = getGame();
-
+	Node* layerNode = NULL;	
+	ListManager* layers = getLayers();
+	
 	if (!layers->nodeCount) {
 		return;
 	}
@@ -215,14 +238,67 @@ void render() {
 			renderObject(obj);
 	    }
 	}
+}
 
-    SDL_Flip(screen);
-    SDL_UpdateRect(screen, 0, 0, 0, 0);
+void* render(void* arg) {
+	Game* game = getGame();
+	SDL_Surface* screen = getScreen();
 
-	logger->dbg("==== Rendering DONE ==== ");
+	int t = 0;
+
+	int add = 0;
+	int now = 0;
+    int nextFrame = 0;
+
+	//logger->err("RENDER: Ask-Lock");
+	lock(DBG_VIEW);
+	//logger->err("RENDER: Lock");
+
+	now = SDL_GetTicks();
+	add = (int)(1000 / (float)FPS);
+    nextFrame = now + add;
+
+    while(game->status != GAME_QUIT) {
+
+	    
+	    //logger->err("Start: %d", now);
+	    //logger->err("Add: %d", add);
+	    //logger->err("TOTAL: %d", nextFrame);
+		
+    	t = SDL_GetTicks();
+		//logger->err("==== Rendering ==== ");
+		//logger->inf("==== Animating ==== ");
+		animate();
+		renderObjectList();
+		//pthread_cond_signal(&game->cond);
+
+	    SDL_Flip(screen);
+	    SDL_UpdateRect(screen, 0, 0, 0, 0);
+
+	    //logger->err("RENDER: Un-Lock");
+	    unlock(DBG_VIEW);
+		//logger->err("==== Rendering END %d ====", SDL_GetTicks() - t);
+		
+
+	    tickWait(nextFrame);
+
+    	now = SDL_GetTicks();
+    	add = (int)(1000 / (float)FPS);
+        nextFrame = now + add;
+
+	    //logger->err("RENDER: Ask-Lock");
+	    lock(DBG_VIEW);
+	    //logger->err("RENDER: Lock");
+		//logger->dbg("==== Rendering DONE ==== ");
+    }
+
+    pthread_exit(NULL);
 }
 
 void buttonUnHover(Object* obj) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_MOUSE;
+
 	logger->inf("==== Button Un-Hover %s =====", obj->name);
 	if (obj == NULL){
 		logger->err("-- Object Is Null");
@@ -248,6 +324,10 @@ void buttonUnHover(Object* obj) {
 }
 
 void buttonHover(Object* obj) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_MOUSE;
+
+
 	logger->inf("==== Button Hover %s =====", obj->name);
 	if (obj == NULL){
 		logger->err("Object Is Null");

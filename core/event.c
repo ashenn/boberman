@@ -19,7 +19,7 @@ void EventKeyUp(int key, int curKey) {
 int EventKeyDown(int key, int curKey) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_EVNT;
-	logger->err("=== Key Event ===");
+	logger->inf("=== Key Event ===");
 
 	if (key == SDLK_ESCAPE || key == SDLK_q) {
 		logger->dbg("-- Event: Quit");
@@ -29,18 +29,18 @@ int EventKeyDown(int key, int curKey) {
 
 	Player* p = getPlayer();
 	if (p == NULL) {
-		logger->err("-- No Player For Event");
+		logger->dbg("-- No Player For Event");
 		return curKey;
 	}
 
-		logger->err("-- Player is Dead");
 	if (!p->alive) {
+		logger->dbg("-- Player is Dead");
 		return curKey;
 	}
 
 	switch (key) {
 		case SDLK_UP:
-			logger->err("-- Player Move UP");
+			logger->dbg("-- Player Move UP");
 			curKey = SDLK_UP;
 
 			if (p && p->alive) {
@@ -51,7 +51,7 @@ int EventKeyDown(int key, int curKey) {
 			break;
 
 		case SDLK_DOWN:
-			logger->err("-- Player Move DOWN");
+			logger->dbg("-- Player Move DOWN");
 			curKey = SDLK_DOWN;
 
 			if (p && p->alive) {
@@ -62,7 +62,7 @@ int EventKeyDown(int key, int curKey) {
 			break;
 
 		case SDLK_LEFT:
-			logger->err("-- Player Move LEFT");
+			logger->dbg("-- Player Move LEFT");
 			curKey = SDLK_LEFT;
 
 			if (p && p->alive) {
@@ -73,7 +73,7 @@ int EventKeyDown(int key, int curKey) {
 			break;
 
 		case SDLK_RIGHT:
-			logger->err("-- Player Move RIGHT");
+			logger->dbg("-- Player Move RIGHT");
 			curKey = SDLK_RIGHT;
 
 			if (p && p->alive) {
@@ -84,7 +84,7 @@ int EventKeyDown(int key, int curKey) {
 			break;
 
 		case SDLK_SPACE:
-			logger->err("-- Player Place Bomb");
+			logger->dbg("-- Player Place Bomb");
 			if (p && p->alive) {
 				placeBomb(p);
 			}
@@ -92,7 +92,7 @@ int EventKeyDown(int key, int curKey) {
 
 		case SDLK_p:
 		case SDLK_k:
-			logger->err("-- Player KILL");
+			logger->dbg("-- Player KILL");
 			if (p && p->alive) {
 				killPlayer(p);
 			}
@@ -111,10 +111,11 @@ void EventMouseClick(SDL_Event* event) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_EVNT;
 
-	logger->dbg("-- EVT KEY BUTTON");
+	logger->dbg("-- EVT KEY CLICK");
 
 	clicked = getClicked(event->button.x, event->button.y, 0);
 	if (clicked != NULL && clicked->enabled && clicked->click != NULL) {
+		logger->dbg("-- Clicked: %s", clicked->name);
 		clicked->click(clicked);
 	}
 }
@@ -172,6 +173,10 @@ void handleEvents() {
 	Object* hovered = NULL;
 	Object** curHovered = getHovered();
 
+	//logger->err("EVENT: Ask-Lock");
+	//pthread_mutex_lock(&game->mutex);
+	//logger->err("EVENT: Lock");
+
 	int key;
 	Player* p = getPlayer();
 	logger->inf("==== EVENTS ====");
@@ -206,5 +211,7 @@ void handleEvents() {
 		}
 	}
 
-	logger->dbg("==== DONE ====");
+	//logger->err("EVENT: Un-Lock");
+	//pthread_mutex_unlock(&game->mutex);
+	logger->dbg("==== EVENTS DONE ====");
 }

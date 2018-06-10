@@ -17,5 +17,7 @@ core/player.c \
 core/bomb.c \
 core/map.c \
 -lSDL -lSDL_image -lSDL_ttf \
--fsanitize=address \
+-lpthread \
+-D_REENTRANT \
+-fsanitize=thread \
 -o app

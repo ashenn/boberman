@@ -19,6 +19,9 @@ void getContainerType(ObjContType type, char* name) {
 }
 
 void deleteContainer(void* container, ObjContType type) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+
 	logger->inf("=== DELETING CONTAINER ===");
 	
 	char contType[15];
@@ -48,6 +51,9 @@ void deleteContainer(void* container, ObjContType type) {
 }
 
 void clearObjects() {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+
 	Node* n = NULL;
 	logger->dbg("==== CLEARING Objects ====");
 	logger->dbg("-- Getting Objects");
@@ -74,6 +80,9 @@ void clearObjects() {
 
 /* Function to sort an array using insertion sort*/
 short layerSort(void* a, void* b) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+
 	Object* ao = (Object*)a;
 	Object* bo = (Object*)b;
 	logger->inf("SORT: %s: %d | %s: %d", ao->name, ao->pos.y, bo->name, bo->pos.y);
@@ -88,6 +97,9 @@ short layerSort(void* a, void* b) {
 }
 
 short addChild(Object* obj, Object* child) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+
 	logger->inf("==== Adding Child %s ====", child->name);
 	logger->dbg("-- parent: %s\n-- child: %s", obj->name, child->name);
 	
@@ -126,6 +138,9 @@ ListManager* getObjectList() {
 	if (objects != NULL){
 		return objects;
 	}
+
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
 
 	logger->inf("==== Init Object List ====");
 	objects = initListMgr();
@@ -170,6 +185,14 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 		obj->pos.h = SCREEN_H;
 	}
 
+	//obj->threadCond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
+	//obj->threadMutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+
+	//pthread_cond_signal(&obj->threadCond);
+	//pthread_mutex_unlock(&obj->threadMutex);
+
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
 
 	logger->dbg(
 		"--name: %s\n--z-index: %d\n--click: %d\n--hover: %d\n--pos: x: %d | y:%d | w:%d | h:%d",
@@ -187,6 +210,9 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 }
 
 Object* addObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, void* hover, void* container) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+
 	logger->inf("=== Adding Object %s ===", name);
 	Object* obj = genObject(name, comp, pos, z, click, hover, container);
 	
@@ -219,9 +245,11 @@ Object* addSimpleObject(char* name, void* comp, SDL_Rect* pos, short z) {
 }
 
 void deleteObject(Object* obj) {
-	logger->enabled = 1;
-	logger->err("===== Deleting Object ====");
-	logger->err("--name: %s", obj->name);
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+
+	logger->inf("===== Deleting Object ====");
+	logger->dbg("--name: %s", obj->name);
 	Node* layer = getNode(getLayers(), obj->z);
 
 	if (obj->childs != NULL) {
@@ -262,7 +290,7 @@ void deleteObject(Object* obj) {
 
 	if (obj->collision != NULL) {
 		ListManager* hitObjects = getHitObjectList();
-		logger->err("REMOVING COLLISION: %s", obj->name);
+		logger->dbg("-- Removing collision: %s", obj->name);
 		deleteNode(hitObjects, obj->collision->id);
 
 		free(obj->collision);
@@ -279,6 +307,9 @@ void deleteObject(Object* obj) {
 }
 
 Object* generateButton(Button* btn) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+
 	AssetMgr* ast = getAssets();
 	logger->inf("===== Generating Button ====");
 	

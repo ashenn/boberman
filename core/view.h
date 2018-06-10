@@ -39,12 +39,12 @@ struct Button {
 };
 
 
+void* render(void* arg);
 SDL_Surface* getScreen();
 ListManager* getLayers();
 short setObjectLayer(Object* obj, short z);
 short isHovered(Object* obj, int x, int y);
 Object* getClicked(int x, int y, short hover);
-void render();
 void buttonUnHover(Object* obj);
 void buttonHover(Object* obj);
 void deleteBtn(Button* btn);

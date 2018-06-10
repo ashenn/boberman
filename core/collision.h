@@ -22,8 +22,8 @@ short canMoveTo(Object* obj, int x, int y);
 void prepareCol(Object* obj, Collision* col);
 short doesObjectCollides(Object* o, Object* o2);
 short doesCollide(Collision* col, Collision* col2);
-void setHitBox(Object* obj, SDL_Rect rect, short blocking);
 void prepareColAtPos(Object* obj, Collision* col, int x, int y);
+void setHitBox(Object* obj, SDL_Rect rect, short blocking, short addToHit);
 Object* getObjectByCollision(Collision* col2, short blocking, Object* ignore);
 
 #endif

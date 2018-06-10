@@ -1,9 +1,13 @@
 #include "bomb.h"
 
 void explosionHit(Object* explObj, Object* targetObj) {
-	logger->err("EXPLOSION COLLISION !!!");
-	logger->err("Explosion: %s !!!", explObj->name);
-	logger->err("Target: %s !!!", targetObj->name);
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_BOMB;
+
+
+	logger->dbg("EXPLOSION COLLISION !!!");
+	logger->dbg("Explosion: %s !!!", explObj->name);
+	logger->dbg("Target: %s !!!", targetObj->name);
 
 	if (targetObj->container == NULL) {
 		return;
@@ -91,7 +95,7 @@ void iterateExplosion(AnimParam* anim) {
 		logger->dbg("-- Adjust Clip");
 		SDL_Rect animClip = {0, (y+1) * BOMB_SIZE, BOMB_SIZE, BOMB_SIZE};
 		
-		anim = spriteAnim(anim->obj, animClip, 0.3f, 0, 1);
+		anim = spriteAnim(anim->obj, animClip, 0.1f, 0, 1);
 		anim->callBack = iterateExplosion;
 	}
 }
@@ -178,7 +182,7 @@ void placeExplosion(Bomb* bomb) {
 	obj->containerType = BOMB;
 
 	SDL_Rect hit = {0,0, BOMB_SIZE, BOMB_SIZE};
-	setHitBox(obj, hit, 0);
+	setHitBox(obj, hit, 0, 1);
 	obj->collision->fnc = explosionHit;
 
 	short z;
@@ -236,7 +240,7 @@ void placeExplosion(Bomb* bomb) {
 
 			objPart = genExplosionPart(part, x, y);
 			addChild(obj, objPart);
-			setHitBox(objPart, hit, 0);
+			setHitBox(objPart, hit, 0, 1);
 			objPart->collision->fnc = explosionHit;
 		}
 
@@ -268,13 +272,13 @@ void placeExplosion(Bomb* bomb) {
 
 		objPart = genExplosionPart(part, x, y);
 		addChild(obj, objPart);
-		setHitBox(objPart, hit, 0);
+		setHitBox(objPart, hit, 0, 1);
 		objPart->collision->fnc = explosionHit;
 	}
 
 
 	SDL_Rect animClip = {0, (y+1) * BOMB_SIZE, BOMB_SIZE, BOMB_SIZE};
-	AnimParam* anim = spriteAnim(obj, animClip, 0.2f, 0, 1);
+	AnimParam* anim = spriteAnim(obj, animClip, 0.1f, 0, 1);
 	
 	anim->deleteObject = 0;
 	anim->callBack = iterateExplosion;
@@ -315,8 +319,7 @@ void iterateBomb(AnimParam* anim) {
 	}
 	
 	if (bomb->state < 7) {
-		logger->dbg("PosY: %d", posY);
-		anim = moveTo(obj, bomb->pos.x, posY, 0.5f, 0);
+		anim = moveTo(obj, bomb->pos.x, posY, 0.2f, 0);
 		
 		anim->callBack = iterateBomb;
 	}
@@ -372,7 +375,7 @@ void placeBomb(Player* p) {
 	bomb->obj = obj;
 
 	logger->dbg("-- Animate");
-	AnimParam* anim = moveTo(obj, bomb->pos.x, bomb->pos.y - 10, 0.3f, 0);
+	AnimParam* anim = moveTo(obj, bomb->pos.x, bomb->pos.y - 10, 0.1f, 0);
 	anim->callBack = iterateBomb;
 
 	logger->dbg("==== PLACE BOMB END ====");
