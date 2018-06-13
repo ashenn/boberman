@@ -11,14 +11,15 @@ void* closeApp() {
 	logger->dbg("-- Cleaning Players");
 	clearPlayers();
 	ListManager* players = getPlayerList();
+	logger->dbg("-- Deleting Players List");
 	free(players);
 
 	// Cleaning Objects	
 	logger->dbg("-- Cleaning Objects");
 	clearObjects();
 
-	ListManager* hitObjects = getHitObjectList();
 	logger->dbg("-- Cleaning Hit Objects");
+	ListManager* hitObjects = getHitObjectList();
 	deleteList(hitObjects);
 
 	ListManager* objects = getObjectList();

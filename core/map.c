@@ -13,6 +13,8 @@ void generateWalls() {
 
 	SDL_Rect hit = {0,0, CELL_SIZE, CELL_SIZE};
 	SDL_Rect pos = {0,0, CELL_SIZE, CELL_SIZE};
+
+	int colideWith = COL_PLAYER | COL_BOMB;
 	
 	for (y = 1; y < MAP_H; ++y) {
 		if ( y % 2) {
@@ -29,7 +31,8 @@ void generateWalls() {
 					logger->dbg("pos: x: %d, y: %d", pos.x, pos.y);
 					
 					wall = addSimpleObject(name, NULL, &pos, 2);
-					setHitBox(wall, hit, 1, 1);
+					setHitBox(wall, hit, 1, COL_WALL);
+					wall->collision->colFlags = colideWith;
 					wall->visible = 0;
 				}
 			}
@@ -38,7 +41,9 @@ void generateWalls() {
 
 	int color = 0;
 	if (game->flags & DBG_HIT) {
+		logger->err("FILL COLOR: %d", 0x03B3BEE);
 		color = 0x03B3BEE;
+		//assert(0);
 	}
 
 	hit.x = 0;
@@ -52,12 +57,13 @@ void generateWalls() {
 	pos.h = (MAP_H + 1) * CELL_SIZE;
 
 	wall = addSimpleObject("Map-End-LEFT", NULL, &pos, 2);
-	wall->visible = 0;
+	wall->visible = game->flags & DBG_HIT;
 	wall->color = color;
 
 	hit.w = 25;
 	hit.h = (MAP_H + 1) * CELL_SIZE;
-	setHitBox(wall, hit, 1, 1);
+	setHitBox(wall, hit, 1, COL_WALL);
+	wall->collision->colFlags = colideWith;
 
 	// PLACING MAP END TOP //
 	pos.x = MAP_X - 25;
@@ -67,12 +73,13 @@ void generateWalls() {
 	pos.w = (MAP_W + 1) * CELL_SIZE;
 
 	wall = addSimpleObject("Map-End-Top", NULL, &pos, 2);
-	wall->visible = 0;
+	wall->visible = game->flags & DBG_HIT;
 	wall->color = color;
 
 	hit.h = 25;
 	hit.w = (MAP_W + 1) * CELL_SIZE;
-	setHitBox(wall, hit, 1, 0);
+	setHitBox(wall, hit, 1, COL_WALL);
+	wall->collision->colFlags = colideWith;
 
 	// PLACING MAP END BOTTOM //
 	pos.x = MAP_X - 25;
@@ -82,12 +89,13 @@ void generateWalls() {
 	pos.w = (MAP_W + 1) * CELL_SIZE;
 
 	wall = addSimpleObject("Map-End-BOTTOM", NULL, &pos, 2);
-	wall->visible = 0;
+	wall->visible = game->flags & DBG_HIT;
 	wall->color = color;
 
 	hit.h = 25;
 	hit.w = (MAP_W + 1) * CELL_SIZE;
-	setHitBox(wall, hit, 1, 0);
+	setHitBox(wall, hit, 1, COL_WALL);
+	wall->collision->colFlags = colideWith;
 
 	// PLACING MAP END RIGHT //
 	pos.y = MAP_Y - 25;
@@ -97,12 +105,13 @@ void generateWalls() {
 	pos.h = (MAP_H + 1) * CELL_SIZE;
 
 	wall = addSimpleObject("Map-End-RIGHT", NULL, &pos, 2);
-	wall->visible = 0;
+	wall->visible = game->flags & DBG_HIT;
 	wall->color = color;
 
 	hit.w = 25;
 	hit.h = (MAP_H + 1) * CELL_SIZE;
-	setHitBox(wall, hit, 1, 0);
+	setHitBox(wall, hit, 1, COL_WALL);
+	wall->collision->colFlags = colideWith;
 
 	generateBlocks();
 }
@@ -123,7 +132,7 @@ void generateBlocks() {
 
 	SDL_Rect hit = {0, 0, CELL_SIZE, CELL_SIZE};
 	SDL_Rect pos = {0, 0, CELL_SIZE, CELL_SIZE};
-
+	int colideWith = COL_PLAYER | COL_BOMB;
 
 	for (y = 0; y < MAP_H; ++y) {
 		logger->enabled = game->flags & DBG_MAP;
@@ -157,13 +166,14 @@ void generateBlocks() {
 			pos.x = MAP_X + (x * CELL_SIZE);
 			
 			blockObj = addSimpleObject(name, img, &pos, 2);
-			setHitBox(blockObj, hit, 1, 1);
+			setHitBox(blockObj, hit, 1, COL_WALL);
 			block->obj = blockObj;
 
 			blockObj->visible = 1;
 			blockObj->container = block;
 			blockObj->clip = &block->clip;
 			blockObj->containerType = BLOCK;
+			blockObj->collision->colFlags = colideWith;
 		}
 	}
 }
@@ -192,6 +202,8 @@ void iterateBlock(AnimParam* anim) {
 	else{
 		logger->dbg("-- Prepare To Delete");
 		anim->deleteObject = 1;
+
+		//generateBonus(block->obj->pos);
 	}
 }
 

@@ -16,8 +16,9 @@ core/animation.c \
 core/player.c \
 core/bomb.c \
 core/map.c \
+core/bonus.c \
 -lSDL -lSDL_image -lSDL_ttf \
 -lpthread \
 -D_REENTRANT \
--fsanitize=thread \
+-fsanitize=address \
 -o app

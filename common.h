@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include <pthread.h>
 
@@ -122,5 +123,6 @@ void killPlayer(Player* p);
 
 #include "base/math.h"
 #include "core/animation.h"
+#include "core/bonus.h"
 
 #endif

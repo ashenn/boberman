@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -412,79 +413,148 @@ short listInsertAfter(ListManager* lst, Node* n, short id) {
 		return 0;
 	}
 
-	short inList = getNode(lst, n->id) == NULL ? 0 : 1;
-	if (inList) {
+	short inList = (getNode(lst, n->id) == NULL) ? 0 : 1;
+	if (!inList) {
 		return 0;
 	}
 
+	//fprintf(stdout, "-- Inserting %s After %s\n", n->name, prev->name);
+	if (n->prev == prev) {
+		//fprintf(stdout, "-- Nothing to to\n");
+		return 0;
+	}
+
+
+	//printNodes(lst);
+
+
+	Node* tmpP = n->prev;
+	Node* tmpN = n->next;
+
+	if (tmpP != NULL) {
+		if (tmpN != NULL) {
+			//fprintf(stdout, "-- 1# %s Is Now Before %s\n", tmpP->name, tmpN->name);
+			tmpP->next = tmpN;
+		}
+		else{
+			//fprintf(stdout, "-- 1# %s Is Now LAST\n", tmpP->name);
+			tmpP->next = NULL;
+			lst->last = tmpP;
+		}
+
+	}
+
+	if (tmpN != NULL) {
+		if (tmpP != NULL) {
+			//fprintf(stdout, "-- 2# %s Is Now After %s\n", tmpN->name, tmpP->name);
+			tmpN->prev = tmpP;
+		}
+		else{
+			//fprintf(stdout, "-- 2# %s Is Now FIRST\n", tmpN->name);
+			tmpN->prev = NULL;
+			lst->first = tmpN;
+		}
+	}
+
 	n->prev = prev;
+	//fprintf(stdout, "-- 3# %s Is Now Before %s\n", prev->name, n->name);
+	
 	n->next = prev->next;
+	//fprintf(stdout, "-- 4# %s Is Now Before %s\n", n->name, prev->next->name);
+
 	n->lstMgr = lst;
 
-	if (prev->next != NULL)
-	{
+	if (prev->next != NULL) {
 		prev->next->prev = n;
 	}
 
 	prev->next = n;
+	//fprintf(stdout, "-- 5# %s Is Now Before %s\n", prev->name, n->name);
 
 	if (prev == lst->last){
 		lst->last = n;
+		n->next = NULL;
 	}
 
-	lst->nodeCount++;
+	//fprintf(stdout, "==============\n");
+	//lst->nodeCount++;
 
 	return 1;
 }
 
 void sortList(ListManager * lst, short (*fnc)(void*, void*)) {
+	//fprintf(stdout, "========= SORTING LIST =========\n");
+	
 	int i;
 	short sort = 0;
 	Node* tmp = NULL;
 	Node* comp = NULL;
-	for (i = 1; i < lst->nodeCount; i++) {
-		Node* key = lst->first->next;
 
+	Node* key = lst->first->next;
+	for (i = 1; i < lst->nodeCount; i++) {
     	comp = key->prev;
+
+		//fprintf(stdout, "##### Node %d: %s #####\n", key->id, key->name);
+
         do {
-			// printf("-- c: %d\n", comp->id);
+			//fprintf(stdout, "-- Compare %d: %s\n", comp->id, comp->name);
+        	if (key == comp) {
+				//fprintf(stdout, "-- Skipping\n");
+        		comp = key->next;
+        		continue;
+        	}
+
+    		
     		sort = (*fnc)(comp->value, key->value);
 			
-			// printf("-- s: %d\n", sort);
+			//fprintf(stdout, "-- Res: %d\n", sort);
 
     		if (sort < 0) {
     			tmp = NULL;
+				//fprintf(stdout, "+++++ Moving: %s\n", key->name);
     			while((tmp = listIterate(lst, tmp)) != NULL) {
     				if (tmp == comp) {
+						//fprintf(stdout, "-- Skipping\n");
     					break;
     				}
 
-					// printf("++++ t: %d\n", tmp->id);
-
+					//fprintf(stdout, "-- Compare %d: %s\n", tmp->id, tmp->name);
 					sort = fnc(comp->value, tmp->value);
+					
+					//fprintf(stdout, "-- Res: %d\n", sort);
+
     			    if (sort < 0) {
-						// printf("Inserting %d Before %d\n", comp->id, tmp->id);
 						listInsertAfter(lst, comp, tmp->id);
 						listInsertAfter(lst, tmp, comp->id);
+						break;
     			    }
-					// printf("+++++++++++++++++++++++++\n");
+
+					//fprintf(stdout, "+++++++++++++++++++++++++\n");
     			}
+
+
+				//fprintf(stdout, "+++++ ASSERTING ++++\n");
+    			//printNodes(lst);
+				//assert(0);
     		}
 	
     		comp = comp->next;
-			// printf("================================================\n");
+			//fprintf(stdout, "================================================\n");
         } while (comp != NULL);
 
-		// printf("--------------------------------------------------------------------\n");
+		//fprintf(stdout, "--------------------------------------------------------------------\n");
    		key = key->next;
         if (key == NULL) {
         	break;
         }
+	
 	}	
 	
-	// printf("==== Sort Completed ====\n");
+	//fprintf(stdout, "==== Sort Completed ====\n");
 	tmp = NULL;
 	while((tmp = listIterate(lst, tmp)) != NULL) {
-		// printf("-- %d\n", tmp->id);
+		//printf("-- Node: %d: %s\n", tmp->id, tmp->name);
 	}
+
+	//assert(0);
 }

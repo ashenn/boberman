@@ -181,9 +181,12 @@ void placeExplosion(Bomb* bomb) {
 	obj->container = bomb;
 	obj->containerType = BOMB;
 
+	int colideWith = COL_PLAYER | COL_WALL;
+
 	SDL_Rect hit = {0,0, BOMB_SIZE, BOMB_SIZE};
-	setHitBox(obj, hit, 0, 1);
+	setHitBox(obj, hit, 0, COL_BOMB);
 	obj->collision->fnc = explosionHit;
+	obj->collision->colFlags = colideWith;
 
 	short z;
 	short x;
@@ -240,8 +243,9 @@ void placeExplosion(Bomb* bomb) {
 
 			objPart = genExplosionPart(part, x, y);
 			addChild(obj, objPart);
-			setHitBox(objPart, hit, 0, 1);
+			setHitBox(objPart, hit, 0, COL_BOMB);
 			objPart->collision->fnc = explosionHit;
+			obj->collision->colFlags = colideWith;
 		}
 
 		switch (dir) {
@@ -272,8 +276,9 @@ void placeExplosion(Bomb* bomb) {
 
 		objPart = genExplosionPart(part, x, y);
 		addChild(obj, objPart);
-		setHitBox(objPart, hit, 0, 1);
+		setHitBox(objPart, hit, 0, COL_BOMB);
 		objPart->collision->fnc = explosionHit;
+		obj->collision->colFlags = colideWith;
 	}
 
 

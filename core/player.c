@@ -27,7 +27,7 @@ ListManager* getPlayerList() {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_PLAYER;
 
-	logger->inf("==== Init Object List ====");
+	logger->inf("==== Init Player List ====");
 	players = initListMgr();
 	return players;
 }
@@ -163,7 +163,7 @@ Player* genPlayer(char* name) {
 	strcpy(p->name, name);
 
 	p->alive = 1;
-	p->bombPower = 3;
+	p->bombPower = 1;
 	p->direction = DOWN;
 	
 	p->pos.x = 0;
@@ -192,7 +192,8 @@ Player* genPlayer(char* name) {
 	updatePlayerClip(p);
 	
 	SDL_Rect hitrect = {18, 60, 20, 15};
-	setHitBox(obj, hitrect, 1, 1);
+	setHitBox(obj, hitrect, 1, COL_PLAYER);
+	obj->collision->colFlags = COL_ALL;
 
 	ListManager* players = getPlayerList();
 	Node* n = addNodeV(players, name, p, 0);

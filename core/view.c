@@ -176,6 +176,7 @@ void printObject(Object* obj) {
 		logger->dbg("-- X=%d | Y=%d", obj->pos.x, obj->pos.y);
     }
     else if(obj->color) {
+    	logger->err("FILL COLOR: ");
     	SDL_FillRect(screen, &obj->pos, obj->color);
     }
     else if(obj->childs == NULL || !obj->childs->nodeCount){
@@ -223,10 +224,10 @@ void renderObjectList() {
 		if (!objects->nodeCount) {
 			continue;
 		}
-		//else if (layerNode->id > 1) {
-			//logger->dbg("Sorting List");
-			//sortList(objects, &layerSort);
-		//}
+		else if (layerNode->id > 1) {
+			//logger->err("===== Sorting List =====");
+			sortList(objects, &layerSort);
+		}
 
 		objNode = NULL;
 	    while((objNode = listIterate(objects, objNode)) != NULL) {

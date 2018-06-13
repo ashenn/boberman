@@ -8,6 +8,7 @@ enum ObjContType
 	NONE,
 	BOMB,
 	BLOCK,
+	BONUS,
 	BUTTON,
 	PLAYER
 };

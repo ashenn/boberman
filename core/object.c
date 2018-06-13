@@ -85,14 +85,14 @@ short layerSort(void* a, void* b) {
 
 	Object* ao = (Object*)a;
 	Object* bo = (Object*)b;
-	logger->inf("SORT: %s: %d | %s: %d", ao->name, ao->pos.y, bo->name, bo->pos.y);
+	//logger->err("SORT: %s: %d | %s: %d", ao->name, ao->pos.y, bo->name, bo->pos.y);
 
 	if (ao->pos.y == bo->pos.y) {
-		logger->inf("-1");
+		//logger->err("0");
 		return 0;
 	}
 
-	logger->inf("%d", (ao->pos.y < bo->pos.y) ? -1 : 1);
+	//logger->err("%d", (ao->pos.y < bo->pos.y) ? -1 : 1);
 	return (ao->pos.y < bo->pos.y) ? -1 : 1;
 }
 

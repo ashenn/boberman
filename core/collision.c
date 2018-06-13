@@ -99,13 +99,16 @@ void handleHits() {
 
 	Object* o = NULL;
 	Object* o2 = NULL;
+	short deleted = 0;
 
 	while((n = listIterate(objects, n)) != NULL) {
+		deleted = 0;
 	    o = (Object*) n->value;
 		Collision* col = o->collision;
 	    if (col == NULL || !col->enabled || col->fnc == NULL) {
 	    	continue;
 	    }
+
 
 		logger->dbg("++++ Object: %s", o->name);
 
@@ -140,6 +143,26 @@ void handleHits() {
 		    	continue;
 		    }
 
+		    /*if (col->flag == COL_NONE || col2->flag == COL_NONE)
+		    {
+				logger->dbg("-- Skipping COL NONE");
+				continue;
+		    }
+
+		    if (col->colFlags != COL_ALL && col2->colFlags != COL_ALL) {
+
+			    if (!(col->colFlags & col2->flag) || !(col2->colFlags & col->flag)) {
+					logger->dbg("-- Does Not Collide Fags\n%s | %s", o->name, o2->name);
+					logger->dbg("-- %d | %d", col->flag, col2->flag);
+					logger->dbg("-- %d | %d", col->colFlags, col2->colFlags);
+					logger->dbg("-- %d | %d", col->colFlags & col2->flag, col2->colFlags & col->flag);
+					continue;
+			    }
+		    }
+		    */
+
+
+
 			short objCollide = doesObjectCollides(o, o2);
 		    collides = collides || objCollide;
 
@@ -148,15 +171,25 @@ void handleHits() {
 				logger->dbg("Collision Function: %p", col->fnc);
 		    	col->fnc(o, o2);
 		    }
+
+		    if (objCollide && col->deleteOnCol) {
+				logger->dbg("DELETING OBJECT  %s", o->name);
+		    	n = n->prev;
+		    	deleteObject(o);
+		    	deleted = 1;
+		    	break;
+		    }
 		}
 
-		if (collides) {
-			if (game->flags & DBG_HIT) {
-				col->dbgObj->clip->x = 320;
+		if (!deleted) {
+			if (collides) {
+				if (game->flags & DBG_HIT) {
+					col->dbgObj->clip->x = 320;
+				}
 			}
-		}
-		else if (game->flags & DBG_HIT) {
-    		col->dbgObj->clip->x = 0;
+			else if (game->flags & DBG_HIT) {
+	    		col->dbgObj->clip->x = 0;
+			}
 		}
 
 		n2 = NULL;
@@ -167,7 +200,7 @@ void handleHits() {
 	logger->dbg("==== Verifying Hits DONE ====");
 }
 
-void setHitBox(Object* obj, SDL_Rect rect, short blocking, short addToHit) {
+void setHitBox(Object* obj, SDL_Rect rect, short blocking, int flag) {
 	Game* game = getGame();
 
 	logger->enabled = game->flags & DBG_HIT;
@@ -181,7 +214,11 @@ void setHitBox(Object* obj, SDL_Rect rect, short blocking, short addToHit) {
 		col = malloc(sizeof(Collision));
 		col->fnc = NULL;
 		col->enabled = 1;
+		col->flag = flag;
 		col->dbgObj = NULL;
+		col->deleteOnCol = 0;
+		col->colFlags = COL_NONE;
+		
 		obj->collision = col;
 	}
 
@@ -196,11 +233,9 @@ void setHitBox(Object* obj, SDL_Rect rect, short blocking, short addToHit) {
 	char boxName[35];
 	snprintf(boxName, 35, "hitBox-%s", obj->name);
 	
-	if (addToHit) {
-		ListManager* objects = getHitObjectList();
-		Node* hitNode = addNodeV(objects, boxName, obj, 0);
-		col->id = hitNode->id;
-	}
+	ListManager* objects = getHitObjectList();
+	Node* hitNode = addNodeV(objects, boxName, obj, 0);
+	col->id = hitNode->id;
 
 	if (!(game->flags & DBG_HIT)) {
 		logger->enabled = 0;
