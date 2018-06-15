@@ -2,7 +2,7 @@
 
 void generateWalls() {
 	Game* game = getGame();
-	logger->enabled = game->flags & DBG_MAP;
+	enableLogger(DBG_MAP);
 
 	logger->inf("==== PLACING WALLS ====");
 	int x;
@@ -41,7 +41,7 @@ void generateWalls() {
 
 	int color = 0;
 	if (game->flags & DBG_HIT) {
-		logger->err("FILL COLOR: %d", 0x03B3BEE);
+		logger->dbg("FILL COLOR: %d", 0x03B3BEE);
 		color = 0x03B3BEE;
 		//assert(0);
 	}
@@ -132,7 +132,6 @@ void generateBlocks() {
 
 	SDL_Rect hit = {0, 0, CELL_SIZE, CELL_SIZE};
 	SDL_Rect pos = {0, 0, CELL_SIZE, CELL_SIZE};
-	int colideWith = COL_PLAYER | COL_BOMB;
 
 	for (y = 0; y < MAP_H; ++y) {
 		logger->enabled = game->flags & DBG_MAP;
@@ -157,10 +156,11 @@ void generateBlocks() {
 			block->state = 0;
 			block->destroyed = 0;
 
-			block->clip.y = CELL_SIZE;
+			block->clip.x = 0;
+			block->clip.y = 2 * BONUS_SIZE;
+			
 			block->clip.w = CELL_SIZE;
 			block->clip.h = CELL_SIZE;
-			block->clip.x = 2 * CELL_SIZE;
 
 			pos.y = MAP_Y + (y * CELL_SIZE);
 			pos.x = MAP_X + (x * CELL_SIZE);
@@ -172,8 +172,11 @@ void generateBlocks() {
 			blockObj->visible = 1;
 			blockObj->container = block;
 			blockObj->clip = &block->clip;
+
 			blockObj->containerType = BLOCK;
-			blockObj->collision->colFlags = colideWith;
+
+			blockObj->collision->flag = COL_BLOCK;
+			blockObj->collision->colFlags = COL_PLAYER | COL_BOMB;
 		}
 	}
 }
@@ -182,28 +185,40 @@ void iterateBlock(AnimParam* anim) {
 	Object* obj = (Object*) anim->obj;
 	Block* block = (Block*) obj->container;
 
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_MAP;
+	enableLogger(DBG_MAP);
 
 	block->state++;
 	logger->dbg("-- Block state: %d", block->state);
 	
-	SDL_Rect animClip = {0, CELL_SIZE, CELL_SIZE, CELL_SIZE};
-	animClip.x = (block->state + 1) * CELL_SIZE;
+	SDL_Rect animClip = {0, 0, CELL_SIZE, CELL_SIZE};
+	
+	animClip.y = 2 * BONUS_SIZE;
+	animClip.x = (block->state) * CELL_SIZE;
 
-	block->clip.y = CELL_SIZE;
-	block->clip.x = (block->state + 2) * CELL_SIZE;
+	block->clip.y = BONUS_SIZE * 2;
+	block->clip.x = (block->state) * CELL_SIZE;
+
+	//logger->dbg("Cur Clip: x: %d, y: %d", block->clip.x, block->clip.y);
+	
 
 	if (block->state < 3) {
 		logger->dbg("-- Block iterate");
-		AnimParam* anim = spriteAnim(block->obj, animClip, 0.3f, 0, 0);
+		AnimParam* anim = spriteAnim(block->obj, animClip, 0.1f, 0, 0);
 		anim->callBack = iterateBlock;
 	}
 	else{
 		logger->dbg("-- Prepare To Delete");
 		anim->deleteObject = 1;
 
-		//generateBonus(block->obj->pos);
+
+		SDL_Rect bonuPos;
+		bonuPos.x = block->obj->pos.x + (BONUS_SIZE / 4);
+		bonuPos.y = block->obj->pos.y + (BONUS_SIZE / 4);
+
+		bonuPos.w = BONUS_SIZE;
+		bonuPos.h = BONUS_SIZE;
+
+		generateBonus(bonuPos);
 	}
 }
 
@@ -212,12 +227,15 @@ void breakBlock(Block* block) {
 		return;
 	}
 
-	block->state++;
+	block->state = 0;
 	block->destroyed = 1;
 	
-	SDL_Rect animClip = {0, CELL_SIZE, CELL_SIZE, CELL_SIZE};
-	animClip.x = (block->state + 1) * CELL_SIZE;
+	SDL_Rect animClip = {0, 0, CELL_SIZE, CELL_SIZE};
+	
+	animClip.x = 0;
+	animClip.y = 2 * BONUS_SIZE;
+	//logger->dbg("Break Clip: x: %d, y: %d", animClip.x, animClip.y);
 
-	AnimParam* anim = spriteAnim(block->obj, animClip, 0.3f, 0, 0);
+	AnimParam* anim = spriteAnim(block->obj, animClip, 0.1f, 0, 0);
 	anim->callBack = iterateBlock;
 }

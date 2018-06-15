@@ -57,6 +57,7 @@
 #define MAP_W 13
 
 #define BOMB_SIZE 36
+#define BONUS_SIZE 36
 
 #define UP 0
 #define DOWN 1
@@ -64,6 +65,7 @@
 #define LEFT 3
 
 #define WALK_FRAMES 2
+#define TICK_FRAMES 35
 
 #include "core/asset.h"
 
@@ -78,27 +80,18 @@ typedef struct AnimParam AnimParam;
 typedef struct AnimDistance AnimDistance;
 typedef enum ExplosionPart ExplosionPart;
 
-typedef struct Bomb Bomb;
-struct Bomb {
-	int id;
-	short z;	// z-index
-	short state;
-	short power;
-	char* name;
-	
-	SDL_Rect clip;
-	int* clipIndex;
-
-	Object* obj;
-	SDL_Rect pos;
-};
-
 typedef struct Player Player;
 struct Player {
 	int id;
 	char* name;
 	short alive;
+	
+	float speed;
+	short shoot;
+	short bombCnt;
+	short bombMax;
 	short bombPower;
+	short canPlaceBomb;
 
 	int clipIndex;
 
@@ -107,6 +100,27 @@ struct Player {
 	short direction;
 
 	Object* object;
+};
+
+typedef struct Bomb Bomb;
+struct Bomb {
+	int id;
+	short z;	// z-index
+	short state;
+	short power;
+	char* name;
+	short exploded;
+	short direction;
+	
+	short moveIterate;
+
+	Player* owner;
+	
+	SDL_Rect clip;
+	int* clipIndex;
+
+	Object* obj;
+	SDL_Rect pos;
 };
 
 void killPlayer(Player* p);

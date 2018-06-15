@@ -9,6 +9,7 @@
 #define COL_BONUS 4
 #define COL_PLAYER 8
 #define COL_ALL 16
+#define COL_BLOCK 32
 
 struct Collision {
 	SDL_Rect pos;
@@ -18,8 +19,8 @@ struct Collision {
 	short colFlags;
 
 	short enabled;
-	short deleteOnCol;
 	short blocking;
+	short deleteOnCol;
 
 	Object* dbgObj;
 

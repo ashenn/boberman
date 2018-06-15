@@ -42,6 +42,8 @@ void logg(short lvl, char* msg, va_list* args){
 		return;
 	}
 
+	pthread_mutex_lock(&logger->mutex);
+	
 	char message[10000];
 	char* l = logger->lvls[lvl];
 	vsprintf(message, msg, *args);
@@ -54,6 +56,7 @@ void logg(short lvl, char* msg, va_list* args){
 		log2file(l, message);
 	}
 
+	pthread_mutex_unlock(&logger->mutex);
 }
 
 

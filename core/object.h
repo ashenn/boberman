@@ -21,6 +21,7 @@ struct Object {
 	int layerId;
 	short z;	// z-index
 	char* name;
+	short lifetime;
 	
 	short visible;	// Displayed
 	short enabled;	// Clickable / Hoverable
@@ -43,6 +44,7 @@ struct Object {
 	void* (*click)(Object* obj);	// Click CallBack
 	void* (*hover)(Object* obj);	// Hover Callback
 
+	void (*onDelete)(Object* obj);	// Hover Callback
 	//pthread_cond_t threadCond;
 	//pthread_mutex_t threadMutex;
 };
@@ -58,4 +60,6 @@ short layerSort(void* a, void* b);
 Object* generateButton(Button* btn);
 short addChild(Object* obj, Object* child);
 Object* genSimpleObject(char* name, void* comp, SDL_Rect* pos, short z);
+
+void clearOutdatedObjects();
 #endif

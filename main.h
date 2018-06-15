@@ -12,5 +12,6 @@ void unlockLogger(int flag);
 
 void lock(int flag);
 void unlock(int flag);
+void enableLogger(int flag);
 
 #endif

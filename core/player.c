@@ -1,5 +1,20 @@
 #include "player.h"
 
+void resetPlayersBomb() {
+	Node* n = NULL;
+	ListManager* players = getPlayerList();
+
+	while((n = listIterate(players, n)) != NULL) {
+	    Player* p = (Player*) n->value;
+
+	    if (p == NULL || !p->alive) {
+	    	continue;
+	    }
+
+	    p->bombCnt = p->bombMax;
+	}
+}
+
 void playerHit(Object* o1, Object*o2) {
 
 }
@@ -24,8 +39,7 @@ ListManager* getPlayerList() {
 		return players;
 	}
 
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_PLAYER;
+	enableLogger(DBG_PLAYER);
 
 	logger->inf("==== Init Player List ====");
 	players = initListMgr();
@@ -33,8 +47,7 @@ ListManager* getPlayerList() {
 }
 
 void clearPlayers() {
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_PLAYER;
+	enableLogger(DBG_PLAYER);
 
 	logger->inf("==== CLEAR PLAYER LIST ====");
 	ListManager* players = getPlayerList();
@@ -86,8 +99,7 @@ void* updatePlayers() {
 }
 
 void* deletePlayer(Player* p) {
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_PLAYER;
+	enableLogger(DBG_PLAYER);
 
 	logger->inf("==== DELETING PLAYER: %s ====", p->name);
 	free(p->name);
@@ -137,16 +149,14 @@ void updatePlayerClip(Player* p) {
 		}
 	}
 
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_PLAYER;
+	enableLogger(DBG_PLAYER);
 
 	logger->dbg("Player Clip Index: %d", p->clipIndex);
 	logger->dbg("Player Clip: x: %d, y: %d, w: %d, h: %d, ", p->clip.x, p->clip.y, p->clip.w, p->clip.h);
 }
 
 Player* genPlayer(char* name) {
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_PLAYER;
+	enableLogger(DBG_PLAYER);
 
 	logger->inf("==== GEN PLAYER: %s ====", name);
 	Player* p = malloc(sizeof(Player));
@@ -163,7 +173,12 @@ Player* genPlayer(char* name) {
 	strcpy(p->name, name);
 
 	p->alive = 1;
+	p->shoot = 0;
+	p->speed = 1.0f;
+	p->bombCnt = 1;
+	p->bombMax = 1;
 	p->bombPower = 1;
+	p->canPlaceBomb = 1;
 	p->direction = DOWN;
 	
 	p->pos.x = 0;
@@ -210,8 +225,7 @@ void playerTickMove(AnimParam* anim) {
 }
 
 void playerMove(Player* p, short direction) {
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_PLAYER;
+	enableLogger(DBG_PLAYER);
 
 	p->direction = direction;
 
@@ -223,19 +237,19 @@ void playerMove(Player* p, short direction) {
 
 	switch (direction) {
 		case UP:
-			moveY = -10;
+			moveY = -10 * p->speed;
 			break;
 
 		case DOWN:
-			moveY = 10;
+			moveY = 10 * p->speed;
 			break;
 
 		case RIGHT:
-			moveX = 10;
+			moveX = 10 * p->speed;
 			break;
 
 		case LEFT:
-			moveX = -10;
+			moveX = -10 * p->speed;
 			break;
 	}
 
@@ -254,10 +268,9 @@ void playerMove(Player* p, short direction) {
 }
 
 short iteratePlayerKill(AnimParam* anim) {
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_PLAYER;
+	enableLogger(DBG_PLAYER);
 
-	logger->err("==== Iterate Player Kill ====");
+	logger->dbg("==== Iterate Player Kill ====");
 	Object* obj = (Object*) anim->obj;
 	Player* p = (Player*) obj->container;
 
@@ -266,28 +279,30 @@ short iteratePlayerKill(AnimParam* anim) {
 	updatePlayerClip(p);
 
 	if (p->clipIndex > 6) {
-		logger->err("=== PLAYER ILL DONE DELETING");
+		logger->dbg("=== PLAYER ILL DONE DELETING");
 		anim->deleteObject = 1;
 		obj->visible = 0;
 		return 0;
 	}
 
-	logger->err("==== Iterate Player Kill DONE ====");
+	logger->dbg("==== Iterate Player Kill DONE ====");
 	return 1;
 }
 
 void killPlayer(Player* p) {
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_PLAYER;
+	enableLogger(DBG_PLAYER);
 
-	logger->err("==== KILL PLAYER ====");
-	logger->err("-- Player: %p", p);
-	logger->err("-- Player: %s", p->name);
+	logger->inf("==== KILL PLAYER ====");
+	logger->dbg("-- Player: %p", p);
+	logger->dbg("-- Player: %s", p->name);
+
+	animRemoveObject(p->object);
 
 	p->alive = 0;
 	p->clipIndex = 0;
 	updatePlayerClip(p);
 	p->object->collision->enabled = 0;
+
 
 	AnimParam* anim = customAnim(p->object, 0.1f, 0, iteratePlayerKill);
 }

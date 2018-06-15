@@ -1,5 +1,24 @@
 #include "object.h"
 
+void clearOutdatedObjects() {
+	Node* n = NULL;
+	ListManager* objects = getObjectList();
+
+	while((n = listIterate(objects, n)) != NULL) {
+	    Object* o = (Object*) n->value;
+	    if (o->lifetime == -1){
+	    	continue;
+	    }
+
+	    logger->dbg("objectLife: %d", o->lifetime);
+	    if (--o->lifetime <= 0){
+	    	logger->dbg("Deleting: %s", o->name);
+	    	n = n->prev;
+	    	deleteObject(o);
+	    }
+	}
+}
+
 void getContainerType(ObjContType type, char* name) {
 	switch (type) {
 		case BUTTON:
@@ -154,6 +173,7 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 	obj->z = z;
 	obj->visible = 1;
 	obj->enabled = 1;
+	obj->lifetime = -1;
 
 	obj->name = malloc(strlen(name)+1);
 	strcpy(obj->name, name);
@@ -168,6 +188,7 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 	obj->color = 0;
 	obj->parent = NULL;
 	obj->childs = NULL;
+	obj->onDelete = NULL;
 	obj->collision = NULL;
 	
 
@@ -230,6 +251,7 @@ Object* addObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 
 	logger->dbg("-- Setting Layer");
 	setObjectLayer(obj, z);
+	logger->dbg("-- Added To Layer");
 
 	logger->dbg("==== Object %s Added ====", obj->name);
 
@@ -251,6 +273,11 @@ void deleteObject(Object* obj) {
 	logger->inf("===== Deleting Object ====");
 	logger->dbg("--name: %s", obj->name);
 	Node* layer = getNode(getLayers(), obj->z);
+
+	if (obj->onDelete != NULL) {
+		logger->dbg("--Calling On Delete Func");
+		obj->onDelete(obj);
+	}
 
 	if (obj->childs != NULL) {
 		logger->dbg("-- Delete Object Childs");

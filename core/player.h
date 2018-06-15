@@ -8,6 +8,7 @@ ListManager* getPlayerList();
 Player* genPlayer(char* name);
 Player* initPlayer(Player* p);
 
+void resetPlayersBomb();
 void placeBomb(Player* p);
 
 void* updatePlayers();
@@ -17,5 +18,6 @@ void calcPlayerObjectPos(SDL_Rect playPos, SDL_Rect* objPos);
 
 void clearPlayers();
 void* deletePlayer(Player* p);
+
 
 #endif

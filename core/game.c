@@ -20,6 +20,16 @@ void* sayGoodbye() {
 	}
 }
 
+void tick() {
+	Game* game = getGame();
+
+	if (game->status != GAME_LOBY) {
+		return;
+	}
+
+	resetPlayersBomb();
+	clearOutdatedObjects();
+}
 
 void tickWait(int next) {
 	int now = SDL_GetTicks();
@@ -50,9 +60,9 @@ void launchSate(short status) {
 	unlock(DBG_VIEW);
 
 	while(game->status == status) {
-		//logger->err("GAME: Ask-Lock");
+		//logger->war("GAME: Ask-Lock");
 		lock(DBG_VIEW);
-		//logger->err("GAME: Lock");
+		//logger->war("GAME: Lock");
 
 		logger->enabled = game->flags & DBG_STATE;
 
@@ -98,7 +108,7 @@ void renderMap() {
 
 	generateWalls();
 
-	Player* p = genPlayer("PLAYER");
+	Player* p = genPlayer("PLAYER-1");
 	initPlayer(p);
 
 	launchSate(GAME_LOBY);

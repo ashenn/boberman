@@ -6,7 +6,13 @@
 typedef enum BonusType BonusType;
 enum BonusType {
 	BNS_BOMB,
-	BNS_SPEED
+	MAL_BOMB,
+	BNS_EXPL,
+	MAL_EXPL,
+	BNS_SPEED,
+	MAL_SPEED,
+	BNS_SHOOT,
+	BNS_SHIELD,
 };
 
 typedef struct Bonus Bonus;

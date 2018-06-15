@@ -62,7 +62,7 @@ short setObjectLayer(Object* obj, short z) {
 		char layerName[12];
 		snprintf(layerName, 12, "#Layer-%d", z);
 		
-		logger->dbg("-- Creating Layer: %s", layerName);
+		logger->inf("-- Creating Layer: %s", layerName);
 		
 		layer = addNodeV(layers, layerName, initListMgr(), 0);
 
@@ -75,13 +75,13 @@ short setObjectLayer(Object* obj, short z) {
 
 	ListManager* layerObjs = (ListManager*)layer->value;
 	
-	logger->dbg("-- Adding Object To Loayer");
+	logger->inf("-- Adding Object To Loayer");
 	Node* objNode = addNodeV(layerObjs, obj->name, obj, 0);
 	
-	logger->dbg("-- nodeID: %d", objNode->id);
+	logger->inf("-- nodeID: %d", objNode->id);
 	objNode->id = obj->id;
 	
-	logger->dbg("==== Object %s Added To Layer: %s ====", obj->name, layer->name);
+	logger->inf("==== Object %s Added To Layer: %s ====", obj->name, layer->name);
 
 	return 1;
 }
@@ -176,11 +176,11 @@ void printObject(Object* obj) {
 		logger->dbg("-- X=%d | Y=%d", obj->pos.x, obj->pos.y);
     }
     else if(obj->color) {
-    	logger->err("FILL COLOR: ");
+    	logger->dbg("FILL COLOR: ");
     	SDL_FillRect(screen, &obj->pos, obj->color);
     }
     else if(obj->childs == NULL || !obj->childs->nodeCount){
-		logger->war("-- Surface Is NULL for object: %s", obj->name);
+		logger->inf("-- Surface Is NULL for object: %s", obj->name);
     }
 
 	logger->dbg("==== Printing Object: %s DONE ====", obj->name);
@@ -225,7 +225,7 @@ void renderObjectList() {
 			continue;
 		}
 		else if (layerNode->id > 1) {
-			//logger->err("===== Sorting List =====");
+			//logger->err("===== Sorting List %s =====", layerNode->name);
 			sortList(objects, &layerSort);
 		}
 
@@ -241,6 +241,19 @@ void renderObjectList() {
 	}
 }
 
+void frameWait(int next) {
+	int now = SDL_GetTicks();
+	//logger->dbg("NEXT: %d", next);
+	//logger->dbg("NOW: %d", now);
+
+	//logger->dbg("DELAY: %d\n", next - now);
+    if(next <= now){
+        return;
+    }
+
+	SDL_Delay(next - now);
+}
+
 void* render(void* arg) {
 	Game* game = getGame();
 	SDL_Surface* screen = getScreen();
@@ -249,7 +262,9 @@ void* render(void* arg) {
 
 	int add = 0;
 	int now = 0;
+    int nextTick = 0;
     int nextFrame = 0;
+
 
 	//logger->err("RENDER: Ask-Lock");
 	lock(DBG_VIEW);
@@ -257,6 +272,7 @@ void* render(void* arg) {
 
 	now = SDL_GetTicks();
 	add = (int)(1000 / (float)FPS);
+    
     nextFrame = now + add;
 
     while(game->status != GAME_QUIT) {
@@ -267,6 +283,12 @@ void* render(void* arg) {
 	    //logger->err("TOTAL: %d", nextFrame);
 		
     	t = SDL_GetTicks();
+		
+		if (--nextTick <= 0) {
+			nextTick = TICK_FRAMES;
+	    	tick();
+		}
+
 		//logger->err("==== Rendering ==== ");
 		//logger->inf("==== Animating ==== ");
 		animate();
@@ -279,9 +301,8 @@ void* render(void* arg) {
 	    //logger->err("RENDER: Un-Lock");
 	    unlock(DBG_VIEW);
 		//logger->err("==== Rendering END %d ====", SDL_GetTicks() - t);
-		
 
-	    tickWait(nextFrame);
+	    frameWait(nextFrame);
 
     	now = SDL_GetTicks();
     	add = (int)(1000 / (float)FPS);

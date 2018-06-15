@@ -21,6 +21,7 @@ struct AnimParam {
 	SDL_Rect pos;
 
 	int frames;
+	int breakAnim;
 	AnimDistance xDist;
 	AnimDistance yDist;
 

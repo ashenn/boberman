@@ -7,8 +7,7 @@ ListManager* getHitObjectList() {
 		return objects;
 	}
 
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_HIT;
+	enableLogger(DBG_HIT);
 
 	logger->inf("==== Init Object Hit List ====");
 	objects = initListMgr();
@@ -21,7 +20,7 @@ Object* getObjectByCollision(Collision* col2, short blocking, Object* ignore) {
 	Game* game = getGame();
 	ListManager* objects = getHitObjectList();
 
-	logger->enabled = game->flags & DBG_HIT;
+	enableLogger(DBG_HIT);
 	logger->inf("==== SEARCH COLLISION ====");
 	while((n = listIterate(objects, n)) != NULL) {
 		o = (Object*) n->value;
@@ -53,6 +52,24 @@ Object* getObjectByCollision(Collision* col2, short blocking, Object* ignore) {
 }
 
 short doesObjectCollides(Object* o, Object* o2) {
+	if (o2->collision == NULL || !o2->collision->enabled) {
+		logger->dbg("-- Skipping");
+    	return 0;
+    }
+
+    if (o->collision->flag == COL_NONE || o2->collision->flag == COL_NONE || o2->collision->flag == COL_WALL) {
+		logger->dbg("-- Skipping COL NONE");
+		return 0;
+    }
+
+
+    if (o->collision->colFlags != COL_ALL && o2->collision->colFlags != COL_ALL) {
+	    if (!(o->collision->colFlags & o2->collision->flag) && !(o2->collision->colFlags & o->collision->flag)) {
+			logger->dbg("-- Skipping Flags Incompatible");
+			return 0;
+	    }
+    }
+
 	Collision col;
 	prepareCol(o, &col);
 
@@ -89,8 +106,7 @@ short doesCollide(Collision* col, Collision* col2) {
 }
 
 void handleHits() {
-	Game* game = getGame();
-	logger->enabled = game->flags & DBG_HIT;
+	enableLogger(DBG_HIT);
 
 	logger->inf("==== Verifying Hits ====");
 	Node* n = NULL;
@@ -100,6 +116,7 @@ void handleHits() {
 	Object* o = NULL;
 	Object* o2 = NULL;
 	short deleted = 0;
+	Game* game = getGame();
 
 	while((n = listIterate(objects, n)) != NULL) {
 		deleted = 0;
@@ -138,30 +155,25 @@ void handleHits() {
 				}
 			}
 
-			if (col2 == NULL || !col2->enabled) {
-				logger->dbg("-- Skipping");
-		    	continue;
-		    }
+			/*
+				if (col2 == NULL || !col2->enabled) {
+					logger->dbg("-- Skipping");
+			    	continue;
+			    }
 
-		    /*if (col->flag == COL_NONE || col2->flag == COL_NONE)
-		    {
-				logger->dbg("-- Skipping COL NONE");
-				continue;
-		    }
-
-		    if (col->colFlags != COL_ALL && col2->colFlags != COL_ALL) {
-
-			    if (!(col->colFlags & col2->flag) || !(col2->colFlags & col->flag)) {
-					logger->dbg("-- Does Not Collide Fags\n%s | %s", o->name, o2->name);
-					logger->dbg("-- %d | %d", col->flag, col2->flag);
-					logger->dbg("-- %d | %d", col->colFlags, col2->colFlags);
-					logger->dbg("-- %d | %d", col->colFlags & col2->flag, col2->colFlags & col->flag);
+			    if (col->flag == COL_NONE || col2->flag == COL_NONE || col2->flag == COL_WALL) {
+					logger->dbg("-- Skipping COL NONE");
 					continue;
 			    }
-		    }
-		    */
 
 
+			    if (col->colFlags != COL_ALL && col2->colFlags != COL_ALL) {
+				    if (!(col->colFlags & col2->flag) && !(col2->colFlags & col->flag)) {
+						logger->err("-- Skipping Flags Incompatible");
+						continue;
+				    }
+			    }
+			*/
 
 			short objCollide = doesObjectCollides(o, o2);
 		    collides = collides || objCollide;
@@ -201,9 +213,7 @@ void handleHits() {
 }
 
 void setHitBox(Object* obj, SDL_Rect rect, short blocking, int flag) {
-	Game* game = getGame();
-
-	logger->enabled = game->flags & DBG_HIT;
+	enableLogger(DBG_HIT);
 
 	logger->inf("===== Setting Hiy Box ====");
 	logger->dbg("-- Object: %s", obj->name);
@@ -228,8 +238,6 @@ void setHitBox(Object* obj, SDL_Rect rect, short blocking, int flag) {
 	col->pos.h = rect.h;
 	col->blocking = blocking;
 
-	logger->dbg("-- Debug_Hit %d", (game->flags & DBG_HIT) != 0);
-
 	char boxName[35];
 	snprintf(boxName, 35, "hitBox-%s", obj->name);
 	
@@ -237,8 +245,8 @@ void setHitBox(Object* obj, SDL_Rect rect, short blocking, int flag) {
 	Node* hitNode = addNodeV(objects, boxName, obj, 0);
 	col->id = hitNode->id;
 
+	Game* game = getGame();
 	if (!(game->flags & DBG_HIT)) {
-		logger->enabled = 0;
 		return;
 	}
 
@@ -295,7 +303,7 @@ short canMoveTo(Object* obj, int x, int y) {
 		return true;
 	}
 
-	logger->enabled = game->flags & DBG_HIT;	
+	enableLogger(DBG_HIT);	
 	logger->inf("==== Can Move To ====");
 	logger->dbg("--obj: %s\n-- from: x: %d, y: %d\n-- to: x: %d, y: %d", obj->name, obj->pos.x, obj->pos.y, x, y);
 	

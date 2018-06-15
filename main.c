@@ -2,6 +2,11 @@
 
 Log* logger;
 
+void enableLogger(int flag) {
+	Game* game = getGame();
+	logger->enabled = game->flags & flag;
+}
+
 void* closeApp() {
 	logger->enabled = 1;
 	logger->inf("==== Closing App ====");	
@@ -45,10 +50,10 @@ void lockLogger(int flag) {
 	Game* game = getGame();
 
 	if (game->flags & flag) {
-		pthread_mutex_lock(&logger->mutex);
 		//logger->err("Lock");
 		//pthread_cond_wait (&logger->cond, &logger->mutex);
 		
+		//pthread_mutex_lock(&logger->mutex);
 		logger->enabled = game->flags & flag;
 	}
 }
@@ -60,15 +65,15 @@ void unlockLogger(int flag) {
 		logger->enabled = 0;
 		//logger->err("Un-Lock");
 		//pthread_cond_signal (&logger->cond);
-		pthread_mutex_unlock(&logger->mutex);
+		//pthread_mutex_unlock(&logger->mutex);
 	}
 }
 
 void lock(int flag) {
 	Game* game = getGame();
 
-	lockLogger(flag);
 	pthread_mutex_lock(&game->mutex);
+	lockLogger(flag);
 }
 
 void unlock(int flag) {
@@ -95,7 +100,7 @@ int main(int argc, char *argv[])
 
 	logger->enabled = 1;
 	logger->war(
-		"-- TEST FLAGS: \n--HIT: %d\n--EVNT: %d\n--MOVE: %d\n--VIEW: %d\n--BOMB: %d\n--MOUSE: %d\n--ASSET: %d\n--ANIM: %d\n--MAP: %d\n--OBJ: %d\n--PLAYER: %d\n--STATE: %d\n--MENU: %d",
+		"-- TEST FLAGS: \n--HIT: %d\n--EVNT: %d\n--MOVE: %d\n--VIEW: %d\n--BOMB: %d\n--MOUSE: %d\n--ASSET: %d\n--ANIM: %d\n--MAP: %d\n--OBJ: %d\n--PLAYER: %d\n--STATE: %d\n--MENU: %d\n--BONUS: %d",
 		game->flags & DBG_HIT,
 		game->flags & DBG_EVNT,
 		game->flags & DBG_MOVE,
@@ -108,7 +113,8 @@ int main(int argc, char *argv[])
 		game->flags & DBG_OBJ,
 		game->flags & DBG_PLAYER,
 		game->flags & DBG_STATE,
-		game->flags & DBG_MENU
+		game->flags & DBG_MENU,
+		game->flags & DBG_BONUS
 	);
 
 	logger->enabled = 0;

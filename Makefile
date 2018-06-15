@@ -16,6 +16,7 @@ SRC	=	main.c                  \
                 core/player.c           \
                 core/bomb.c             \
                 core/map.c              \
+                core/bonus.c            \
                 
 
 OBJ	=	$(SRC:%.c=%.o)

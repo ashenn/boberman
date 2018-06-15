@@ -12,6 +12,7 @@ AnimParam* initAnimParam(Object* obj, float time, float delay, void* fnc) {
 	param->fnc = fnc;
 	param->time = time;
 	param->boolean = 0;
+	param->breakAnim = 0;
 	param->custFnc = NULL;
 	param->callBack = NULL;
 	param->deleteObject = 0;
@@ -125,6 +126,12 @@ void* animMoveTo(AnimParam* param) {
 	
 	logger->dbg("-- Moving Coords: X = %d | Y = %d", xMove, yMove);
 
+
+	if (!canMoveTo(obj, obj->pos.x + xMove, obj->pos.y + yMove)) {
+		param->breakAnim = 1;
+		return NULL;
+	}
+
 	animSetPostion(
 		obj, 
 		obj->pos.x + xMove,
@@ -197,10 +204,6 @@ AnimParam* animAddObject(Object* obj, AnimParam* param) {
 }
 
 AnimParam* moveTo(Object* obj, int x, int y, float time, float delay) {
-	if (!canMoveTo(obj, x, y)) {
-		return NULL;
-	}
-
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_ANIM;
 
@@ -225,6 +228,16 @@ AnimParam* moveTo(Object* obj, int x, int y, float time, float delay) {
 	
 	param->yDist = animDistanceByFrame(vec.y, time);
 	logger->dbg("-- yTotDist: %d", param->yDist);
+
+	int xMove = obj->pos.x + param->xDist.perFrame + param->xDist.rest;
+	int yMove = obj->pos.y + param->yDist.perFrame + param->yDist.rest;
+	
+	if (!canMoveTo(obj, xMove, yMove)) {
+		logger->dbg("Can't Move %s to First Position", obj->name);
+		logger->dbg("X: %d | Y: %d", xMove , yMove);
+		free(param);
+		return NULL;
+	}
 
 	param->fnc = (void*)animMoveTo;
 	logger->dbg("-- Param Ready");
@@ -287,14 +300,14 @@ AnimParam* customAnim(Object* obj, float loopTime, float delay, short (*fnc) (An
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_ANIM;
 
-	logger->err("==== Adding Custom Anim ====");
-	logger->err("-- Object: %s", obj->name);
+	logger->dbg("==== Adding Custom Anim ====");
+	logger->dbg("-- Object: %s", obj->name);
 	AnimParam* param = initAnimParam(obj, loopTime, delay, NULL);
 
 	param->custFnc = fnc;	
 	animAddObject(obj, param);
 
-	logger->err("==== Custom Anim Added ====");
+	logger->dbg("==== Custom Anim Added ====");
 	return param;
 }
 
@@ -334,7 +347,7 @@ void animate() {
 	    	param->frames--;
 			logger->dbg("-- Frames Left: %d", param->frames);
 
-	    	if (param->frames <= 0){
+	    	if (param->frames <= 0 || param->breakAnim){
 	    		if (param->custFnc != NULL) {
 	    			short loop = param->custFnc(param);
 	    			if (loop) {

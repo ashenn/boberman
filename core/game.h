@@ -25,6 +25,7 @@
 #define DBG_STATE 1024
 #define DBG_MENU 2048
 #define DBG_ANIM 4096
+#define DBG_BONUS 8192
 
 typedef struct Game Game;
 struct Game {
@@ -45,5 +46,7 @@ void changeGameStatus(short status);
 void renderMap();
 void* loadMap();
 void parseGameArgs(int argc, char* argv[]);
+
+void tick();
 
 #endif

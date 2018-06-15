@@ -492,7 +492,7 @@ void sortList(ListManager * lst, short (*fnc)(void*, void*)) {
 
 	Node* key = lst->first->next;
 	for (i = 1; i < lst->nodeCount; i++) {
-    	comp = key->prev;
+    	comp = lst->first;
 
 		//fprintf(stdout, "##### Node %d: %s #####\n", key->id, key->name);
 
@@ -515,7 +515,7 @@ void sortList(ListManager * lst, short (*fnc)(void*, void*)) {
     			while((tmp = listIterate(lst, tmp)) != NULL) {
     				if (tmp == comp) {
 						//fprintf(stdout, "-- Skipping\n");
-    					break;
+    					continue;
     				}
 
 					//fprintf(stdout, "-- Compare %d: %s\n", tmp->id, tmp->name);
@@ -526,14 +526,14 @@ void sortList(ListManager * lst, short (*fnc)(void*, void*)) {
     			    if (sort < 0) {
 						listInsertAfter(lst, comp, tmp->id);
 						listInsertAfter(lst, tmp, comp->id);
+
+						comp = key;
 						break;
     			    }
 
 					//fprintf(stdout, "+++++++++++++++++++++++++\n");
     			}
 
-
-				//fprintf(stdout, "+++++ ASSERTING ++++\n");
     			//printNodes(lst);
 				//assert(0);
     		}
@@ -553,7 +553,7 @@ void sortList(ListManager * lst, short (*fnc)(void*, void*)) {
 	//fprintf(stdout, "==== Sort Completed ====\n");
 	tmp = NULL;
 	while((tmp = listIterate(lst, tmp)) != NULL) {
-		//printf("-- Node: %d: %s\n", tmp->id, tmp->name);
+		//fprintf(stdout "-- Node: %d: %s\n", tmp->id, tmp->name);
 	}
 
 	//assert(0);

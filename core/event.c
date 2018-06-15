@@ -8,7 +8,7 @@ void EventKeyUp(int key, int curKey) {
 	Player* p = getPlayer();
 
 	if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT) {
-		if (p && key == curKey) {
+		if (p && p->alive && key == curKey) {
 			p->clipIndex = 0;
 			animRemoveObject(p->object);
 			updatePlayerClip(p);
