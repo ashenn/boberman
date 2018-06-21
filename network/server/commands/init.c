@@ -15,6 +15,13 @@ void init_commands () {
     Node* n = addNodeV(server->commands, "move", arg, 1);
 
     arg = malloc(sizeof(Arg));
+    arg->function = (void*) playerMove;
+    
+    logger->dbg("-- Player Stop Move");
+    n = addNodeV(server->commands, "stopmove", arg, 1);
+    arg->function = (void*) playerStop;
+
+    arg = malloc(sizeof(Arg));
     arg->function = (void*) placeBomb;
     
     logger->dbg("-- Place Bomb");

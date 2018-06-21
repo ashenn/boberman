@@ -225,10 +225,12 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
 
                 logger->war("Client Disconected: %s !!!", client->name);
                 
-                close( fd );
-                *(client_socket + i) = 0;
+                //close( fd );
+                //*(client_socket + i) = 0;
                 
-                killPlayer(client->player);
+                if(client->player != NULL && client->player->alive) {
+                    killPlayer(client->player);
+                }
             } else {
                 logger->err("-- Receiving Message");
 
@@ -290,6 +292,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     max_sd = add_child_socket_to_set(max_sd, client_socket, &readfds);
 
     logger->dbg("-- Fetching Activity");
+    
     struct timeval tv = {1, 0};
     activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 

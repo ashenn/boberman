@@ -13,6 +13,9 @@ server_t* initServer(short init) {
 	logger->inf("==== INIT SERVER ====");
 	
 	server = socket_init(inet_addr("127.0.0.1"), game->options.port);
+	if(server == NULL) {
+		return NULL;
+	}
 
 	logger->dbg("-- init Commands List");
 	server->commands = initListMgr();

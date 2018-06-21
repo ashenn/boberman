@@ -91,6 +91,13 @@ short findHost() {
 		return 0;
 	}
 
+	if(getServer() == NULL) {
+		char name[12];
+		memset(name, 0, 12);
+		
+		snprintf(name, 12, "player-%d", id);
+		initPlayer(genPlayer(name));
+	}
 
 	logger->inf("Connexion Accepted");
 

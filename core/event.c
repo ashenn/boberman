@@ -9,9 +9,10 @@ void EventKeyUp(int key, int curKey) {
 
 	if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT) {
 		if (p && p->alive && key == curKey) {
-			p->clipIndex = 0;
-			animRemoveObject(p->object);
-			updatePlayerClip(p);
+			sendCommand("stopmove", 0);
+			//p->clipIndex = 0;
+			//animRemoveObject(p->object);
+			//updatePlayerClip(p);
 		}
 	}
 }
@@ -99,7 +100,7 @@ int EventKeyDown(int key, int curKey) {
 		case SDLK_SPACE:
 			logger->dbg("-- Player Place Bomb");
 			if (p && p->alive) {
-				placeBomb(p);
+				//placeBomb(p);
 
 				sendCommand("bomb", 0);
 			}

@@ -251,6 +251,12 @@ void playerTickMove(AnimParam* anim) {
 	playerMove(p, p->direction);
 }
 
+void playerStop(Player* p) {
+	p->clipIndex = 0;
+	animRemoveObject(p->object);
+	updatePlayerClip(p);
+}
+
 void* playerMove(Player* p, short direction) {
 	enableLogger(DBG_PLAYER);
 
