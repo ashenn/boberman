@@ -4,15 +4,22 @@ void clearOutdatedObjects() {
 	Node* n = NULL;
 	ListManager* objects = getObjectList();
 
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+	logger->inf("==== Clear Outdated Objects ====");
+	
 	while((n = listIterate(objects, n)) != NULL) {
 	    Object* o = (Object*) n->value;
 	    if (o->lifetime == -1){
 	    	continue;
 	    }
-
-	    logger->dbg("objectLife: %d", o->lifetime);
-	    if (--o->lifetime <= 0){
-	    	logger->dbg("Deleting: %s", o->name);
+		
+	    o->lifetime--;
+		logger->dbg("--obj: %s", o->name);
+		logger->dbg("--life: %d", o->lifetime);
+	    
+	    if (o->lifetime <= 0){
+			logger->dbg("-- Deleting : %s", o->name);
 	    	n = n->prev;
 	    	deleteObject(o);
 	    }

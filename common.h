@@ -21,6 +21,8 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 
+#include "network/server/server.h"
+
 #define CELL_SIZE 55
 
 #define SCREEN_W 800
@@ -65,7 +67,10 @@
 #define LEFT 3
 
 #define WALK_FRAMES 2
-#define TICK_FRAMES 35
+#define TICK_FRAMES 5
+#define TICK_REFRESH 4
+
+#define MSG_SIZE 500
 
 #include "core/asset.h"
 
@@ -85,6 +90,7 @@ struct Player {
 	int id;
 	char* name;
 	short alive;
+	short direction;
 	
 	float speed;
 	short shoot;
@@ -97,7 +103,6 @@ struct Player {
 
 	SDL_Rect pos;
 	SDL_Rect clip;
-	short direction;
 
 	Object* object;
 };

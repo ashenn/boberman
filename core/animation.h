@@ -22,25 +22,25 @@ struct AnimParam {
 
 	int frames;
 	int breakAnim;
-	AnimDistance xDist;
-	AnimDistance yDist;
+	struct AnimDistance xDist;
+	struct AnimDistance yDist;
 
 	short init;
 	short deleteObject;
 	
 	void* (*fnc)();
 	short (*custFnc)();
-	void (*callBack	)(AnimParam*);
+	void (*callBack	)(struct AnimParam*);
 	
-	Object* obj;
+	struct Object* obj;
 	SDL_Rect target;
 	short boolean;
 };
 
 void animate();
-AnimParam* moveTo(Object* obj, int x, int y, float time, float delay);
-void animRemoveObject(Object* obj);
-AnimParam* spriteAnim(Object* obj, SDL_Rect clip, float time, float delay, short applyToChilds);
-AnimParam* customAnim(Object* obj, float loopTime, float delay, short (*fnc) (AnimParam*));
+struct AnimParam* moveTo(struct Object* obj, int x, int y, float time, float delay);
+void animRemoveObject(struct Object* obj);
+struct AnimParam* spriteAnim(struct Object* obj, SDL_Rect clip, float time, float delay, short applyToChilds);
+struct AnimParam* customAnim(struct Object* obj, float loopTime, float delay, short (*fnc) (struct AnimParam*));
 
 #endif

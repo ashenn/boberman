@@ -2,11 +2,16 @@
 #define _GAME_H__
 
 #include "../common.h"
+#include "view.h"
+#include "../network/server/server.h"
+#include "../network/client/client.h"
+
+#define DEFAULT_PORT 8888
 
 #define GAME_MENU 0
 #define GAME_LOBY 1
 #define GAME_READY 2
-#define GAME_SART 3
+#define GAME_START 3
 #define GAME_RUNNING 4
 #define GAME_END 5
 #define GAME_QUIT 6
@@ -26,6 +31,14 @@
 #define DBG_MENU 2048
 #define DBG_ANIM 4096
 #define DBG_BONUS 8192
+#define DBG_SERVER 16384
+#define DBG_CLIENT 32768
+
+typedef struct GameOptions GameOptions;
+struct GameOptions {
+	int port;
+	char ip[16];
+};
 
 typedef struct Game Game;
 struct Game {
@@ -36,11 +49,13 @@ struct Game {
 	pthread_mutex_t mutex;
 
 	void* renderThread;
+
+	GameOptions options;
 };
 
 Game* getGame();
 void quitGame();
-Button** getMenu();
+struct Button** getMenu();
 void mainMenu();
 void changeGameStatus(short status);
 void renderMap();

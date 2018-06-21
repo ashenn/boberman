@@ -17,6 +17,14 @@ SRC	=	main.c                  \
                 core/bomb.c             \
                 core/map.c              \
                 core/bonus.c            \
+                network/server/network/socket.c                \
+                network/server/network/handler.c               \
+                network/server/network/communication.c         \
+                network/server/protocol/reader.c               \
+                network/server/commands/init.c                 \
+                network/server/commands/messages.c             \
+                network/server/server.c                        \
+                network/client/client.c                        \
                 
 
 OBJ	=	$(SRC:%.c=%.o)
@@ -25,7 +33,7 @@ LIB	=	-lSDL                   \
                 -lSDL_image             \
                 -lSDL_ttf               \
                 -lpthread               \
-                -fsanitize=thread       \
+                -fsanitize=address       \
                 -D_REENTRANT
 
 $(NAME):	$(OBJ)

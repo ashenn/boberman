@@ -314,6 +314,8 @@ void* render(void* arg) {
 		//logger->dbg("==== Rendering DONE ==== ");
     }
 
+	unlock(DBG_VIEW);
+	//logger->err("RENDER: Un-Lock");
     pthread_exit(NULL);
 }
 

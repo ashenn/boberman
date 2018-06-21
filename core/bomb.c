@@ -50,61 +50,62 @@ void bombHit(Object* bombObj, Object* targetObj) {
 		return;
 	}
 
-	logger->inf("=== BOMB COL ===");
+	logger->err("=== BOMB COL ===");
 	
-	logger->dbg("-- Cast To Bomb");
+	logger->err("-- Cast To Bomb");
 	Bomb* bomb = (Bomb*) bombObj->container;
 
 	if (bomb->exploded  || bomb->state < 3) {
-		logger->dbg("-- Cant Move: %d state", bomb->state);
+		logger->err("-- Cant Move: %d state", bomb->state);
 		return;
 	}
 
 	if (targetObj->container == NULL || targetObj->containerType != PLAYER) {
-		logger->dbg("-- Not Player");
+		logger->err("-- Not Player");
 		return;
 	}
 
-	logger->dbg("-- Cast To Player");
+	logger->err("-- Cast To Player");
 	Player* p = (Player*) targetObj->container;
 	
 	if (0 && !p->shoot) {
-		logger->dbg("-- Can't Shoot");
+		logger->err("-- Can't Shoot");
 		return;
 	}
 
-	logger->dbg("-- Calc Pos");
+	logger->err("-- Calc Pos");
 	int x = bombObj->pos.x;
 	int y = bombObj->pos.y;
 
 	switch (p->direction) {
 		case UP:
-			y -= 10;
+			y -= 30;
 			break;
 
 		case DOWN:
-			y += 10;
+			y += 30;
 			break;
 
 		case LEFT:
-			x -= 10;
+			x -= 30;
 			break;
 
 		case RIGHT:
-			x += 10;
+			x += 30;
 			break;
 	}
 
-	logger->dbg("-- Move To x: %d, y: %d", x, y);
+	logger->err("-- Move To x: %d, y: %d", x, y);
 
+	bombObj->collision->enabled = 0;
 	AnimParam* anim = moveTo(bombObj, x, y, 0.2f, 0);
 
 	if (anim == NULL) {
-		logger->dbg("-- Cant't Move To x: %d, y: %d", x, y);
+		logger->err("-- Cant't Move To x: %d, y: %d", x, y);
 		return;
 	}
 
-	//anim->callBack = bombMove;
+	anim->callBack = bombMove;
 }
 
 void explosionHit(Object* explObj, Object* targetObj) {
@@ -431,17 +432,15 @@ void iterateBomb(AnimParam* anim) {
 		posY = bomb->pos.y;
 		bomb->clip.y = 1;
 
-		if (bomb->state == 4)
+		/*if (bomb->state == 4)
 		{
-			/*
 			logger->dbg("-- Add Collision");
 			SDL_Rect hit = {0,0,BOMB_SIZE, BOMB_SIZE};
 			setHitBox(obj, hit, 0, COL_BOMB);
 
 			obj->collision->colFlags = COL_PLAYER | COL_WALL;
-			obj->collision->enabled = 1;
-			*/
-		}
+			obj->collision->fnc = bombHit;
+		}*/
 		
 		if (bomb->state < 6) {
 			if (bomb->clip.x >= BOMB_SIZE){

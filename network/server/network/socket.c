@@ -1,12 +1,14 @@
-#include "../../libs/libmy_extended.h"
 #include "../server.h"
 
-server_t socket_init(unsigned int addr, int port) {
-    
+server_t* socket_init(unsigned int addr, int port) {
+    Game* game = getGame();
+    logger->enabled = game->flags & DBG_SERVER;
+    logger->inf("==== INIT SOCKET ====");    
+    logger->dbg("-- addr: %d:%d", addr, port);    
 
     int socket_fd;
     struct sockaddr_in server;
-    server_t response;
+    server_t* response = malloc(sizeof(server_t));
 
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = addr;
@@ -15,24 +17,23 @@ server_t socket_init(unsigned int addr, int port) {
     socket_fd = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_fd == -1)
     {
-        error(logger, "Could not create socket");
+        logger->err("Could not create socket");
     }
-    info(logger, "Master socket created ...\n");
+
+    logger->dbg("-- Master socket created");
 
     if( bind(socket_fd,(struct sockaddr *)&server , sizeof(server)) < 0)
     {
-        error(logger, "Bind failed..");
+        logger->err("Socket Bind failed..");
         return response;
     }
     char m[30];
-    my_strcat(m, "Bind successful on port : ");
-    my_strcat(m, (char *)opts->next->value);
-    info(logger, m);
+    logger->dbg("-- Socket Bind successful on port : %d", port);
 
-    listen(socket_fd , 3);
+    listen(socket_fd, 3);
 
-    response.fd = socket_fd;
-    response.addr = server;
+    response->fd = socket_fd;
+    response->addr = server;
 
     return response;
 }

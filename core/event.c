@@ -21,9 +21,14 @@ int EventKeyDown(int key, int curKey) {
 	logger->enabled = game->flags & DBG_EVNT;
 	logger->inf("=== Key Event ===");
 
-	if (key == SDLK_ESCAPE || key == SDLK_q) {
+	if (key == SDLK_ESCAPE) {
 		logger->dbg("-- Event: Quit");
+		logger->err("############# Event: Quit ##################");
 		EventQuit();
+		return curKey;
+	}
+
+	if(game->status != GAME_START && game->status != GAME_RUNNING) {
 		return curKey;
 	}
 
@@ -87,14 +92,6 @@ int EventKeyDown(int key, int curKey) {
 			logger->dbg("-- Player Place Bomb");
 			if (p && p->alive) {
 				placeBomb(p);
-			}
-			break;
-
-		case SDLK_p:
-		case SDLK_k:
-			logger->dbg("-- Player KILL");
-			if (p && p->alive) {
-				killPlayer(p);
 			}
 			break;
 		
@@ -173,10 +170,6 @@ void handleEvents() {
 	Object* hovered = NULL;
 	Object** curHovered = getHovered();
 
-	//logger->err("EVENT: Ask-Lock");
-	//pthread_mutex_lock(&game->mutex);
-	//logger->err("EVENT: Lock");
-
 	int key;
 	Player* p = getPlayer();
 	logger->inf("==== EVENTS ====");
@@ -211,7 +204,5 @@ void handleEvents() {
 		}
 	}
 
-	//logger->err("EVENT: Un-Lock");
-	//pthread_mutex_unlock(&game->mutex);
 	logger->dbg("==== EVENTS DONE ====");
 }

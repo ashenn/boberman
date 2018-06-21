@@ -20,21 +20,8 @@ int main (int argc, char *argv[])
 
     init_commands ();
 
-	// ---------
-	client_t *bot = malloc(sizeof(client_t));
-	bot->fd = -1;
-	bot->id = -1;
-	bot->name = NULL;
-
-	clients = create_list(bot);
-
-	channel_t *default_channel = malloc(sizeof(channel_t));
-	default_channel->id = 0x00;
-	default_channel->clients = create_list(bot);
-	default_channel->name = "General";
-
-	channels = create_list(default_channel);
-	// ---------
+	clients = initListMgr();
+	channels = initListMgr();
 
 	server_t server_info = socket_init(inet_addr("127.0.0.1"), my_getnbr(opts->next->value));
 

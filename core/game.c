@@ -1,22 +1,58 @@
+#include <sys/time.h>
 #include "game.h"
 
-void* sayHello() {
-	logger->err("Hello !");
+void* setServerPort(int port) {
+	Game* game = getGame();
+	game->options.port = port;
 }
 
-void* sayGoodbye() {
-	logger->err("Goodbye !");
+void* setServerIp(char* ip) {
+	Game* game = getGame();
+	strcpy(game->options.ip, ip);
+}
 
-	clearObjects();
+void* findGame() {
+	enableLogger(DBG_CLIENT);
+	logger->inf("==== FIND GAME ====");
+	Connexion* co = getConnexion();
+	if(co->init) {
+		logger->inf("GAME ALREADY INIT");
+		return NULL;
+	}
+	
+	if(!findHost()) {
+		logger->err("Faild To Find Host !!!");
+		return NULL;
+	}
+	
+	logger->war("Host Found Host !!!");
 
-	AssetMgr* ast = getAssets();
-	SDL_Surface* bg = ast->getImg("title");
-	addSimpleObject("Background", bg, NULL, 1);
+	pthread_create(&clientThread, NULL, clientProcess, (void*)NULL);
+	loadMap();
+}
 
-	int i;
-	Button** btns = getMenu();
-	for (i = 0; btns[i] != NULL; ++i){
-		generateButton(btns[i]);
+void* hostGame() {
+	server_t* serv = getServer();
+	if(serv == NULL) {
+		logger->err("TEST 1.0");
+		pthread_create(&serverThread, NULL, serverProcess, (void*)NULL);
+
+		waitCond();
+
+		logger->err("TEST 1.1");
+		serv = getServer();
+
+		logger->err("TEST 1.2 => %p", serv);
+
+		if(serv == NULL || serv->fd < 0) {
+			logger->err("TEST 1.3");
+			return NULL;
+		}
+
+		logger->err("TEST 1.4");
+
+		unlock(DBG_SERVER);
+		loadMap();
 	}
 }
 
@@ -27,16 +63,17 @@ void tick() {
 		return;
 	}
 
-	resetPlayersBomb();
-	clearOutdatedObjects();
+	static int cnt = 0;
+
+	if(++cnt == TICK_REFRESH) {
+		resetPlayersBomb();
+		clearOutdatedObjects();
+		cnt = 0;
+	}
 }
 
 void tickWait(int next) {
 	int now = SDL_GetTicks();
-	//logger->dbg("NEXT: %d", next);
-	//logger->dbg("NOW: %d", now);
-
-	//logger->dbg("DELAY: %d\n", next - now);
     if(next <= now){
         return;
     }
@@ -55,6 +92,7 @@ void launchSate(short status) {
 	int add = 0;
 	int nextFrame = 0;
 	Game* game = getGame();
+	game->status = status;
 
 	//logger->err("GAME: Un-Lock");
 	unlock(DBG_VIEW);
@@ -108,8 +146,7 @@ void renderMap() {
 
 	generateWalls();
 
-	Player* p = genPlayer("PLAYER-1");
-	initPlayer(p);
+	findGame();
 
 	launchSate(GAME_LOBY);
 }
@@ -131,6 +168,9 @@ Game* getGame() {
 
 	game->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
 	game->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+
+	memset(game->options.ip, 0, sizeof(game->options.ip));
+	game->options.port = DEFAULT_PORT;
 
 	return game;
 }
@@ -212,7 +252,7 @@ Button** getMenu() {
 		btnHost->imgHoverPath = NULL;
 		btnHost->imgObj = NULL;
 		btnHost->txtObj = NULL;
-		btnHost->click = (void*) sayGoodbye;
+		btnHost->click = (void*) hostGame;
 		btnHost->hover = (void*) buttonHover;
 		btnHost->hasAnim = 1;
 
@@ -379,6 +419,12 @@ void* addDebugFlag(char* flag) {
 	else if(!strcmp("menu", flag)) {
 		game->flags = game->flags | DBG_MENU;
 	}
+	else if(!strcmp("server", flag)) {
+		game->flags = game->flags | DBG_SERVER;
+	}
+	else if(!strcmp("client", flag)) {
+		game->flags = game->flags | DBG_CLIENT;
+	}
 }
 
 void parseGameArgs(int argc, char* argv[]){
@@ -391,8 +437,28 @@ void parseGameArgs(int argc, char* argv[]){
 		.type="alpha"
 	};
 
+	static Arg arg2 = {
+		.name = "p", 
+		.function = setServerPort, 
+		.hasParam = 1, 
+		.defParam = NULL, 
+		.asInt = 1,
+		.type="num"
+	};
+
+	static Arg arg3 = {
+		.name = "ip", 
+		.function = setServerIp, 
+		.hasParam = 1, 
+		.defParam = NULL, 
+		.asInt = 0,
+		.type="any"
+	};
+
 	static  Arg* args[] = {
 		&arg1,
+		&arg2,
+		&arg3,
 		NULL
 	};
 

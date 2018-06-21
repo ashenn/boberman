@@ -156,6 +156,11 @@ void updatePlayerClip(Player* p) {
 }
 
 Player* genPlayer(char* name) {
+	static int cnt = 0;
+	if(cnt >= 4) {
+		return NULL;
+	}
+
 	enableLogger(DBG_PLAYER);
 
 	logger->inf("==== GEN PLAYER: %s ====", name);
@@ -181,8 +186,28 @@ Player* genPlayer(char* name) {
 	p->canPlaceBomb = 1;
 	p->direction = DOWN;
 	
+
 	p->pos.x = 0;
 	p->pos.y = 0;
+	switch(cnt) {
+		case 1:
+			p->pos.x = MAP_W - 1;
+			break;
+
+		case 2:
+			p->direction = UP;
+			p->pos.y = MAP_H-1;
+			break;
+
+		case 3:
+			p->direction = UP;
+			p->pos.y = MAP_H-1;
+			p->pos.x = MAP_W - 1;
+			break;
+
+	}
+
+	p->clipIndex = 0;
 
 	logger->dbg("-- loading image");
 	AssetMgr* ast = getAssets();
@@ -192,7 +217,8 @@ Player* genPlayer(char* name) {
 	SDL_Rect pos = {0,0, PLAYER_W, PLAYER_H};
 	Object* obj = p->object = addSimpleObject(name, img, &pos, 3);
 	
-	p->clipIndex = 0;
+
+	
 	p->clip.w = PLAYER_W;
 	p->clip.h = PLAYER_H;
 
@@ -216,6 +242,7 @@ Player* genPlayer(char* name) {
 
 	logger->inf("==== GEN PLAYER: %s DONE ====", name);
 
+	cnt++;
 	return p;
 }
 

@@ -14,4 +14,7 @@ void lock(int flag);
 void unlock(int flag);
 void enableLogger(int flag);
 
+void waitCond();
+void signalCond();
+
 #endif

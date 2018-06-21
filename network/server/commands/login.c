@@ -1,4 +1,3 @@
-#include "../../libs/libmy_extended.h"
 #include "../server.h"
 
 int new_client_id() {
@@ -25,10 +24,11 @@ int new_client_id() {
 }
 
 void add_client(char *pseudo, int sd) {
-    int id = new_client_id();
 
     client_t *new_client = malloc(sizeof(client_t));
-    new_client->id = id;
+    Node* n = addNode(clients, "new-client", new_client, 1);
+
+    new_client->id = n->id;
     new_client->name = pseudo;
     //new_client->addr = addr;
     new_client->fd = sd;

@@ -27,28 +27,28 @@ struct Button {
 	char* imgPath;
 	char* imgHoverPath;
 
-	Object* imgObj;
-	Object* txtObj;
+	struct Object* imgObj;
+	struct Object* txtObj;
 
 
-	void* (*click)(Object* obj);
-	void* (*hover)(Object* obj);
+	void* (*click)(struct Object* obj);
+	void* (*hover)(struct Object* obj);
 
 	short hasAnim;
-	AnimParam* anim;
+	struct AnimParam* anim;
 };
 
 
 void* render(void* arg);
 SDL_Surface* getScreen();
 ListManager* getLayers();
-short setObjectLayer(Object* obj, short z);
-short isHovered(Object* obj, int x, int y);
-Object* getClicked(int x, int y, short hover);
-void buttonUnHover(Object* obj);
-void buttonHover(Object* obj);
-void deleteBtn(Button* btn);
-Object** getHovered();
+short setObjectLayer(struct Object* obj, short z);
+short isHovered(struct Object* obj, int x, int y);
+struct Object* getClicked(int x, int y, short hover);
+void buttonUnHover(struct Object* obj);
+void buttonHover(struct Object* obj);
+void deleteBtn(struct Button* btn);
+struct Object** getHovered();
 void clearScreen();
 
 #endif

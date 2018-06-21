@@ -1,4 +1,6 @@
 #include "main.h"
+#include "network/server/server.h"
+#include "network/client/client.h"
 
 Log* logger;
 
@@ -16,6 +18,7 @@ void* closeApp() {
 	logger->dbg("-- Cleaning Players");
 	clearPlayers();
 	ListManager* players = getPlayerList();
+
 	logger->dbg("-- Deleting Players List");
 	free(players);
 
@@ -50,10 +53,6 @@ void lockLogger(int flag) {
 	Game* game = getGame();
 
 	if (game->flags & flag) {
-		//logger->err("Lock");
-		//pthread_cond_wait (&logger->cond, &logger->mutex);
-		
-		//pthread_mutex_lock(&logger->mutex);
 		logger->enabled = game->flags & flag;
 	}
 }
@@ -63,9 +62,6 @@ void unlockLogger(int flag) {
 
 	if (game->flags & flag) {
 		logger->enabled = 0;
-		//logger->err("Un-Lock");
-		//pthread_cond_signal (&logger->cond);
-		//pthread_mutex_unlock(&logger->mutex);
 	}
 }
 
@@ -82,6 +78,16 @@ void unlock(int flag) {
 	pthread_mutex_unlock(&game->mutex);
 }
 
+void waitCond() {
+	Game* game = getGame();
+	pthread_cond_wait(&game->cond, &game->mutex);
+}
+
+void signalCond() {
+	Game* game = getGame();
+	pthread_cond_signal(&game->cond);
+}
+
 int main(int argc, char *argv[])
 {
 	logger = initLogger(argc, argv);
@@ -94,11 +100,19 @@ int main(int argc, char *argv[])
 	Game* game = getGame();
 	parseGameArgs(argc, argv);
 	
+	if(!game->options.ip[0]) {
+		logger->war("Setting Default IP");
+		snprintf(game->options.ip, 16, "127.0.0.1");
+	}
+	
+
 	logger->inf("-- Init: Window");
 	SDL_Surface* screen = getScreen();
 	
 
 	logger->enabled = 1;
+	logger->war("Server Address: %s:%d", game->options.ip, game->options.port);
+
 	logger->war(
 		"-- TEST FLAGS: \n--HIT: %d\n--EVNT: %d\n--MOVE: %d\n--VIEW: %d\n--BOMB: %d\n--MOUSE: %d\n--ASSET: %d\n--ANIM: %d\n--MAP: %d\n--OBJ: %d\n--PLAYER: %d\n--STATE: %d\n--MENU: %d\n--BONUS: %d",
 		game->flags & DBG_HIT,
@@ -123,31 +137,6 @@ int main(int argc, char *argv[])
 	pthread_create (&renderThread, NULL, render, (void*)NULL);
 	game->renderThread = &renderThread;
 
-	/*
-		int i = 0;
-		while(i < 5) {
-		    SDL_Delay(1000);
-
-			pthread_mutex_lock(&game->mutex);
-
-		    lockLogger(DBG_VIEW);
-		    logger->err("TEST: #%d", i++);
-		    unlockLogger(DBG_VIEW);
-			
-			pthread_mutex_unlock(&game->mutex);
-		}
-
-		pthread_mutex_lock(&game->mutex);
-		game->status = GAME_QUIT;
-		pthread_mutex_unlock(&game->mutex);
-
-		   
-		logger->err("==== END TEST ====");
-
-		return 0;
-	*/
-
-
 	//logger->err("INIT: Ask-Lock");
 	lock(DBG_STATE);
 	//logger->err("INIT: Lock");
@@ -162,12 +151,19 @@ int main(int argc, char *argv[])
 			case GAME_LOBY:
 				renderMap();
 				break;
-
-			default:
-				break;
 		}
 	}
 
+	//logger->err("GAME: Un-Lock");
+	game->status = GAME_QUIT;
+	unlock(DBG_STATE);
+	logger->err("WAINTING FOR THREADS END");
+	
 	pthread_join (renderThread, NULL);
+	if(initServer(0) != NULL) {
+		pthread_join (serverThread, NULL);
+	}
+
+	logger->err("THREADS ENDED");
 	closeApp();
 }

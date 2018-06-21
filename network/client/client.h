@@ -1,34 +1,34 @@
+#ifndef CLIENT_H
+#define CLIENT_H
+
 #include <errno.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/time.h>
 
-typedef struct {
-    char id;
-    void (*function)(char* buffer, int sd);
-} command_t;
+#include "../../base/basic.h"
+#include "../../base/libList.h"
+#include "../../base/libParse.h"
+#include "../../base/logger.h"
 
+#include "../../main.h"
 
-void read_command(char *buffer, int sd);
+pthread_t clientThread;
+
 typedef struct {
     int id;
+    int fd;
+
+    short init;
+
     char *name;
-} client_t;
+    struct sockaddr_in client;
+    struct sockaddr_in server;
+} Connexion;
 
-extern List user_commands;
-extern List commands;
-extern List clients;
+short findHost();
+void* clientProcess();
+Connexion* getConnexion();
 
-//commands
-void init_commands();
-
-char 	*readline(void);
-void	quit(char* buffer, int sd);
-void	joinChannel(char* buffer, int sd);
-void    fetchClients(char* buffer, int sd);
-
-char 	**init_commands_list(void);
-void    c_recv_list_users(char *buffer, int sd);
-void    c_recv_msg(char *buffer, int sd);
-void c_recv_user(char *buffer, int sd);
+#endif // CLIENT_H
