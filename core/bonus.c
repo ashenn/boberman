@@ -215,5 +215,5 @@ void generateBonus(SDL_Rect pos) {
 	bns->obj->collision->colFlags = COL_PLAYER;// | COL_BOMB;
 	
 	bns->obj->clip = &bns->clip;
-	bns->obj->lifetime = 5;
+	bns->obj->lifetime = 10;
 }

@@ -19,7 +19,7 @@ server_t* initServer(short init) {
 	
 	logger->dbg("-- init Clients List");
 	server->clients = initListMgr();
-
+	init_commands();
 	return server;
 	
 }
@@ -39,6 +39,9 @@ void* serverProcess() {
 
 	logger->dbg("-- Server INIT");
 	server_t* server = initServer(1);
+	if(server == NULL) {
+		return NULL;
+	}
 	
 	signalCond();
 
@@ -58,13 +61,13 @@ void* serverProcess() {
 		//logger->dbg("-- Server Ask-Lock");
 		lock(DBG_SERVER);
 		//logger->dbg("-- Server Locked");
-	    
-
 	}
 
 	logger->dbg("-- Free Server");
 	deleteList(server->clients);
 	deleteList(server->commands);
+
+	close(server->fd);
 	free(server);
 
 	logger->dbg("==== SERVER THREAD END ====");

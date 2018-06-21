@@ -12,9 +12,12 @@ void* setServerIp(char* ip) {
 }
 
 void* findGame() {
+	Game* game = getGame();
 	enableLogger(DBG_CLIENT);
+
 	logger->inf("==== FIND GAME ====");
 	Connexion* co = getConnexion();
+
 	if(co->init) {
 		logger->inf("GAME ALREADY INIT");
 		return NULL;
@@ -27,29 +30,25 @@ void* findGame() {
 	
 	logger->war("Host Found Host !!!");
 
-	pthread_create(&clientThread, NULL, clientProcess, (void*)NULL);
+	pthread_create(&game->clientThread, NULL, clientProcess, (void*)NULL);
 	loadMap();
 }
 
 void* hostGame() {
+	Game* game= getGame();
 	server_t* serv = getServer();
+	
 	if(serv == NULL) {
-		logger->err("TEST 1.0");
-		pthread_create(&serverThread, NULL, serverProcess, (void*)NULL);
+		pthread_create(&game->serverThread, NULL, serverProcess, (void*)NULL);
 
 		waitCond();
-
-		logger->err("TEST 1.1");
 		serv = getServer();
 
-		logger->err("TEST 1.2 => %p", serv);
-
 		if(serv == NULL || serv->fd < 0) {
-			logger->err("TEST 1.3");
 			return NULL;
 		}
 
-		logger->err("TEST 1.4");
+		setServerIp("127.0.0.1");
 
 		unlock(DBG_SERVER);
 		loadMap();
@@ -151,6 +150,47 @@ void renderMap() {
 	launchSate(GAME_LOBY);
 }
 
+void initGameFlags(Game* game) {
+	game->flagList = initListMgr();
+
+	static int flags[16] = {
+		DBG_HIT,
+		DBG_EVNT,
+		DBG_MOVE,
+		DBG_VIEW,
+		DBG_BOMB,
+		DBG_MOUSE,
+		DBG_ASSET,
+		DBG_ANIM,
+		DBG_MAP,
+		DBG_OBJ,
+		DBG_PLAYER,
+		DBG_STATE,
+		DBG_MENU,
+		DBG_SERVER,
+		DBG_CLIENT
+	};
+
+
+	
+	addNodeV(game->flagList, "hit", flags + 0, 0);
+	addNodeV(game->flagList, "evnt", flags + 1, 0);
+	addNodeV(game->flagList, "move", flags + 2, 0);
+	addNodeV(game->flagList, "view", flags + 3, 0);
+	addNodeV(game->flagList, "bomb", flags + 3, 0);
+	addNodeV(game->flagList, "mouse", flags + 5, 0);
+	addNodeV(game->flagList, "asset", flags + 6, 0);
+	addNodeV(game->flagList, "anim", flags + 7, 0);
+	addNodeV(game->flagList, "map", flags + 8, 0);
+	addNodeV(game->flagList, "obj", flags + 6, 0);
+	addNodeV(game->flagList, "player", flags + 10, 0);
+	addNodeV(game->flagList, "state", flags + 11, 0);
+	addNodeV(game->flagList, "menu", flags + 12, 0);
+	addNodeV(game->flagList, "server", flags + 13, 0);
+	addNodeV(game->flagList, "client", flags + 14, 0);
+	
+}
+
 Game* getGame() {
 	static Game* game = NULL;
 	
@@ -164,8 +204,8 @@ Game* getGame() {
 
 	game->flags = NO_FLAG;
 	game->status = GAME_MENU;
-	game->renderThread = NULL;
-
+	initGameFlags(game);
+	
 	game->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
 	game->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
@@ -380,51 +420,15 @@ void changeGameStatus(short status) {
 void* addDebugFlag(char* flag) {
 	Game* game = getGame();
 
-	if (!strcmp("hit", flag)) {
-		game->flags = game->flags | DBG_HIT;
+	logger->err("==== setting Flag: %s ====", flag);
+	Node* n = getNodeByName(game->flagList, flag);
+	
+	if(n == NULL) {
+		logger->err("Faild To Found Flag: %s", flag);
+		return NULL;
 	}
-	else if(!strcmp("evnt", flag)) {
-		game->flags = game->flags | DBG_EVNT;
-	}
-	else if(!strcmp("move", flag)) {
-		game->flags = game->flags | DBG_MOVE;
-	}
-	else if(!strcmp("view", flag)) {
-		game->flags = game->flags | DBG_VIEW;
-	}
-	else if(!strcmp("bomb", flag)) {
-		game->flags = game->flags | DBG_BOMB;
-	}
-	else if(!strcmp("mouse", flag)) {
-		game->flags = game->flags | DBG_MOUSE;
-	}
-	else if(!strcmp("asset", flag)) {
-		game->flags = game->flags | DBG_ASSET;
-	}
- 	else if(!strcmp("anim", flag)) {
-		game->flags = game->flags | DBG_ANIM;
-	}
-	else if(!strcmp("map", flag)) {
-		game->flags = game->flags | DBG_MAP;
-	}
-	else if(!strcmp("obj", flag)) {
-		game->flags = game->flags | DBG_OBJ;
-	}
-	else if(!strcmp("player", flag)) {
-		game->flags = game->flags | DBG_PLAYER;
-	}
-	else if(!strcmp("state", flag)) {
-		game->flags = game->flags | DBG_STATE;
-	}
-	else if(!strcmp("menu", flag)) {
-		game->flags = game->flags | DBG_MENU;
-	}
-	else if(!strcmp("server", flag)) {
-		game->flags = game->flags | DBG_SERVER;
-	}
-	else if(!strcmp("client", flag)) {
-		game->flags = game->flags | DBG_CLIENT;
-	}
+
+	game->flags = game->flags | *((int*) n->value);
 }
 
 void parseGameArgs(int argc, char* argv[]){

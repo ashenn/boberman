@@ -66,9 +66,6 @@ void deleteContainer(void* container, ObjContType type) {
 		case PLAYER:
 			deletePlayer(container);
 			break;
-
-		default:
-			break;
 	}
 
 	logger->dbg("-- Free");

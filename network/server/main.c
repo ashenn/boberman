@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
 
 	network_handling(server_info.fd, server_info.addr);
 
-	close (server_info.fd);
+	close(server_info.fd);
 
 	destroy_options(&opts);
 	destroy_list(&args);

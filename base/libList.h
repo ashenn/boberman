@@ -16,6 +16,7 @@ struct Node{
 	ListManager* lstMgr;
 
 	void* value;
+	void* (*fnc)();
 	short valIsAlloc;
 
 	Node* next;

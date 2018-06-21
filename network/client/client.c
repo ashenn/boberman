@@ -94,18 +94,6 @@ short findHost() {
 
 	logger->inf("Connexion Accepted");
 
-	char playerName[12];
-	snprintf(playerName, 12, "player-%d", id);
-	
-	/*
-		lock(DBG_CLIENT);
-		
-		Player* p = genPlayer(playerName);
-		initPlayer(p);
-
-		unlock(DBG_CLIENT);
-	*/
-
 	return 1;
 }
 
@@ -188,7 +176,25 @@ void* clientProcess() {
 		//logger->war("Client: Lock");
 	}
 
+	close(co->fd);
 
 	//logger->war("Client: Un-Lock");
     unlock(DBG_CLIENT);
+}
+
+void sendCommand(char* cmd, int val) {
+	Player* p = getPlayer();
+	if(p == NULL) {
+		logger->err("Can't Send command If player is not init");
+		return;
+	}
+
+	Connexion* co = getConnexion();
+
+	char msg[MSG_SIZE];
+	memset(msg, 0, MSG_SIZE);
+	snprintf(msg, MSG_SIZE, "%s:%d", cmd, val);
+
+	logger->err("#### Sending Comand %s", msg);
+	send(co->fd, msg, MSG_SIZE, 0);
 }

@@ -8,11 +8,17 @@ void init_commands () {
     logger->inf("==== INIT SERVER COMMANDS ====");
     clearList(server->commands);
 
+    Arg* arg = malloc(sizeof(Arg));
+    arg->function = (void*) playerMove;
+    
     logger->dbg("-- Player Move");
-    addNodeV(server->commands, "move", &playerMove, 0);
+    Node* n = addNodeV(server->commands, "move", arg, 1);
+
+    arg = malloc(sizeof(Arg));
+    arg->function = (void*) placeBomb;
     
     logger->dbg("-- Place Bomb");
-    addNodeV(server->commands, "bomb", &placeBomb, 0);
+    n = addNodeV(server->commands, "bomb", arg, 1);
     
     logger->dbg("==== INIT SERVER COMMANDS DONE ====");
 }

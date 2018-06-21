@@ -14,15 +14,13 @@
 
 #include "../../main.h"
 
-pthread_t clientThread;
-
 typedef struct {
     int id;
     int fd;
 
     short init;
 
-    char *name;
+    char* name;
     struct sockaddr_in client;
     struct sockaddr_in server;
 } Connexion;
@@ -30,5 +28,6 @@ typedef struct {
 short findHost();
 void* clientProcess();
 Connexion* getConnexion();
+void sendCommand(char* cmd, int val);
 
-#endif // CLIENT_H
+#endif

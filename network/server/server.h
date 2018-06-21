@@ -8,6 +8,7 @@
 #include "../../base/logger.h"
 
 #include "../../main.h"
+#include "../../common.h"
 
 
 #include <unistd.h>
@@ -18,13 +19,13 @@
 #include <netinet/in.h>
 #include <sys/time.h>
 
-pthread_t serverThread;
-
 typedef struct {
     struct sockaddr_in addr;
     int fd;
     int id;
-    char *name;
+
+    char* name;
+    Player* player;
 } client_t;
 
 typedef struct {

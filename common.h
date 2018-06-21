@@ -21,8 +21,6 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 
-#include "network/server/server.h"
-
 #define CELL_SIZE 55
 
 #define SCREEN_W 800

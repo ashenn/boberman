@@ -13,7 +13,7 @@ void placeBomb(Player* p);
 
 void* updatePlayers();
 void updatePlayerClip(Player* p);
-void playerMove(Player* p, short direction);
+void* playerMove(Player* p, short direction);
 void calcPlayerObjectPos(SDL_Rect playPos, SDL_Rect* objPos);
 
 void clearPlayers();

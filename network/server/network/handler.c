@@ -27,7 +27,6 @@ char *tamer (char *b) {
 void handle_master_socket(int master_socket_fd, int *client_socket, struct sockaddr_in server, fd_set *readfds) {
     Game* game = getGame();
     server_t* serv = getServer();
-    //server_t* server = getServer();
 
     logger->enabled = game->flags & DBG_SERVER;
     logger->inf("==== HANDLE MASTER SOCKET ====");
@@ -71,7 +70,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
 
     client->id = cliNode->id;
 
-    logger->war("-- id: %d",client->id);
+    logger->war("-- id: %d", client->id);
 
     char motd[43];
     snprintf(motd, 43, "ok:%d", client->id);
@@ -93,13 +92,19 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     lock(DBG_SERVER);
     //logger->war("HANDLER: Lock");
     
-    genPlayer(clientName);
+    client->fd = new_socket;
+    client->name = clientName;
+    client->player = genPlayer(clientName);
+    if(serv->clients->nodeCount == 1) {
+        initPlayer(client->player);
+    }
 
     //logger->war("HANDLER: Un-Lock");
     unlock(DBG_SERVER);
 
     logger->dbg("==== HANDLE MASTER SOCKET END ====");
 }
+
 int find_client_by_fd(int fd) {
     printf("all : {");
     Node *tmp = NULL;
@@ -136,43 +141,104 @@ int find_client_by_id(int id) {
     return -1;
 }
 
+client_t* getClientByFd(int fd) {
+    Node *tmp = NULL;
+    server_t* server = getServer();
+
+    while((tmp = listIterate(server->clients, tmp)) != NULL) {
+        client_t *client = tmp->value;
+
+        if (client->fd != -1 && client->fd == fd){
+            return client;
+        }
+    }
+
+    logger->war("Faild To Find Client With FD: %d", fd);
+    return NULL;
+}
+
 void kill_client(int fd) {
     server_t* server = getServer();
     int id = find_client_by_fd(fd);
+
     if (id != -1)
         deleteNode(server->clients, id);
 }
 
+void handleCommand(Player* p, char* msg) {
+    logger->err("Handeling Command: %s", msg);
+
+
+    char* resp[3];
+    explode(':', msg, 0, 0, resp);
+
+    char* cmd = resp[0];
+    int val = str2int(resp[1]);
+
+    logger->err("CMD: %s Value: %d", cmd, val);
+
+    logger->err("Calling Command");
+    server_t* server = getServer();
+
+    logger->err("Existing Commands: %d", server->commands->nodeCount);
+    Node* n = getNodeByName(server->commands, cmd);
+    
+    if(n != NULL) {
+        Arg* arg = n->value;
+        arg->function(p, val);
+    }
+    else{
+        logger->err("Fail To Find Command: %s", cmd);
+    }
+
+    free(resp[0]);
+    free(resp[1]);
+}
+
 void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_in server) {
+    //logger->inf("==== Handeling Clients ====");
     int sd;
     ssize_t valread;
     int addrlen = sizeof(&server);
-    char buffer[1025];
-    /*
-    for (int i = 0; i < 4; i++) {
-       sd = *(client_socket + i);
+    char buffer[MSG_SIZE];
+    
+    int i;
+    Node* n = NULL;
+    //logger->err("-- getting Server");
+    server_t* serv = getServer();
 
-        if (FD_ISSET( sd , readfds)) {
-            if ((valread = recv( sd , buffer, 1024, 0)) == 0) {
-                getpeername(sd , (struct sockaddr*)&server , (socklen_t*)&addrlen);
+    while((n = listIterate(serv->clients, n)) != NULL) {
+        logger->err("-- Node: #%d => %d", n->id, n->name);
+
+        client_t *client = n->value;
+        int fd = client->fd;
+        
+        
+        logger->err("-- Checking fd: %d", fd);
+        if (FD_ISSET( fd , readfds)) {
+            
+            logger->err("-- Getting Message");
+            if ((valread = recv( fd , buffer, MSG_SIZE, 0)) == 0) {
+                logger->err("-- Faild Deleting User");
+                //getpeername(fd , (struct sockaddr*)&server , (socklen_t*)&addrlen);
+                //Node *n = search_node_by_index(clients, find_client_by_fd(fd)).next;
+
+                logger->war("Client Disconected: %s !!!", client->name);
                 
-                Node *n = search_node_by_index(clients, find_client_by_fd(sd)).next;
-                
-                client_t *theclient = n->value;
-                char *disconect_notif = malloc (100);
-                sprintf(disconect_notif, " %s has left the chat \n", theclient->name);
-                broadcast(client_socket, 4, -1, disconect_notif);
-                close( sd );
+                close( fd );
                 *(client_socket + i) = 0;
-                kill_client(sd);
+                
+                killPlayer(client->player);
             } else {
-                buffer[valread] = '\0';
-                printf("find val : ");
-                read_command(buffer, sd, client_socket);
-        }
+                logger->err("-- Receiving Message");
+
+                logger->err("Received Command: %s", buffer);
+                handleCommand(client->player, buffer);
+                //buffer[valread] = '\0';
+                //read_command(buffer, fd, client_socket);
+            }
         }
     }
-    */
 }
 
 int network_handling (int master_socket_fd, struct sockaddr_in server) {
@@ -237,8 +303,8 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     logger->dbg("-- Handeling Master Socket");
     handle_master_socket(master_socket_fd,  client_socket, server, &readfds);
 
-    //logger->dbg("-- Handeling Clients Socket");
-    //handle_client_sockets(client_socket, &readfds, server);
+    logger->dbg("-- Handeling Clients Socket");
+    handle_client_sockets(client_socket, &readfds, server);
 
     logger->dbg("==== HANDLE NETWORK DONE ====");
     return 1;

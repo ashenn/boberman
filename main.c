@@ -43,6 +43,7 @@ void* closeApp() {
 	SDL_Quit();
 	
 	logger->dbg("-- Free Game");
+	deleteList(game->flagList);
 	free(game);
 
 	logger->dbg("==== Killing Game Proccess ====");
@@ -114,7 +115,7 @@ int main(int argc, char *argv[])
 	logger->war("Server Address: %s:%d", game->options.ip, game->options.port);
 
 	logger->war(
-		"-- TEST FLAGS: \n--HIT: %d\n--EVNT: %d\n--MOVE: %d\n--VIEW: %d\n--BOMB: %d\n--MOUSE: %d\n--ASSET: %d\n--ANIM: %d\n--MAP: %d\n--OBJ: %d\n--PLAYER: %d\n--STATE: %d\n--MENU: %d\n--BONUS: %d",
+		"-- TEST FLAGS: \n--HIT: %d\n--EVNT: %d\n--MOVE: %d\n--VIEW: %d\n--BOMB: %d\n--MOUSE: %d\n--ASSET: %d\n--ANIM: %d\n--MAP: %d\n--OBJ: %d\n--PLAYER: %d\n--STATE: %d\n--MENU: %d\n--BONUS: %d\n--SERVER: %d\n--CLIENT: %d",
 		game->flags & DBG_HIT,
 		game->flags & DBG_EVNT,
 		game->flags & DBG_MOVE,
@@ -128,14 +129,14 @@ int main(int argc, char *argv[])
 		game->flags & DBG_PLAYER,
 		game->flags & DBG_STATE,
 		game->flags & DBG_MENU,
-		game->flags & DBG_BONUS
+		game->flags & DBG_BONUS,
+		game->flags & DBG_SERVER,
+		game->flags & DBG_CLIENT
 	);
 
 	logger->enabled = 0;
 
-	pthread_t renderThread;
-	pthread_create (&renderThread, NULL, render, (void*)NULL);
-	game->renderThread = &renderThread;
+	pthread_create (&game->renderThread, NULL, render, (void*)NULL);
 
 	//logger->err("INIT: Ask-Lock");
 	lock(DBG_STATE);
@@ -151,6 +152,10 @@ int main(int argc, char *argv[])
 			case GAME_LOBY:
 				renderMap();
 				break;
+
+			case GAME_START:
+				launchSate(GAME_START);
+				break;
 		}
 	}
 
@@ -159,9 +164,9 @@ int main(int argc, char *argv[])
 	unlock(DBG_STATE);
 	logger->err("WAINTING FOR THREADS END");
 	
-	pthread_join (renderThread, NULL);
+	pthread_join (game->renderThread, NULL);
 	if(initServer(0) != NULL) {
-		pthread_join (serverThread, NULL);
+		pthread_join (game->serverThread, NULL);
 	}
 
 	logger->err("THREADS ENDED");

@@ -18,6 +18,10 @@ server_t* socket_init(unsigned int addr, int port) {
     if (socket_fd == -1)
     {
         logger->err("Could not create socket");
+        
+        free(response);
+        response = NULL;
+        return NULL;
     }
 
     logger->dbg("-- Master socket created");
@@ -25,8 +29,12 @@ server_t* socket_init(unsigned int addr, int port) {
     if( bind(socket_fd,(struct sockaddr *)&server , sizeof(server)) < 0)
     {
         logger->err("Socket Bind failed..");
-        return response;
+
+        free(response);
+        response = NULL;
+        return NULL;
     }
+
     char m[30];
     logger->dbg("-- Socket Bind successful on port : %d", port);
 

@@ -44,11 +44,14 @@ typedef struct Game Game;
 struct Game {
 	short status;
 	unsigned int flags;
+	ListManager* flagList;
 
 	pthread_cond_t cond;
 	pthread_mutex_t mutex;
 
-	void* renderThread;
+	pthread_t serverThread;
+	pthread_t clientThread;
+	pthread_t renderThread;
 
 	GameOptions options;
 };
@@ -63,5 +66,6 @@ void* loadMap();
 void parseGameArgs(int argc, char* argv[]);
 
 void tick();
+void launchSate(short status);
 
 #endif

@@ -19,7 +19,7 @@ void EventKeyUp(int key, int curKey) {
 int EventKeyDown(int key, int curKey) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_EVNT;
-	logger->inf("=== Key Event ===");
+	logger->err("=== Key Event ===");
 
 	if (key == SDLK_ESCAPE) {
 		logger->dbg("-- Event: Quit");
@@ -28,18 +28,18 @@ int EventKeyDown(int key, int curKey) {
 		return curKey;
 	}
 
-	if(game->status != GAME_START && game->status != GAME_RUNNING) {
+	if(game->status != GAME_LOBY && game->status != GAME_START && game->status != GAME_RUNNING) {
 		return curKey;
 	}
 
 	Player* p = getPlayer();
 	if (p == NULL) {
-		logger->dbg("-- No Player For Event");
+		logger->err("-- No Player For Event");
 		return curKey;
 	}
 
 	if (!p->alive) {
-		logger->dbg("-- Player is Dead");
+		logger->err("-- Player is Dead");
 		return curKey;
 	}
 
@@ -51,7 +51,9 @@ int EventKeyDown(int key, int curKey) {
 			if (p && p->alive) {
 				animRemoveObject(p->object);
 				p->clipIndex = 0;
-				playerMove(p, UP);
+				//playerMove(p, UP);
+
+				sendCommand("move", UP);
 			}
 			break;
 
@@ -62,7 +64,9 @@ int EventKeyDown(int key, int curKey) {
 			if (p && p->alive) {
 				animRemoveObject(p->object);
 				p->clipIndex = 0;
-				playerMove(p, DOWN);
+				//playerMove(p, DOWN);
+
+				sendCommand("move", DOWN);
 			}
 			break;
 
@@ -73,7 +77,9 @@ int EventKeyDown(int key, int curKey) {
 			if (p && p->alive) {
 				animRemoveObject(p->object);
 				p->clipIndex = 0;
-				playerMove(p, LEFT);
+				//playerMove(p, LEFT);
+
+				sendCommand("move", LEFT);
 			}
 			break;
 
@@ -84,7 +90,9 @@ int EventKeyDown(int key, int curKey) {
 			if (p && p->alive) {
 				animRemoveObject(p->object);
 				p->clipIndex = 0;
-				playerMove(p, RIGHT);
+				//playerMove(p, RIGHT);
+
+				sendCommand("move", RIGHT);
 			}
 			break;
 
@@ -92,10 +100,9 @@ int EventKeyDown(int key, int curKey) {
 			logger->dbg("-- Player Place Bomb");
 			if (p && p->alive) {
 				placeBomb(p);
+
+				sendCommand("bomb", 0);
 			}
-			break;
-		
-		default:
 			break;
 	}
 

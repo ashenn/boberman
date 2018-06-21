@@ -251,7 +251,7 @@ void playerTickMove(AnimParam* anim) {
 	playerMove(p, p->direction);
 }
 
-void playerMove(Player* p, short direction) {
+void* playerMove(Player* p, short direction) {
 	enableLogger(DBG_PLAYER);
 
 	p->direction = direction;
@@ -288,7 +288,7 @@ void playerMove(Player* p, short direction) {
 
 	if (anim == NULL) {
 		logger->dbg("CANT MOVE TO POS: x:%d, y:%d", p->object->pos.x + moveX, p->object->pos.y + moveY);
-		return;
+		return NULL;
 	}
 	
 	anim->callBack = playerTickMove;
