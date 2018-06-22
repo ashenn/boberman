@@ -258,6 +258,10 @@ void playerStop(Player* p) {
 }
 
 void* playerMove(Player* p, short direction) {
+	if(p == NULL || !p->alive) {
+		return NULL;
+	}
+
 	enableLogger(DBG_PLAYER);
 
 	p->direction = direction;

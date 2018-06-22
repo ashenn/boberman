@@ -89,7 +89,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     }
 
     //logger->war("HANDLER: Ask-Lock");
-    lock(DBG_SERVER);
+    //lock(DBG_SERVER);
     //logger->war("HANDLER: Lock");
     
     client->fd = new_socket;
@@ -100,7 +100,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     }
 
     //logger->war("HANDLER: Un-Lock");
-    unlock(DBG_SERVER);
+    //unlock(DBG_SERVER);
 
     logger->dbg("==== HANDLE MASTER SOCKET END ====");
 }
@@ -184,8 +184,10 @@ void handleCommand(Player* p, char* msg) {
     Node* n = getNodeByName(server->commands, cmd);
     
     if(n != NULL) {
-        Arg* arg = n->value;
-        arg->function(p, val);
+        if(p->alive) {
+            Arg* arg = n->value;
+            arg->function(p, val);
+        }
     }
     else{
         logger->err("Fail To Find Command: %s", cmd);
@@ -303,11 +305,13 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
         return 0;
     }
 
+    lock(DBG_SERVER);
     logger->dbg("-- Handeling Master Socket");
     handle_master_socket(master_socket_fd,  client_socket, server, &readfds);
 
     logger->dbg("-- Handeling Clients Socket");
     handle_client_sockets(client_socket, &readfds, server);
+    unlock(DBG_SERVER);
 
     logger->dbg("==== HANDLE NETWORK DONE ====");
     return 1;

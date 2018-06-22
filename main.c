@@ -162,13 +162,13 @@ int main(int argc, char *argv[])
 	unlock(DBG_STATE);
 	logger->err("WAINTING FOR THREADS END");
 	
-	pthread_join (game->renderThread, NULL);
+	pthread_join(game->renderThread, NULL);
 	if(getServer() != NULL) {
-		pthread_join (game->serverThread, NULL);
+		pthread_join(game->serverThread, NULL);
 	}
 
 	if(getConnexion() != NULL) {
-		pthread_join (game->clientThread, NULL);
+		pthread_join(game->clientThread, NULL);
 	}
 
 	logger->err("THREADS ENDED");

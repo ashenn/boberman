@@ -40,19 +40,15 @@ void* serverProcess() {
 	lock(DBG_SERVER);
 	//logger->dbg("-- Server Locked");
 
-	logger->dbg("-- Server INIT");
 	server_t* server = initServer(1);
-	logger->err("-- Signall COND");
 	signalCond();
 	if(server == NULL) {
 		unlock(DBG_SERVER);
-		logger->err("-- Server INIT FAILD");
 		return NULL;
 	}
 	
 
 	if(server->fd < 0) {
-		logger->err("Faild To Init Socket !!!");
 		unlock(DBG_SERVER);
 		return NULL;
 	}
