@@ -100,16 +100,14 @@ int main(int argc, char *argv[])
 
 	Game* game = getGame();
 	parseGameArgs(argc, argv);
-	
-	if(!game->options.ip[0]) {
-		logger->war("Setting Default IP");
-		snprintf(game->options.ip, 16, "127.0.0.1");
-	}
-	
 
 	logger->inf("-- Init: Window");
 	SDL_Surface* screen = getScreen();
 	
+	if(!game->options.ip[0]) {
+		logger->war("Setting Default IP");
+		snprintf(game->options.ip, 16, "127.0.0.1");
+	}	
 
 	logger->enabled = 1;
 	logger->war("Server Address: %s:%d", game->options.ip, game->options.port);
@@ -165,8 +163,12 @@ int main(int argc, char *argv[])
 	logger->err("WAINTING FOR THREADS END");
 	
 	pthread_join (game->renderThread, NULL);
-	if(initServer(0) != NULL) {
+	if(getServer() != NULL) {
 		pthread_join (game->serverThread, NULL);
+	}
+
+	if(getConnexion() != NULL) {
+		pthread_join (game->clientThread, NULL);
 	}
 
 	logger->err("THREADS ENDED");

@@ -42,11 +42,14 @@ void* serverProcess() {
 
 	logger->dbg("-- Server INIT");
 	server_t* server = initServer(1);
+	logger->err("-- Signall COND");
+	signalCond();
 	if(server == NULL) {
+		unlock(DBG_SERVER);
+		logger->err("-- Server INIT FAILD");
 		return NULL;
 	}
 	
-	signalCond();
 
 	if(server->fd < 0) {
 		logger->err("Faild To Init Socket !!!");

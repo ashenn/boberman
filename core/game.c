@@ -39,12 +39,18 @@ void* hostGame() {
 	server_t* serv = getServer();
 	
 	if(serv == NULL) {
+		logger->err("-- Call Server THREAD");
 		pthread_create(&game->serverThread, NULL, serverProcess, (void*)NULL);
 
+		logger->err("-- Wait Cond");
 		waitCond();
+		logger->err("-- Cond Validated");
 		serv = getServer();
 
+		logger->err("-- Checking");
 		if(serv == NULL || serv->fd < 0) {
+			unlock(DBG_SERVER);
+			logger->err("-- faild");
 			return NULL;
 		}
 
