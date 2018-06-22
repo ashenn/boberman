@@ -146,8 +146,8 @@ void renderMap() {
 	addSimpleObject("Background", bg, NULL, 1);
 
 	generateWalls();
-
-	findGame();
+	Player* p = genPlayer("Player-1");
+	initPlayer(p);
 
 	launchSate(GAME_LOBY);
 }
@@ -246,7 +246,7 @@ Button** getMenu() {
 		btnJoin->imgHoverPath = NULL;
 		btnJoin->imgObj = NULL;
 		btnJoin->txtObj = NULL;
-		btnJoin->click = (void*) loadMap;
+		btnJoin->click = (void*) findGame;
 		btnJoin->hover = (void*) buttonHover;
 		btnJoin->hasAnim = 1;
 
@@ -414,7 +414,7 @@ void mainMenu() {
 void changeGameStatus(short status) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_STATE;
-
+	
 	logger->inf("==== Changing Status: %d ====", status);
 	game->status = status;
 }

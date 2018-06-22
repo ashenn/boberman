@@ -33,7 +33,7 @@ LIB	=	-lSDL                   \
                 -lSDL_image             \
                 -lSDL_ttf               \
                 -lpthread               \
-                -fsanitize=address       \
+                -fsanitize=thread       \
                 -D_REENTRANT
 
 $(NAME):	$(OBJ)

@@ -162,12 +162,15 @@ int main(int argc, char *argv[])
 	unlock(DBG_STATE);
 	logger->err("WAINTING FOR THREADS END");
 	
+	logger->err("JOIN RENDER");
 	pthread_join(game->renderThread, NULL);
 	if(getServer() != NULL) {
+		logger->err("JOIN SERVER");
 		pthread_join(game->serverThread, NULL);
 	}
 
 	if(getConnexion() != NULL) {
+		logger->err("JOIN CLIENT");
 		pthread_join(game->clientThread, NULL);
 	}
 
