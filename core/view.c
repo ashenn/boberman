@@ -300,6 +300,7 @@ void* render(void* arg) {
 
 	    //logger->err("RENDER: Un-Lock");
 	    unlock(DBG_VIEW);
+	    usleep(25);
 		//logger->err("==== Rendering END %d ====", SDL_GetTicks() - t);
 
 	    frameWait(nextFrame);

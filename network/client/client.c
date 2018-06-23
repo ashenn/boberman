@@ -164,8 +164,9 @@ void* clientProcess() {
 
 		enableLogger(DBG_CLIENT);
 		logger->dbg("-- Getting Message");
-	  getMessage(msg);
+	  	getMessage(msg);
 		logger->dbg("-- Got Message %s, l:%d ", msg, strlen(msg));
+	    
 	    if(strlen(msg) == 0) {
 			enableLogger(DBG_CLIENT);
 			logger->dbg("-- msg is empty continue...");
@@ -183,11 +184,13 @@ void* clientProcess() {
 		explode(':', msg, 0, 0, resp);
 		Player *pl = getPlayer();
 		logger->dbg("%d", pl->id);
+		
 		if (strcmp(resp[0], "newPlayer") == 0) {
 			logger->err("New player Recieved : %s (I am %d)", resp[1], pl->id);
 			if (pl->id != str2int(resp[1]))
 				genPlayer("Player-n");
 		}
+		
 		if (strcmp(resp[0], "playerLeft") == 0) {
 			logger->err("Player left Recieved : %s (I am %d)", resp[1], pl->id);
 			ListManager* players = getPlayerList();
@@ -198,6 +201,7 @@ void* clientProcess() {
 					killPlayer(deadPlayer);
 			}
 		}
+		
 		if (strcmp(resp[0], "playerkilled") == 0) {
 			logger->err("player killed Recieved : %s (I am %d)", resp[1], pl->id);
 			ListManager* players = getPlayerList();

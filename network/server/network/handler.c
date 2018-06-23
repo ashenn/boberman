@@ -332,7 +332,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
 
     logger->dbg("-- Fetching Activity");
 
-    struct timeval tv = {1, 0};
+    struct timeval tv = {0, 15};
     activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 
     if ((activity < 0) && (errno!=EINTR))
@@ -342,12 +342,16 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
         return 0;
     }
 
+    // logger->err("-- Handeler: Ask-Lock");
     lock(DBG_SERVER);
+    // logger->err("-- Handeler: Lock");
+    
     logger->dbg("-- Handeling Master Socket");
     handle_master_socket(master_socket_fd,  client_socket, server, &readfds);
 
     logger->dbg("-- Handeling Clients Socket");
     handle_client_sockets(client_socket, &readfds, server);
+    // logger->err("-- Handeler: Un-Lock");
     unlock(DBG_SERVER);
 
     logger->dbg("==== HANDLE NETWORK DONE ====");
