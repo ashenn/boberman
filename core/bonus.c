@@ -145,7 +145,7 @@ BonusType prepareBonus() {
 	int r = rand() % 2;
 	short spawn = !r;
 	if (!spawn) {
-		return -1;
+		return BNS_NONE;
 	}
 	int type = rand() % 6;
 	logger->dbg("=== GENERATE BONUS %d ===", type);

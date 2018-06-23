@@ -156,7 +156,7 @@ void explosionHit(Object* explObj, Object* targetObj) {
 				bonuPos.h = BONUS_SIZE;
 
 				Game* game = getGame();
-					generateBonus(bonuPos);			
+				generateBonus(bonuPos, block->bonusType);
 
 				logger->err("BroadCast DONE");
 			}

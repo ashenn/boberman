@@ -153,6 +153,7 @@ void generateBlocks() {
 			logger->dbg("-- Placing: %s", name);
 
 			block = malloc(sizeof(Block));
+			block->bonusType = BNS_NONE;
 			block->state = 0;
 			block->destroyed = 0;
 

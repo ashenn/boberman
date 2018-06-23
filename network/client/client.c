@@ -85,11 +85,12 @@ short findHost() {
 	char* resp[3];
 	explode(':', msg, 0, 0, resp);
 
-	logger->inf("-- Checking explode");
-	logger->inf("-- 0: %s\n--1: %s", resp[0], resp[1]);
+	logger->err("-- Checking explode");
+	logger->err("-- 0: %s\n--1: %s", resp[0], resp[1]);
 
-	int id = str2int(resp[1]);
-
+	printf("%s\n", resp[1]);
+	int id = char2int(resp[1][0]);
+	logger->err("id : %d", id);
 	free(resp[0]);
 	free(resp[1]);
 
@@ -133,7 +134,7 @@ void* clientProcess() {
 
 	while(game->status < GAME_QUIT) {
 
-		logger->err("Client: Un-Lock");
+		//logger->err("Client: Un-Lock");
 	    unlock(DBG_CLIENT);
 
 		enableLogger(DBG_CLIENT);
@@ -245,7 +246,7 @@ void* clientProcess() {
 
 					bonuPos.w = BONUS_SIZE;
 					bonuPos.h = BONUS_SIZE;
-					generateBonus(bonuPos, resp[2]);
+					generateBonus(bonuPos, str2int(resp[2]));
 				}
 			}
 		}

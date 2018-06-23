@@ -27,7 +27,7 @@ struct Bonus {
 	BonusType type;
 };
 
-void generateBonus();
+void generateBonus(SDL_Rect pos, BonusType type);
 BonusType prepareBonus();
 
 #endif
