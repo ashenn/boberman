@@ -34,10 +34,10 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     if (!FD_ISSET(master_socket_fd, readfds)) {
         return;
     }
-    
+
     int new_socket;
     int addrlen = sizeof(&server);
-    
+
     if ((new_socket = accept(master_socket_fd, (struct sockaddr *)&server, (socklen_t*)&addrlen))<0) {
         logger->err("Faild To Accept New Socket !!!");
         exit(EXIT_FAILURE);
@@ -57,7 +57,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
         return;
     }
 
-    
+
     logger->war("Adding New Player: %d", serv->clients->nodeCount+1);
 
     char clientName[12];
@@ -65,7 +65,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     logger->war("-- Name: %s", clientName);
 
     client_t* client = malloc(sizeof(client_t));
-    
+
     Node* cliNode = addNodeV(serv->clients, clientName, client, 1);
 
     client->id = cliNode->id;
@@ -79,6 +79,9 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     if( send(new_socket, motd, strlen(motd), 0) != strlen(motd) ) {
         logger->err("Faild To Send Welcome Message");
     }
+    char newPlayer[43];
+    snprintf(newPlayer, 43, "newPlayer:%d", client->id);
+
 
     for (int i = 0; i < 4; i++) {
         if( *(client_socket + i) == 0 ) {
@@ -91,7 +94,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     //logger->war("HANDLER: Ask-Lock");
     //lock(DBG_SERVER);
     //logger->war("HANDLER: Lock");
-    
+
     client->fd = new_socket;
     client->name = clientName;
     client->player = genPlayer(clientName);
@@ -99,6 +102,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
         initPlayer(client->player);
     }
 
+    broadcast(newPlayer);
     //logger->war("HANDLER: Un-Lock");
     //unlock(DBG_SERVER);
 
@@ -165,6 +169,27 @@ void kill_client(int fd) {
         deleteNode(server->clients, id);
 }
 
+void broadcast(char *msg) {
+
+  Node* tmp = NULL;
+  server_t* server = getServer();
+  int nc = server->clients->nodeCount;
+  logger->err("Broadcast msg: %s for %d clients", msg, nc);
+  while((tmp = listIterate(server->clients, tmp)) != NULL) {
+
+    client_t *client = tmp->value;
+    logger->err("Broadcast msg: %s", msg);
+    int i = send(client->fd, msg, strlen(msg), 0);
+    if (i != strlen(msg)) {
+      logger->err("Broadcast error for fd : %d, %d", client->fd, i);
+    }
+    else {
+      logger->err("Broadcast success for fd : %d", client->fd);
+    }
+  }
+}
+
+
 void handleCommand(Player* p, char* msg) {
     logger->err("Handeling Command: %s", msg);
 
@@ -182,11 +207,12 @@ void handleCommand(Player* p, char* msg) {
 
     logger->err("Existing Commands: %d", server->commands->nodeCount);
     Node* n = getNodeByName(server->commands, cmd);
-    
+
     if(n != NULL) {
         if(p->alive) {
             Arg* arg = n->value;
             arg->function(p, val);
+
         }
     }
     else{
@@ -203,7 +229,7 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
     ssize_t valread;
     int addrlen = sizeof(&server);
     char buffer[MSG_SIZE];
-    
+
     int i;
     Node* n = NULL;
     //logger->err("-- getting Server");
@@ -214,11 +240,11 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
 
         client_t *client = n->value;
         int fd = client->fd;
-        
-        
+
+
         logger->err("-- Checking fd: %d", fd);
         if (FD_ISSET( fd , readfds)) {
-            
+
             logger->err("-- Getting Message");
             if ((valread = recv( fd , buffer, MSG_SIZE, 0)) == 0) {
                 logger->err("-- Faild Deleting User");
@@ -226,11 +252,15 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
                 //Node *n = search_node_by_index(clients, find_client_by_fd(fd)).next;
 
                 logger->war("Client Disconected: %s !!!", client->name);
-                
+
                 //close( fd );
                 //*(client_socket + i) = 0;
-                
+
                 if(client->player != NULL && client->player->alive) {
+
+                    char playerLeft[43];
+                    snprintf(playerLeft, 43, "playerLeft:%d", client->player->id);
+                    broadcast(playerLeft);
                     killPlayer(client->player);
                 }
             } else {
@@ -258,7 +288,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     if(game->status >= GAME_END) {
         return 0;
     }
-    
+
     logger->inf("==== HANDLE NETWORK ====");
 
     if(client_socket == NULL) {
@@ -270,10 +300,10 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
         for (a = 0; a < 4; a++) {
             client_socket[a] = 0;
         }
-        
+
         logger->dbg("==== INIT CLIENTS SOCKETS DONE ====");
     }
-    
+
 
     logger->dbg("-- Reset fd");
     //clear the socket set
@@ -282,7 +312,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     //add master socket to set
     logger->dbg("-- Set Master fd");
     logger->dbg("-- test");
-    
+
     logger->dbg("-- test %d", master_socket_fd);
     FD_SET(master_socket_fd, &readfds);
     logger->dbg("-- test DONE");
@@ -294,7 +324,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     max_sd = add_child_socket_to_set(max_sd, client_socket, &readfds);
 
     logger->dbg("-- Fetching Activity");
-    
+
     struct timeval tv = {1, 0};
     activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 

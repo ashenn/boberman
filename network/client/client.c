@@ -30,7 +30,7 @@ Connexion* initConnexion(short init) {
 	connexion.server.sin_family = AF_INET;
 	connexion.server.sin_port = htons(game->options.port);
 	connexion.server.sin_addr.s_addr = inet_addr(game->options.ip);
-	
+
 
 	logger->dbg("-- Connecting To Server");
 	if (connect(connexion.fd, (struct sockaddr *) &connexion.server, sizeof(connexion.server)) == -1) {
@@ -49,6 +49,7 @@ Connexion* getConnexion() {
 }
 
 void getMessage(char* msg) {
+	logger->inf("Message recieved !!! %s", msg);
 	memset(msg, 0, MSG_SIZE);
 	Connexion* co = getConnexion();
 	int i = recv(co->fd, msg, MSG_SIZE - 1, 0);
@@ -60,10 +61,10 @@ void getMessage(char* msg) {
 
 short findHost() {
 	enableLogger(DBG_CLIENT);
-	logger->inf("==== Findding Host ====");	
-	
+	logger->inf("==== Findding Host ====");
+
 	Connexion* co = initConnexion(1);
-	
+
 	if(co == NULL || !co->init) {
 		return 0;
 	}
@@ -82,7 +83,7 @@ short findHost() {
 	logger->inf("-- 0: %s\n--1: %s", resp[0], resp[1]);
 
 	int id = str2int(resp[1]);
-	
+
 	free(resp[0]);
 	free(resp[1]);
 
@@ -90,11 +91,12 @@ short findHost() {
 		logger->err("Connexion Refuse !!!");
 		return 0;
 	}
-
 	if(getServer() == NULL) {
 		char name[12];
 		memset(name, 0, 12);
-		
+		for(int i = 0; i < id; i++) {
+			Player* p = genPlayer("Player-1");
+		}
 		snprintf(name, 12, "player-%d", id);
 		initPlayer(genPlayer(name));
 	}
@@ -118,7 +120,7 @@ void* clientProcess() {
 	Connexion* co = getConnexion();
 
 	while(game->status < GAME_QUIT) {
-		
+
 		//logger->war("Client: Un-Lock");
 	    unlock(DBG_CLIENT);
 		sleep(1);
@@ -138,9 +140,9 @@ void* clientProcess() {
 
 		if ((activity < 0) && (errno != EINTR)) {
 			enableLogger(DBG_CLIENT);
-		    
+
 		    logger->war("No Activity");
-	    	
+
 			//logger->war("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
 			//logger->war("Client: Lock");
@@ -154,7 +156,7 @@ void* clientProcess() {
 
 			logger->dbg("-- read fd is empty skipping");
 			//logger->war("Client: Ask-Lock");
-	    	
+
 	    	lock(DBG_CLIENT);
 			//logger->war("Client: Lock");
 		    continue;
@@ -162,13 +164,13 @@ void* clientProcess() {
 
 		enableLogger(DBG_CLIENT);
 		logger->dbg("-- Getting Message");
-	    getMessage(msg);
-
-	    if(!strlen(msg)) {
+	  getMessage(msg);
+		logger->dbg("-- Got Message %s, l:%d ", msg, strlen(msg));
+	    if(strlen(msg) == 0) {
 			enableLogger(DBG_CLIENT);
 			logger->dbg("-- msg is empty continue...");
 			//logger->war("Client: Ask-Lock");
-	    	
+
 	    	lock(DBG_CLIENT);
 			//logger->war("Client: Lock");
 	    	continue;
@@ -176,6 +178,26 @@ void* clientProcess() {
 
 		enableLogger(DBG_CLIENT);
 		logger->dbg("-- Msg: %s", msg);
+
+		char* resp[3];
+		explode(':', msg, 0, 0, resp);
+		Player *pl = getPlayer();
+		logger->dbg("%d", pl->id);
+		if (strcmp(resp[0], "newPlayer") == 0) {
+			logger->err("New player Recieved : %s (I am %d)", resp[1], pl->id);
+			if (pl->id - 1 != str2int(resp[1]))
+				genPlayer("Player-n");
+		}
+		if (strcmp(resp[0], "playerLeft") == 0) {
+			logger->err("New player Recieved : %s (I am %d)", resp[1], pl->id);
+			ListManager* players = getPlayerList();
+			Node *tmp = NULL;
+			while((tmp = listIterate(players, tmp)) != NULL) {
+				Player *deadPlayer = tmp->value;
+				if (deadPlayer->id == str2int(resp[1]) )
+					killPlayer(deadPlayer);
+			}
+		}
 
 
 		//logger->war("Client: Ask-Lock");

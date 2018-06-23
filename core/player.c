@@ -34,7 +34,7 @@ Player* getPlayer() {
 
 ListManager* getPlayerList() {
 	static ListManager* players = NULL;
-	
+
 	if (players != NULL){
 		return players;
 	}
@@ -56,7 +56,7 @@ void clearPlayers() {
 	Player* p = NULL;
 	while((n = listIterate(players, n)) != NULL) {
 		logger->inf("--Delete Node: %p", n);
-	    
+
 	    p = (Player*) n->value;
 	    deleteObject(p->object);
 
@@ -156,10 +156,13 @@ void updatePlayerClip(Player* p) {
 }
 
 Player* genPlayer(char* name) {
+
 	static int cnt = 0;
 	if(cnt >= 4) {
 		return NULL;
 	}
+
+	logger->err("#### GEN PLAYER %s/%d", name, cnt);
 
 	enableLogger(DBG_PLAYER);
 
@@ -167,7 +170,7 @@ Player* genPlayer(char* name) {
 	Player* p = malloc(sizeof(Player));
 
 	logger->dbg("-- Player Address %p", p);
-	
+
 	if (p == NULL) {
 		logger->err("#### Fail To Malloc Player");
 		logger->dbg("==== GEN PLAYER FAILD ====");
@@ -185,7 +188,7 @@ Player* genPlayer(char* name) {
 	p->bombPower = 1;
 	p->canPlaceBomb = 1;
 	p->direction = DOWN;
-	
+
 
 	p->pos.x = 0;
 	p->pos.y = 0;
@@ -216,22 +219,22 @@ Player* genPlayer(char* name) {
 	logger->dbg("-- Creating Object");
 	SDL_Rect pos = {0,0, PLAYER_W, PLAYER_H};
 	Object* obj = p->object = addSimpleObject(name, img, &pos, 3);
-	
 
-	
+
+
 	p->clip.w = PLAYER_W;
 	p->clip.h = PLAYER_H;
 
 	p->object->clip = &p->clip;
 	obj->clipIndex = &p->clipIndex;
-	
+
 	obj->container = p;
 	obj->containerType = PLAYER;
 
-	
+
 	calcPlayerObjectPos(p->pos, &p->object->pos);
 	updatePlayerClip(p);
-	
+
 	SDL_Rect hitrect = {18, 60, 20, 15};
 	setHitBox(obj, hitrect, 1, COL_PLAYER);
 	obj->collision->colFlags = COL_ALL;
@@ -300,7 +303,7 @@ void* playerMove(Player* p, short direction) {
 		logger->dbg("CANT MOVE TO POS: x:%d, y:%d", p->object->pos.x + moveX, p->object->pos.y + moveY);
 		return NULL;
 	}
-	
+
 	anim->callBack = playerTickMove;
 }
 

@@ -54,13 +54,15 @@ server_t* initServer(short init);
 
 #include "../../core/game.h"
 
+void broadcast(char *msg);
+
 
 //network
 void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_in server);
 int network_handling (int socket_fd, struct sockaddr_in server);
 server_t* socket_init(unsigned int addr, int port);
 void handle_master_socket(int master_socket_fd, int *client_socket, struct sockaddr_in server, fd_set *readfds);
-int broadcast(int *clients, int maxclient, int self, char *buffer);
+//int broadcast(int *clients, int maxclient, int self, char *buffer);
 
 //protocol
 void read_command(char *buffer, int sd, int* client_socket);
@@ -74,7 +76,7 @@ int find_client_by_fd(int fd);
 int send_to_client(int client, char *buffer);
 void c_fetch_clients(char *buffer, int sd, int *client_socket);
 void c_fetch_client(char *buffer, int sd, int *client_socket);
-void c_message_channel(char *buffer, int sd, int *client_socket);
+//void c_message_channel(char *buffer, int sd, int *client_socket);
 void c_create_channel(char *buffer, int sd, int *client_socket);
 
 #endif

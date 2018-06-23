@@ -22,22 +22,23 @@ void* findGame() {
 		logger->inf("GAME ALREADY INIT");
 		return NULL;
 	}
-	
+
 	if(!findHost()) {
 		logger->err("Faild To Find Host !!!");
 		return NULL;
 	}
-	
+
 	logger->war("Host Found Host !!!");
 
 	pthread_create(&game->clientThread, NULL, clientProcess, (void*)NULL);
+	logger->war("clientThread created");
 	loadMap();
 }
 
 void* hostGame() {
 	Game* game= getGame();
 	server_t* serv = getServer();
-	
+
 	if(serv == NULL) {
 		pthread_create(&game->serverThread, NULL, serverProcess, (void*)NULL);
 
@@ -49,7 +50,7 @@ void* hostGame() {
 			logger->err("-- faild");
 			return NULL;
 		}
-
+		clearObjects();
 		setServerIp("127.0.0.1");
 
 		unlock(DBG_SERVER);
@@ -107,12 +108,12 @@ void launchSate(short status) {
 
 		now = SDL_GetTicks();
 		add = (int)(1000 / (float)FPS);
-	    
+
 	    nextFrame = now + add;
 
 		handleEvents();
-    	
-    	if (game->status == GAME_LOBY) {    		
+
+    	if (game->status == GAME_LOBY) {
     		handleHits();
     	}
 
@@ -139,15 +140,12 @@ void renderMap() {
 	logger->enabled = game->flags & DBG_MAP;
 
 	logger->inf("==== LOADING MAP ====");
-	clearObjects();
 
 	AssetMgr* ast = getAssets();
 	SDL_Surface* bg = ast->getImg("map");
 	addSimpleObject("Background", bg, NULL, 1);
 
 	generateWalls();
-	Player* p = genPlayer("Player-1");
-	initPlayer(p);
 
 	launchSate(GAME_LOBY);
 }
@@ -174,7 +172,7 @@ void initGameFlags(Game* game) {
 	};
 
 
-	
+
 	addNodeV(game->flagList, "hit", flags + 0, 0);
 	addNodeV(game->flagList, "evnt", flags + 1, 0);
 	addNodeV(game->flagList, "move", flags + 2, 0);
@@ -190,24 +188,24 @@ void initGameFlags(Game* game) {
 	addNodeV(game->flagList, "menu", flags + 12, 0);
 	addNodeV(game->flagList, "server", flags + 13, 0);
 	addNodeV(game->flagList, "client", flags + 14, 0);
-	
+
 }
 
 Game* getGame() {
 	static Game* game = NULL;
-	
+
 	if (game != NULL) {
 		return game;
 	}
 
 	logger->enabled = 1;
-	logger->inf("==== INIT Game* game ====");	
+	logger->inf("==== INIT Game* game ====");
 	game = malloc(sizeof(Game));
 
 	game->flags = NO_FLAG;
 	game->status = GAME_MENU;
 	initGameFlags(game);
-	
+
 	game->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
 	game->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
@@ -219,7 +217,7 @@ Game* getGame() {
 
 void quitGame() {
 	logger->enabled = 1;
-	logger->inf("==== Quitting Game* game ====");	
+	logger->inf("==== Quitting Game* game ====");
 	Game* game = getGame();
 	game->status = GAME_QUIT;
 }
@@ -229,8 +227,8 @@ Button** getMenu() {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_MENU;
 
-	logger->inf("==== Getting Menu ====");	
-	
+	logger->inf("==== Getting Menu ====");
+
 
 	Button* btnJoin = malloc(sizeof(Button));
 		btnJoin->z = 2;
@@ -257,17 +255,17 @@ Button** getMenu() {
 		// Define Position
 		btnJoin->pos.x = SCREEN_W + 5;
 		btnJoin->pos.y = percent(45, SCREEN_H);
-		
+
 		// Define Animation Position
 		btnJoin->anim = malloc(sizeof(AnimParam));
 		btnJoin->anim->time = 0.7f;
 		btnJoin->anim->delay = 0;
 		btnJoin->anim->pos.x = percent(50, SCREEN_W) - (LG_BTN_W / 2);
 		btnJoin->anim->pos.y = percent(45, SCREEN_H);
-		
+
 		btnJoin->anim->pos.w = 0;
 		btnJoin->anim->pos.h = 0;
-	
+
 		logger->dbg(
 			"-- Button: %s\n--pos: x: %d | y: %d | w: %d | h: %d\n--anim: x: %d | y: %d | w: %d | h: %d\n",
 			btnJoin->name,
@@ -315,7 +313,7 @@ Button** getMenu() {
 		btnHost->anim->pos.x = percent(50, SCREEN_W) - (LG_BTN_W / 2);
 		//btnHost->anim->pos.y = 230;
 		btnHost->anim->pos.y = btnJoin->anim->pos.y + (LG_BTN_H  * 1.25);
-		
+
 		btnHost->anim->pos.w = 0;
 		btnHost->anim->pos.h = 0;
 
@@ -414,7 +412,7 @@ void mainMenu() {
 void changeGameStatus(short status) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_STATE;
-	
+
 	logger->inf("==== Changing Status: %d ====", status);
 	game->status = status;
 }
@@ -424,7 +422,7 @@ void* addDebugFlag(char* flag) {
 
 	logger->err("==== setting Flag: %s ====", flag);
 	Node* n = getNodeByName(game->flagList, flag);
-	
+
 	if(n == NULL) {
 		logger->err("Faild To Found Flag: %s", flag);
 		return NULL;
@@ -435,28 +433,28 @@ void* addDebugFlag(char* flag) {
 
 void parseGameArgs(int argc, char* argv[]){
 	static Arg arg1 = {
-		.name = "-dbg", 
-		.function = addDebugFlag, 
-		.hasParam = 1, 
-		.defParam = NULL, 
+		.name = "-dbg",
+		.function = addDebugFlag,
+		.hasParam = 1,
+		.defParam = NULL,
 		.asInt = 0,
 		.type="alpha"
 	};
 
 	static Arg arg2 = {
-		.name = "p", 
-		.function = setServerPort, 
-		.hasParam = 1, 
-		.defParam = NULL, 
+		.name = "p",
+		.function = setServerPort,
+		.hasParam = 1,
+		.defParam = NULL,
 		.asInt = 1,
 		.type="num"
 	};
 
 	static Arg arg3 = {
-		.name = "ip", 
-		.function = setServerIp, 
-		.hasParam = 1, 
-		.defParam = NULL, 
+		.name = "ip",
+		.function = setServerIp,
+		.hasParam = 1,
+		.defParam = NULL,
 		.asInt = 0,
 		.type="any"
 	};

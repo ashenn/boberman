@@ -14,7 +14,7 @@ int main (int argc, char *argv[])
 	List args = get_args(argc, argv);
 	logger = config_logger("./journal.log", 0, 1, 1);
 
-	add_option(&opts, "-p", 1, "8888", my_putstr); //port
+	add_option(&opts, "-p", 1, "8889", my_putstr); //port
 	add_option(&opts, "-c", 1, "25", my_putstr);  //max clients
 	parser(&opts, args);
 
@@ -35,5 +35,3 @@ int main (int argc, char *argv[])
 
 	return 0;
 }
-
-

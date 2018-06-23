@@ -1,6 +1,6 @@
 #include "../server.h"
 
-void c_message_channel(char *buffer, int sd, int *client_socket) {
+/*void c_message_channel(char *buffer, int sd, int *client_socket) {
     logger->inf("==== Received Mesage ====");
     logger->dbg("-- from sd: #%d", client_socket);
     logger->dbg("%s", buffer);
@@ -16,4 +16,4 @@ void c_message_channel(char *buffer, int sd, int *client_socket) {
     }
 
     return;
-}
+}*/
