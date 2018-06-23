@@ -13,6 +13,7 @@
 #include "../../base/logger.h"
 
 #include "../../main.h"
+#include "../../core/map.h"
 
 typedef struct {
     int id;

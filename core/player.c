@@ -255,6 +255,11 @@ void playerTickMove(AnimParam* anim) {
 }
 
 void playerStop(Player* p) {
+	char msg[25];
+	memset(msg, 0, 25); 
+	snprintf(msg, 25, "stop:%d", p->id);
+	//broadcast(msg);
+	
 	p->clipIndex = 0;
 	animRemoveObject(p->object);
 	updatePlayerClip(p);
@@ -264,6 +269,11 @@ void* playerMove(Player* p, short direction) {
 	if(p == NULL || !p->alive) {
 		return NULL;
 	}
+
+	char msg[25];
+	memset(msg, 0, 25); 
+	snprintf(msg, 25, "move:%d:%d", p->id, direction);
+	//broadcast(msg);
 
 	enableLogger(DBG_PLAYER);
 

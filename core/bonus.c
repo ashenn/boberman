@@ -153,6 +153,10 @@ BonusType prepareBonus() {
 }
 
 void generateBonus(SDL_Rect pos, BonusType type) {
+	if(type == BNS_NONE) {
+		return;
+	}
+
 	Bonus* bns = malloc(sizeof(Bonus));
 	bns->z = 1;
 	bns->clip.y = 0;

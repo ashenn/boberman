@@ -1,5 +1,15 @@
 #include "map.h"
 
+ListManager* getBlockList() {
+	static ListManager* blocks = NULL;
+	if(blocks != NULL) {
+		return blocks;
+	}
+
+	blocks = initListMgr();
+	return blocks;
+}
+
 void generateWalls() {
 	Game* game = getGame();
 	enableLogger(DBG_MAP);
@@ -130,6 +140,7 @@ void generateBlocks() {
 	int x = 0;
 	int y = 0;
 
+	ListManager* blockList = getBlockList();
 	SDL_Rect hit = {0, 0, CELL_SIZE, CELL_SIZE};
 	SDL_Rect pos = {0, 0, CELL_SIZE, CELL_SIZE};
 
@@ -169,7 +180,9 @@ void generateBlocks() {
 			blockObj = addSimpleObject(name, img, &pos, 2);
 			setHitBox(blockObj, hit, 1, COL_WALL);
 			block->obj = blockObj;
-			block->id = blockObj->id;
+
+			Node* blockNode = addNodeV(blockList, name, block, 0);
+			block->id = blockNode->id;
 
 			blockObj->visible = 1;
 			blockObj->container = block;

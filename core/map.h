@@ -19,5 +19,6 @@ void generateWalls();
 void generateBlocks();
 
 void breakBlock(Block* block);
+ListManager* getBlockList();
 
 #endif

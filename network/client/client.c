@@ -197,6 +197,10 @@ void* clientProcess() {
 		Player *pl = getPlayer();
 		logger->dbg("%d", pl->id);
 
+		//logger->war("Client: Ask-Lock");
+	    lock(DBG_CLIENT);
+		//logger->war("Client: Lock");
+
 		if (strcmp(resp[0], "newPlayer") == 0) {
 			logger->err("New player Recieved : %s (I am %d)", resp[1], pl->id);
 			if (pl->id != str2int(resp[1]))
@@ -227,27 +231,31 @@ void* clientProcess() {
 
 		if (strcmp(resp[0], "breackblock") == 0) {
 			logger->err("Break Block By Id: %d", resp[1]);
-			ListManager* objs = getObjectList();
+			ListManager* blockList = getBlockList();
 
 			int id = str2int(resp[1]);
-			Node* blockNode = getNode(objs, id);
+			Node* blockNode = getNode(blockList, id);
 
 			if(blockNode != NULL) {
-				Object* o = blockNode->value;
+				Block* block = blockNode->value;
+				Object* o = block->obj;
 
 				logger->err("Object Got: %s", o->name);
 
-				if(o->containerType == BLOCK) {
-					breakBlock(o->container);
-					SDL_Rect bonuPos;
-					Block *block = o->container;
-					bonuPos.x = block->obj->pos.x + (BONUS_SIZE / 4);
-					bonuPos.y = block->obj->pos.y + (BONUS_SIZE / 4);
+				breakBlock(block);
+				SDL_Rect bonuPos;
 
-					bonuPos.w = BONUS_SIZE;
-					bonuPos.h = BONUS_SIZE;
-					generateBonus(bonuPos, str2int(resp[2]));
-				}
+				bonuPos.x = block->obj->pos.x + (BONUS_SIZE / 4);
+				bonuPos.y = block->obj->pos.y + (BONUS_SIZE / 4);
+
+				bonuPos.w = BONUS_SIZE;
+				bonuPos.h = BONUS_SIZE;
+
+				int bonusType = str2int(resp[2]);
+
+
+				generateBonus(bonuPos, bonusType);
+				deleteNode(blockList, block->id);
 			}
 		}
 
@@ -255,21 +263,52 @@ void* clientProcess() {
 			logger->err("Bomb Placed By Id: %d", resp[1]);
 			int id = str2int(resp[1]);
 			ListManager* players = getPlayerList();
-			Node* playernode = getNode(players, id);
+			Node* playerNode = getNode(players, id);
 
 
-			if(playernode != NULL) {
-					Player *player = playernode->value;
+			if(playerNode != NULL) {
+					Player *player = playerNode->value;
 					if(player != NULL) {
 						placeBomb(player);
 					}
 			}
 		}
 
+		/*
+		if (strcmp(resp[0], "move") == 0) {
+			int id = str2int(resp[1]);
+			int direction = str2int(resp[2]);
+			logger->err("Moving Player #%d: %d", id, direction);
 
-		//logger->war("Client: Ask-Lock");
-	    lock(DBG_CLIENT);
-		//logger->war("Client: Lock");
+			ListManager* players = getPlayerList();
+			Node* playerNode = getNode(players, id);
+
+			if(playerNode != NULL) {
+				Player *player = playerNode->value;
+				if(player != NULL) {
+
+					playerMove(player, direction);
+				}
+			}
+		}
+
+		if (strcmp(resp[0], "stop") == 0) {
+			logger->err("Stopping Player #%d", resp[1]);
+			int id = str2int(resp[1]);
+
+			ListManager* players = getPlayerList();
+			Node* playerNode = getNode(players, id);
+
+			if(playerNode != NULL) {
+				Player *player = playerNode->value;
+				if(player != NULL) {
+					int direction = str2int(resp[1]);
+
+					playerStop(player);
+				}
+			}
+		}
+		*/
 	}
 
 	close(co->fd);
