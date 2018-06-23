@@ -41,7 +41,7 @@ void bombMove(AnimParam* anim) {
 	if (anim == NULL) {
 		return;
 	}
-	
+
 	anim->callBack = bombMove;
 }
 
@@ -51,7 +51,7 @@ void bombHit(Object* bombObj, Object* targetObj) {
 	}
 
 	logger->err("=== BOMB COL ===");
-	
+
 	logger->err("-- Cast To Bomb");
 	Bomb* bomb = (Bomb*) bombObj->container;
 
@@ -67,7 +67,7 @@ void bombHit(Object* bombObj, Object* targetObj) {
 
 	logger->err("-- Cast To Player");
 	Player* p = (Player*) targetObj->container;
-	
+
 	if (0 && !p->shoot) {
 		logger->err("-- Can't Shoot");
 		return;
@@ -112,9 +112,13 @@ void explosionHit(Object* explObj, Object* targetObj) {
 	if (targetObj->container == NULL) {
 		return;
 	}
-
+	char playerkilled[43];
+	Player *killedPlayer;
 	switch(targetObj->containerType) {
 		case PLAYER:
+			killedPlayer = targetObj->container;
+			snprintf(playerkilled, 43, "playerkilled:%d", killedPlayer->id);
+			broadcast(playerkilled);
 			killPlayer(targetObj->container);
 			break;
 
@@ -155,16 +159,16 @@ void getExplPartName(ExplosionPart part, char* name) {
 
 void clearExplosion(Object* obj) {
 	enableLogger(DBG_BOMB);
-	
+
 	logger->inf("==== CLEAR EXPLOSION ====");
-	
+
 	logger->dbg("-- Name %s", obj->name);
 	Node* n = NULL;
 
 	while((n = listIterate(obj->childs, n)) != NULL) {
 	    Object* child = (Object*) n->value;
 		logger->dbg("-- Clear Child %s", child->name);
-	    
+
 	}
 
 	logger->dbg("==== CLEAR EXPLOSION DONE ====", obj->name);
@@ -181,10 +185,10 @@ void iterateExplosion(AnimParam* anim) {
 
 	Bomb* bomb = (Bomb*) anim->obj->container;
 	bomb->state++;
-	
+
 	int y =  bomb->state - 9;
 	logger->dbg("-- Explosion State: %d", y);
-	
+
 	if (y > 3){
 		anim->deleteObject = 1;
 		logger->dbg("-- Delete Object");
@@ -193,7 +197,7 @@ void iterateExplosion(AnimParam* anim) {
 		logger->dbg("-- Adjust Clip");
 		SDL_Rect animClip = {0, (y+1) * BOMB_SIZE, BOMB_SIZE, BOMB_SIZE};
 		logger->dbg("-- x: %d, y: %d", 0, y);
-		
+
 		anim = spriteAnim(anim->obj, animClip, 0.1f, 0, 1);
 		anim->callBack = iterateExplosion;
 	}
@@ -202,7 +206,7 @@ void iterateExplosion(AnimParam* anim) {
 Object* genExplosionPart(ExplosionPart index, int x, int y) {
 	enableLogger(DBG_BOMB);
 	logger->inf("==== GENERATING EXPLOSION PART ====");
-	
+
 	char partName[15];
 	getExplPartName(index, partName);
 	logger->dbg("-- partName %s", partName);
@@ -260,10 +264,10 @@ void placeExplosion(Bomb* bomb) {
 
 	bomb->state++;
 	int y = bomb->state - 5;
-	
+
 	char name[45];
 	snprintf(name, 35, "Explosion-%d", cnt++);
-	
+
 	Object* obj = addSimpleObject(name, ast->getImg("bomb3"), NULL, 2);
 	bomb->obj = obj;
 
@@ -274,7 +278,7 @@ void placeExplosion(Bomb* bomb) {
 	bomb->clip.y = BOMB_SIZE;
 	bomb->clip.h = BOMB_SIZE;
 	bomb->clip.w = BOMB_SIZE;
-	
+
 	obj->clip = &bomb->clip;
 	obj->container = bomb;
 	obj->containerType = BOMB;
@@ -305,7 +309,7 @@ void placeExplosion(Bomb* bomb) {
 
 					targetX = obj->pos.x;
 					targetY = obj->pos.y - (z * BOMB_SIZE);
-					break; 
+					break;
 
 				case DOWN:
 					x = 0;
@@ -314,7 +318,7 @@ void placeExplosion(Bomb* bomb) {
 
 					targetX = obj->pos.x;
 					targetY = obj->pos.y + (z * BOMB_SIZE);
-					break; 
+					break;
 
 				case RIGHT:
 					y = 0;
@@ -323,7 +327,7 @@ void placeExplosion(Bomb* bomb) {
 
 					targetY = obj->pos.y;
 					targetX = obj->pos.x + (z * BOMB_SIZE);
-					break; 
+					break;
 
 				case LEFT:
 					y = 0;
@@ -351,25 +355,25 @@ void placeExplosion(Bomb* bomb) {
 				x = 0;
 				y = -(z);
 				part = EXPL_END_TOP;
-				break; 
+				break;
 
 			case DOWN:
 				x = 0;
 				y = z;
 				part = EXPL_END_DOWN;
-				break; 
+				break;
 
 			case RIGHT:
 				y = 0;
 				x = z;
 				part = EXPL_END_RIGHT;
-				break; 
+				break;
 
 			case LEFT:
 				y = 0;
 				x = -(z);
 				part = EXPL_END_LEFT;
-				break; 
+				break;
 		}
 
 		objPart = genExplosionPart(part, x, y);
@@ -382,7 +386,7 @@ void placeExplosion(Bomb* bomb) {
 
 	SDL_Rect animClip = {0, (y+1) * BOMB_SIZE, BOMB_SIZE, BOMB_SIZE};
 	AnimParam* anim = spriteAnim(obj, animClip, 0.1f, 0, 1);
-	
+
 	anim->deleteObject = 0;
 	anim->callBack = iterateExplosion;
 
@@ -408,7 +412,7 @@ void iterateBomb(AnimParam* anim) {
 	}
 
 	bomb->state++;
-	
+
 	int posY = 0;
 
 	switch (bomb->state) {
@@ -421,13 +425,13 @@ void iterateBomb(AnimParam* anim) {
 			bomb->owner->canPlaceBomb = 1;
 			posY = bomb->pos.y -10;
 			break;
-		
+
 		case 3:
 			posY = bomb->pos.y;
 			break;
 	}
 
-	
+
 	if (bomb->state > 3){
 		posY = bomb->pos.y;
 		bomb->clip.y = 1;
@@ -441,7 +445,7 @@ void iterateBomb(AnimParam* anim) {
 			obj->collision->colFlags = COL_PLAYER | COL_WALL;
 			obj->collision->fnc = bombHit;
 		}*/
-		
+
 		if (bomb->state < 6) {
 			if (bomb->clip.x >= BOMB_SIZE){
 				bomb->clip.x -= BOMB_SIZE;
@@ -451,11 +455,11 @@ void iterateBomb(AnimParam* anim) {
 			bomb->clip.x = BOMB_SIZE * 3;
 		}
 	}
-	
+
 	if (bomb->state < 7) {
 		logger->dbg("Bomb Anim %s", obj->name);
 		anim = moveTo(obj, bomb->pos.x, posY, 0.2f, 0);
-		
+
 		if (anim != NULL) {
 			logger->dbg("Bomb Anim Success");
 			anim->callBack = iterateBomb;
@@ -470,7 +474,7 @@ void iterateBomb(AnimParam* anim) {
 void placeBomb(Player* p) {
 	static int cnt = 0;
 	enableLogger(DBG_BOMB);
-	
+
 	AssetMgr* ast = getAssets();
 
 	if (p->bombCnt <= 0 || !p->canPlaceBomb) {
@@ -487,10 +491,10 @@ void placeBomb(Player* p) {
 
 	char name[35];
 	snprintf(name, 35, "Bomb-%d", cnt++);
-	
+
 	logger->dbg("-- Object Name: %s", name);
 	Object* obj = addSimpleObject(name, ast->getImg("bomb3"), NULL, 2);
-	
+
 
 	logger->dbg("-- Setting Pos");
 	obj->pos.x = p->object->pos.x + (PLAYER_W / 2) - 20;
@@ -516,7 +520,7 @@ void placeBomb(Player* p) {
 
 	logger->dbg("-- Link Clip");
 	obj->clip = &bomb->clip;
-	
+
 	obj->container = bomb;
 	obj->containerType = BOMB;
 	bomb->obj = obj;
@@ -534,6 +538,6 @@ void placeBomb(Player* p) {
 	obj->collision->enabled = 0;
 	obj->collision->fnc = NULL;
 	*/
-	
+
 	logger->dbg("==== PLACE BOMB END ====");
 }

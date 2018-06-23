@@ -174,9 +174,13 @@ void broadcast(char *msg) {
   Node* tmp = NULL;
   server_t* server = getServer();
   int nc = server->clients->nodeCount;
+  int first = 0;
   logger->err("Broadcast msg: %s for %d clients", msg, nc);
   while((tmp = listIterate(server->clients, tmp)) != NULL) {
-
+    if (!first) {
+      first ++;
+      continue;
+    }
     client_t *client = tmp->value;
     logger->err("Broadcast msg: %s", msg);
     int i = send(client->fd, msg, strlen(msg), 0);
@@ -263,6 +267,7 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
                     broadcast(playerLeft);
                     killPlayer(client->player);
                     close(client->fd);
+                    n = n->prev;
                     deleteNode(serv->clients, client->id);
                 }
             } else {

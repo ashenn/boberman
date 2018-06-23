@@ -94,7 +94,7 @@ short findHost() {
 	if(getServer() == NULL) {
 		char name[12];
 		memset(name, 0, 12);
-		for(int i = 0; i < id; i++) {
+		for(int i = 1; i < id; i++) {
 			Player* p = genPlayer("Player-1");
 		}
 		snprintf(name, 12, "player-%d", id);
@@ -116,9 +116,9 @@ void* clientProcess() {
 	char msg[MSG_SIZE];
 
 	fd_set readfds;
-	struct timeval tv = {1, 0};
+	struct timeval tv = {0, 20};
 	Connexion* co = getConnexion();
-
+  lock(DBG_CLIENT);
 	while(game->status < GAME_QUIT) {
 
 		//logger->war("Client: Un-Lock");
@@ -185,11 +185,21 @@ void* clientProcess() {
 		logger->dbg("%d", pl->id);
 		if (strcmp(resp[0], "newPlayer") == 0) {
 			logger->err("New player Recieved : %s (I am %d)", resp[1], pl->id);
-			if (pl->id - 1 != str2int(resp[1]))
+			if (pl->id != str2int(resp[1]))
 				genPlayer("Player-n");
 		}
 		if (strcmp(resp[0], "playerLeft") == 0) {
-			logger->err("New player Recieved : %s (I am %d)", resp[1], pl->id);
+			logger->err("Player left Recieved : %s (I am %d)", resp[1], pl->id);
+			ListManager* players = getPlayerList();
+			Node *tmp = NULL;
+			while((tmp = listIterate(players, tmp)) != NULL) {
+				Player *deadPlayer = tmp->value;
+				if (deadPlayer->id == str2int(resp[1]))
+					killPlayer(deadPlayer);
+			}
+		}
+		if (strcmp(resp[0], "playerkilled") == 0) {
+			logger->err("player killed Recieved : %s (I am %d)", resp[1], pl->id);
 			ListManager* players = getPlayerList();
 			Node *tmp = NULL;
 			while((tmp = listIterate(players, tmp)) != NULL) {

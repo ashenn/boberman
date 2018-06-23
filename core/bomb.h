@@ -2,6 +2,7 @@
 #define _PLAYER_H__
 
 #include "../common.h"
+#include "../network/server/server.h"
 #define BOMB_TIME 2
 
 enum ExplosionPart

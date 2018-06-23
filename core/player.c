@@ -320,7 +320,8 @@ short iteratePlayerKill(AnimParam* anim) {
 
 	if (p->clipIndex > 6) {
 		logger->dbg("=== PLAYER ILL DONE DELETING");
-		anim->deleteObject = 1;
+		//anim->deleteObject = 1;
+		obj->enabled = 0;
 		obj->visible = 0;
 		return 0;
 	}
@@ -330,6 +331,8 @@ short iteratePlayerKill(AnimParam* anim) {
 }
 
 void killPlayer(Player* p) {
+	if (!p->alive)
+		return;
 	enableLogger(DBG_PLAYER);
 
 	logger->inf("==== KILL PLAYER ====");

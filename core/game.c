@@ -55,6 +55,7 @@ void* hostGame() {
 
 		unlock(DBG_SERVER);
 		loadMap();
+		findGame();
 	}
 }
 
@@ -124,7 +125,7 @@ void launchSate(short status) {
 		//logger->err("GAME: Un-Lock");
 		unlock(DBG_VIEW);
 
-		SDL_Delay(5);
+		SDL_Delay(25);
 	}
 
 	logger->dbg("===== STATE END =====");

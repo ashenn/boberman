@@ -54,8 +54,6 @@ void* serverProcess() {
 		return NULL;
 	}
 
-	initPlayer(genPlayer("Player-1"));
-
 	while(game->status < GAME_END) {
 		//logger->dbg("-- Server Unlock");
 		unlock(DBG_SERVER);
