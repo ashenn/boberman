@@ -22,14 +22,14 @@ struct Object {
 	short z;	// z-index
 	char* name;
 	short lifetime;
-	
+
 	short visible;	// Displayed
 	short enabled;	// Clickable / Hoverable
-	
+
 	int* clipIndex;
 	SDL_Rect pos;	// Poition / site
 	SDL_Rect* clip;	// Image Clip
-	
+
 	Collision* collision;
 
 	void* container;	// Custom Struc ex: Button
@@ -57,6 +57,7 @@ Object* addObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 void clearObjects();
 void deleteObject(Object* obj);
 short layerSort(void* a, void* b);
+Object* generateText(char* text, char* fontName, int fontSize);
 Object* generateButton(Button* btn);
 short addChild(Object* obj, Object* child);
 Object* genSimpleObject(char* name, void* comp, SDL_Rect* pos, short z);

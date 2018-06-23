@@ -419,6 +419,7 @@ void changeGameStatus(short status) {
 	logger->enabled = game->flags & DBG_STATE;
 
 	logger->inf("==== Changing Status: %d ====", status);
+	generateText("Changing status", "pf", FONT_LG);
 	game->status = status;
 }
 

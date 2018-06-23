@@ -7,17 +7,17 @@ void clearOutdatedObjects() {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_OBJ;
 	logger->inf("==== Clear Outdated Objects ====");
-	
+
 	while((n = listIterate(objects, n)) != NULL) {
 	    Object* o = (Object*) n->value;
 	    if (o->lifetime == -1){
 	    	continue;
 	    }
-		
+
 	    o->lifetime--;
 		logger->dbg("--obj: %s", o->name);
 		logger->dbg("--life: %d", o->lifetime);
-	    
+
 	    if (o->lifetime <= 0){
 			logger->dbg("-- Deleting : %s", o->name);
 	    	n = n->prev;
@@ -37,7 +37,7 @@ void getContainerType(ObjContType type, char* name) {
 		case BOMB:
 			snprintf(name, 15, "BOMB");
 			break;
-		
+
 		default:
 			snprintf(name, 15, "BAD CONT_INDEX");
 			break;
@@ -49,7 +49,7 @@ void deleteContainer(void* container, ObjContType type) {
 	logger->enabled = game->flags & DBG_OBJ;
 
 	logger->inf("=== DELETING CONTAINER ===");
-	
+
 	char contType[15];
 	getContainerType(type, contType);
 	logger->dbg("-- Type % s", contType);
@@ -80,7 +80,7 @@ void clearObjects() {
 	Node* n = NULL;
 	logger->dbg("==== CLEARING Objects ====");
 	logger->dbg("-- Getting Objects");
-	
+
 	ListManager* objects = getObjectList();
 
 	logger->dbg("-- Cleaning Hover");
@@ -125,12 +125,12 @@ short addChild(Object* obj, Object* child) {
 
 	logger->inf("==== Adding Child %s ====", child->name);
 	logger->dbg("-- parent: %s\n-- child: %s", obj->name, child->name);
-	
+
 	if (obj->childs == NULL) {
 		logger->dbg("-- Init child list");
 		obj->childs = initListMgr();
 	}
-	
+
 
 	logger->dbg("-- Child Pos: x: %d + %d, y: %d + %d", child->pos.x, obj->pos.x, child->pos.y, obj->pos.y);
 	child->pos.x += obj->pos.x;
@@ -157,7 +157,7 @@ short addChild(Object* obj, Object* child) {
 
 ListManager* getObjectList() {
 	static ListManager* objects = NULL;
-	
+
 	if (objects != NULL){
 		return objects;
 	}
@@ -173,7 +173,7 @@ ListManager* getObjectList() {
 
 Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, void* hover, void* container) {
 	Object* obj = malloc(sizeof(Object));
-	
+
 	obj->z = z;
 	obj->visible = 1;
 	obj->enabled = 1;
@@ -184,17 +184,17 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 
 	obj->component = comp;
 	obj->container = container;
-	
+
 	obj->clip = NULL;
 	obj->click = click;
 	obj->hover = hover;
-	
+
 	obj->color = 0;
 	obj->parent = NULL;
 	obj->childs = NULL;
 	obj->onDelete = NULL;
 	obj->collision = NULL;
-	
+
 
 	if (pos != NULL)
 	{
@@ -206,7 +206,7 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 	else{
 		obj->pos.x = 0;
 		obj->pos.y = 0;
-		obj->pos.w = SCREEN_W; 
+		obj->pos.w = SCREEN_W;
 		obj->pos.h = SCREEN_H;
 	}
 
@@ -240,10 +240,10 @@ Object* addObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 
 	logger->inf("=== Adding Object %s ===", name);
 	Object* obj = genObject(name, comp, pos, z, click, hover, container);
-	
+
 	ListManager* objects = getObjectList();
 	logger->dbg("-- Adding Node");
-	
+
 	Node* n = addNodeV(objects, name, obj, 1);
 	if (n == NULL) {
 		logger->err("==== Fail to insert object in list ====");
@@ -285,15 +285,15 @@ void deleteObject(Object* obj) {
 
 	if (obj->childs != NULL) {
 		logger->dbg("-- Delete Object Childs");
-		
+
 		Node* childNode = NULL;
 		while((childNode = listIterate(obj->childs, childNode)) != NULL) {
 			Object* child = (Object*) childNode->value;
-			
+
 			if (child->clip != NULL) {
 				free(child->clip);
 			}
-			
+
 			logger->dbg("-- child: %s", child->name);
 			deleteObject(child);
 
@@ -333,8 +333,39 @@ void deleteObject(Object* obj) {
 
 	ListManager* objects = getObjectList();
 	deleteNode(objects, obj->id);
-	
+
 	logger->dbg("===== DELETE OBJECT DONE ====");
+}
+
+Object* generateText(char* text, char* fontName, int fontSize) {
+	Game* game = getGame();
+	logger->enabled = game->flags & DBG_OBJ;
+	AssetMgr* ast = getAssets();
+	TTF_Font* font = ast->getFont(fontName, fontSize);
+	if (font == NULL) {
+	    logger->err("Sdl err: %s", TTF_GetError());
+		logger->err("==== TEXT DONE ====");
+	    return NULL;
+	}
+	logger->dbg("-- Generating Text");
+	SDL_Color color = {
+		0, 0, 0
+	};
+	SDL_Surface* txt = TTF_RenderText_Solid(font, text, color);
+	if (txt == NULL) {
+			logger->err("Fail to Render Text");
+		logger->err("==== BUTTON DONE ====");
+			return NULL;
+	}
+	SDL_Rect rect = {
+		(SCREEN_W / 2) - (fontSize * (strlen(text) / 4)),
+		1,
+		SCREEN_W,
+		SCREEN_H,
+	};
+	Object *object = addSimpleObject("Info", txt, &rect, 3);
+	object->lifetime = 5;
+	return object;
 }
 
 Object* generateButton(Button* btn) {
@@ -343,7 +374,7 @@ Object* generateButton(Button* btn) {
 
 	AssetMgr* ast = getAssets();
 	logger->inf("===== Generating Button ====");
-	
+
 	logger->dbg(
 		"--name: %s\n--text: %s\n--click: %d\n--hover: %d\n--image: %s\n--font: %s\n--pos: x: %d | y:%d | w:%d | h:%d",
 		btn->name,
@@ -388,7 +419,7 @@ Object* generateButton(Button* btn) {
 
 	logger->dbg("-- Adding Button");
 	btn->imgObj = addObject(btn->name, img, &btn->pos, btn->z, btn->click, btn->hover, btn);
-	
+
 	btn->imgObj->container = btn;
 	btn->imgObj->containerType = BUTTON;
 
@@ -399,9 +430,9 @@ Object* generateButton(Button* btn) {
 		btn->pos.w,
 		btn->pos.h,
 	};
-	
+
 	btn->txtObj = genSimpleObject("btnText", txt, &rect, 3);
-	
+
 	logger->dbg("-- Adding child");
 	addChild(btn->imgObj, btn->txtObj);
 
