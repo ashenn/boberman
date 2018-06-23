@@ -5,6 +5,7 @@
 
 typedef enum BonusType BonusType;
 enum BonusType {
+	BNS_NONE,
 	BNS_BOMB,
 	MAL_BOMB,
 	BNS_EXPL,
@@ -27,5 +28,6 @@ struct Bonus {
 };
 
 void generateBonus();
+BonusType prepareBonus();
 
 #endif

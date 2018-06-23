@@ -78,7 +78,7 @@ void decBomb(Object* bnsObj, Object* playerObj) {
 		Player* p = (Player*) playerObj->container;
 		if (p->bombMax > 1) {
 			enableLogger(DBG_BONUS);
-			
+
 			p->bombCnt--;
 			p->bombMax--;
 			logger->dbg("Dec Bomb Count %s: %d", p->name, p->bombMax);
@@ -132,33 +132,33 @@ void* getBonusFunc(short type) {
 	return NULL;
 }
 
-void generateBonus(SDL_Rect pos) {
+BonusType prepareBonus() {
 	static short init  = 0;
-	
+
 	enableLogger(DBG_BONUS);
-	
+
 	if (!init) {
 		srand(time(NULL));
 		init = 1;
 	}
 
-	Bonus* bns = malloc(sizeof(Bonus));
-	bns->z = 1;
-
 	int r = rand() % 2;
 	short spawn = !r;
 	if (!spawn) {
-		return;
+		return -1;
 	}
-
-
 	int type = rand() % 6;
 	logger->dbg("=== GENERATE BONUS %d ===", type);
+	return type;
+}
 
+void generateBonus(SDL_Rect pos, BonusType type) {
+	Bonus* bns = malloc(sizeof(Bonus));
+	bns->z = 1;
 	bns->clip.y = 0;
 	bns->clip.w = BONUS_SIZE;
 	bns->clip.h = BONUS_SIZE;
-	
+
 	switch	(type) {
 		case BNS_BOMB:
 			logger->dbg("-- Add BNS BOMB");
@@ -210,10 +210,10 @@ void generateBonus(SDL_Rect pos) {
 	bns->obj->containerType = BONUS;
 	bns->obj->collision->fnc = getBonusFunc(type);
 	bns->obj->collision->deleteOnCol = 1;
-	
+
 	bns->obj->collision->flag = COL_BONUS;
 	bns->obj->collision->colFlags = COL_PLAYER;// | COL_BOMB;
-	
+
 	bns->obj->clip = &bns->clip;
 	bns->obj->lifetime = 10;
 }

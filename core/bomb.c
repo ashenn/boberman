@@ -118,7 +118,7 @@ void explosionHit(Object* explObj, Object* targetObj) {
 	Game* game = getGame();
 	char playerkilled[43];
 	char blockBreaked[43];
-	
+
 	switch(targetObj->containerType) {
 		case PLAYER:
 			if(game->isServer) {
@@ -133,23 +133,34 @@ void explosionHit(Object* explObj, Object* targetObj) {
 
 		case BLOCK:
 			logger->err("Breaking Block");
-			
+
 			if(game->isServer) {
 				logger->err("Is Server");
 				block = targetObj->container;
 				if(block->destroyed) {
 					return;
 				}
+				block->bonusType = prepareBonus();
 
-				
 				memset(blockBreaked, 0, 43);
-				snprintf(blockBreaked, 43, "breackblock:%d", block->id);
+				snprintf(blockBreaked, 43, "breackblock:%d:%d", block->id, block->bonusType);
 				logger->err("Msg: %s", blockBreaked);
 				broadcast(blockBreaked);
 
+
+				SDL_Rect bonuPos;
+				bonuPos.x = block->obj->pos.x + (BONUS_SIZE / 4);
+				bonuPos.y = block->obj->pos.y + (BONUS_SIZE / 4);
+
+				bonuPos.w = BONUS_SIZE;
+				bonuPos.h = BONUS_SIZE;
+
+				Game* game = getGame();
+					generateBonus(bonuPos);			
+
 				logger->err("BroadCast DONE");
 			}
-			
+
 			logger->err("Breaking");
 			breakBlock(targetObj->container);
 			break;
@@ -505,8 +516,18 @@ void placeBomb(Player* p) {
 
 	AssetMgr* ast = getAssets();
 
+
+
 	if (p->bombCnt <= 0 || !p->canPlaceBomb) {
 		return;
+	}
+
+	Game *game = getGame();
+	if (game->isServer) {
+		char bombPlaced[43];
+		memset(bombPlaced, 0, 43);
+		snprintf(bombPlaced, 43, "bombPlaced:%d", p->id);
+		broadcast(bombPlaced);
 	}
 
 	p->bombCnt--;

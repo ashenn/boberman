@@ -117,7 +117,7 @@ void launchSate(short status) {
 
 		handleEvents();
 
-    	if (game->status == GAME_LOBY) {
+    	if (game->status == GAME_LOBY && game->isServer) {
     		handleHits();
     	}
 

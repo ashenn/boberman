@@ -53,7 +53,7 @@ void getMessage(char* msg) {
 	memset(msg, 0, MSG_SIZE);
 	Connexion* co = getConnexion();
 
-	
+
 	int i = recv(co->fd, msg, 1, 0);
 	logger->err("Test Décode !!! %d", (int)msg[0]);
 
@@ -130,7 +130,7 @@ void* clientProcess() {
 	struct timeval tv = {0, 20};
 	Connexion* co = getConnexion();
   	lock(DBG_CLIENT);
-	
+
 	while(game->status < GAME_QUIT) {
 
 		logger->err("Client: Un-Lock");
@@ -177,7 +177,7 @@ void* clientProcess() {
 		logger->err("-- Getting Message");
 	  	getMessage(msg);
 		logger->err("-- Got Message %s\nMsg Length:%d", msg, strlen(msg));
-	    
+
 	    if(strlen(msg) == 0) {
 			enableLogger(DBG_CLIENT);
 			logger->err("-- msg is empty continue...");
@@ -195,13 +195,13 @@ void* clientProcess() {
 		explode(':', msg, 0, 0, resp);
 		Player *pl = getPlayer();
 		logger->dbg("%d", pl->id);
-		
+
 		if (strcmp(resp[0], "newPlayer") == 0) {
 			logger->err("New player Recieved : %s (I am %d)", resp[1], pl->id);
 			if (pl->id != str2int(resp[1]))
 				genPlayer("Player-n");
 		}
-		
+
 		if (strcmp(resp[0], "playerLeft") == 0) {
 			logger->err("Player left Recieved : %s (I am %d)", resp[1], pl->id);
 			ListManager* players = getPlayerList();
@@ -212,7 +212,7 @@ void* clientProcess() {
 					killPlayer(deadPlayer);
 			}
 		}
-		
+
 		if (strcmp(resp[0], "playerkilled") == 0) {
 			logger->err("player killed Recieved : %s (I am %d)", resp[1], pl->id);
 			ListManager* players = getPlayerList();
@@ -223,11 +223,11 @@ void* clientProcess() {
 					killPlayer(deadPlayer);
 			}
 		}
-		
+
 		if (strcmp(resp[0], "breackblock") == 0) {
 			logger->err("Break Block By Id: %d", resp[1]);
 			ListManager* objs = getObjectList();
-			
+
 			int id = str2int(resp[1]);
 			Node* blockNode = getNode(objs, id);
 
@@ -238,7 +238,30 @@ void* clientProcess() {
 
 				if(o->containerType == BLOCK) {
 					breakBlock(o->container);
+					SDL_Rect bonuPos;
+					Block *block = o->container;
+					bonuPos.x = block->obj->pos.x + (BONUS_SIZE / 4);
+					bonuPos.y = block->obj->pos.y + (BONUS_SIZE / 4);
+
+					bonuPos.w = BONUS_SIZE;
+					bonuPos.h = BONUS_SIZE;
+					generateBonus(bonuPos, resp[2]);
 				}
+			}
+		}
+
+		if (strcmp(resp[0], "bombPlaced") == 0) {
+			logger->err("Bomb Placed By Id: %d", resp[1]);
+			int id = str2int(resp[1]);
+			ListManager* players = getPlayerList();
+			Node* playernode = getNode(players, id);
+
+
+			if(playernode != NULL) {
+					Player *player = playernode->value;
+					if(player != NULL) {
+						placeBomb(player);
+					}
 			}
 		}
 

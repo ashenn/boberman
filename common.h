@@ -2,7 +2,7 @@
 #define __COMMON_H__
 
 #include <stdio.h>
-#include <time.h> 
+#include <time.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,7 +89,7 @@ struct Player {
 	char* name;
 	short alive;
 	short direction;
-	
+
 	float speed;
 	short shoot;
 	short bombCnt;
@@ -114,11 +114,11 @@ struct Bomb {
 	char* name;
 	short exploded;
 	short direction;
-	
+
 	short moveIterate;
 
 	Player* owner;
-	
+
 	SDL_Rect clip;
 	int* clipIndex;
 
@@ -137,7 +137,6 @@ void killPlayer(Player* p);
 #include "core/object.h"
 #include "core/game.h"
 #include "core/view.h"
-
 #include "base/math.h"
 #include "core/animation.h"
 #include "core/bonus.h"

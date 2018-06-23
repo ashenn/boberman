@@ -7,7 +7,7 @@ void generateWalls() {
 	logger->inf("==== PLACING WALLS ====");
 	int x;
 	int y;
-	
+
 	char name[35];
 	Object* wall = NULL;
 
@@ -15,11 +15,11 @@ void generateWalls() {
 	SDL_Rect pos = {0,0, CELL_SIZE, CELL_SIZE};
 
 	int colideWith = COL_PLAYER | COL_BOMB;
-	
+
 	for (y = 1; y < MAP_H; ++y) {
 		if ( y % 2) {
 			pos.y = MAP_Y + (y * CELL_SIZE);
-			
+
 			for (x = 1; x < MAP_W; ++x) {
 				if (x % 2) {
 
@@ -27,9 +27,9 @@ void generateWalls() {
 					logger->dbg("Placing Wall: %s", name);
 
 					pos.x = MAP_X + (x * CELL_SIZE);
-					
+
 					logger->dbg("pos: x: %d, y: %d", pos.x, pos.y);
-					
+
 					wall = addSimpleObject(name, NULL, &pos, 2);
 					setHitBox(wall, hit, 1, COL_WALL);
 					wall->collision->colFlags = colideWith;
@@ -52,7 +52,7 @@ void generateWalls() {
 	// PLACING MAP END LEFT //
 	pos.x = MAP_X - 25;
 	pos.y = MAP_Y - 25;
-	
+
 	pos.w = 25;
 	pos.h = (MAP_H + 1) * CELL_SIZE;
 
@@ -68,7 +68,7 @@ void generateWalls() {
 	// PLACING MAP END TOP //
 	pos.x = MAP_X - 25;
 	pos.y = MAP_Y - 30;
-	
+
 	pos.h = 25;
 	pos.w = (MAP_W + 1) * CELL_SIZE;
 
@@ -84,7 +84,7 @@ void generateWalls() {
 	// PLACING MAP END BOTTOM //
 	pos.x = MAP_X - 25;
 	pos.y = (MAP_H * CELL_SIZE) + MAP_Y;
-	
+
 	pos.h = 25;
 	pos.w = (MAP_W + 1) * CELL_SIZE;
 
@@ -100,7 +100,7 @@ void generateWalls() {
 	// PLACING MAP END RIGHT //
 	pos.y = MAP_Y - 25;
 	pos.x = ((MAP_W + 1) * CELL_SIZE) - 10;
-	
+
 	pos.w = 25;
 	pos.h = (MAP_H + 1) * CELL_SIZE;
 
@@ -126,7 +126,7 @@ void generateBlocks() {
 
 	int i = 0;
 	char name[100];
-	
+
 	int x = 0;
 	int y = 0;
 
@@ -135,10 +135,10 @@ void generateBlocks() {
 
 	for (y = 0; y < MAP_H; ++y) {
 		logger->enabled = game->flags & DBG_MAP;
-		
+
 		for (x = 0; x < MAP_W; ++x) {
 			logger->enabled = game->flags & DBG_MAP;
-			
+
 			if ((y <= 1 || y >= MAP_H -2) && (x <= 1 || x >= MAP_W -2)) {
 			 	logger->dbg("Skiping\n-- x: %d\n-- y: %d\n==========\n", x, y);
 				continue;
@@ -151,20 +151,20 @@ void generateBlocks() {
 
 			snprintf(name, 100, "block-%d", i++);
 			logger->dbg("-- Placing: %s", name);
-		
+
 			block = malloc(sizeof(Block));
 			block->state = 0;
 			block->destroyed = 0;
 
 			block->clip.x = 0;
 			block->clip.y = 2 * BONUS_SIZE;
-			
+
 			block->clip.w = CELL_SIZE;
 			block->clip.h = CELL_SIZE;
 
 			pos.y = MAP_Y + (y * CELL_SIZE);
 			pos.x = MAP_X + (x * CELL_SIZE);
-			
+
 			blockObj = addSimpleObject(name, img, &pos, 2);
 			setHitBox(blockObj, hit, 1, COL_WALL);
 			block->obj = blockObj;
@@ -190,9 +190,9 @@ void iterateBlock(AnimParam* anim) {
 
 	block->state++;
 	logger->dbg("-- Block state: %d", block->state);
-	
+
 	SDL_Rect animClip = {0, 0, CELL_SIZE, CELL_SIZE};
-	
+
 	animClip.y = 2 * BONUS_SIZE;
 	animClip.x = (block->state) * CELL_SIZE;
 
@@ -200,7 +200,7 @@ void iterateBlock(AnimParam* anim) {
 	block->clip.x = (block->state) * CELL_SIZE;
 
 	//logger->dbg("Cur Clip: x: %d, y: %d", block->clip.x, block->clip.y);
-	
+
 
 	if (block->state < 3) {
 		logger->dbg("-- Block iterate");
@@ -210,19 +210,6 @@ void iterateBlock(AnimParam* anim) {
 	else{
 		logger->dbg("-- Prepare To Delete");
 		anim->deleteObject = 1;
-
-
-		SDL_Rect bonuPos;
-		bonuPos.x = block->obj->pos.x + (BONUS_SIZE / 4);
-		bonuPos.y = block->obj->pos.y + (BONUS_SIZE / 4);
-
-		bonuPos.w = BONUS_SIZE;
-		bonuPos.h = BONUS_SIZE;
-
-		Game* game = getGame();
-		if(game->isServer) {
-			generateBonus(bonuPos);
-		}
 	}
 }
 
@@ -233,9 +220,9 @@ void breakBlock(Block* block) {
 
 	block->state = 0;
 	block->destroyed = 1;
-	
+
 	SDL_Rect animClip = {0, 0, CELL_SIZE, CELL_SIZE};
-	
+
 	animClip.x = 0;
 	animClip.y = 2 * BONUS_SIZE;
 	//logger->dbg("Break Clip: x: %d, y: %d", animClip.x, animClip.y);

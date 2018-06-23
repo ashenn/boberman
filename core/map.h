@@ -9,6 +9,7 @@ struct Block {
 	char* name;
 	short state;
 	short destroyed;
+	int bonusType;
 
 	Object* obj;
 	SDL_Rect clip;
