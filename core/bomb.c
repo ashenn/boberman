@@ -112,17 +112,45 @@ void explosionHit(Object* explObj, Object* targetObj) {
 	if (targetObj->container == NULL) {
 		return;
 	}
-	char playerkilled[43];
+
 	Player *killedPlayer;
+	Block* block;
+	Game* game = getGame();
+	char playerkilled[43];
+	char blockBreaked[43];
+	
 	switch(targetObj->containerType) {
 		case PLAYER:
-			killedPlayer = targetObj->container;
-			snprintf(playerkilled, 43, "playerkilled:%d", killedPlayer->id);
-			broadcast(playerkilled);
+			if(game->isServer) {
+				killedPlayer = targetObj->container;
+				memset(playerkilled, 0, 43);
+				snprintf(playerkilled, 43, "playerkilled:%d", killedPlayer->id);
+				broadcast(playerkilled);
+			}
+
 			killPlayer(targetObj->container);
 			break;
 
 		case BLOCK:
+			logger->err("Breaking Block");
+			
+			if(game->isServer) {
+				logger->err("Is Server");
+				block = targetObj->container;
+				if(block->destroyed) {
+					return;
+				}
+
+				
+				memset(blockBreaked, 0, 43);
+				snprintf(blockBreaked, 43, "breackblock:%d", block->id);
+				logger->err("Msg: %s", blockBreaked);
+				broadcast(blockBreaked);
+
+				logger->err("BroadCast DONE");
+			}
+			
+			logger->err("Breaking");
 			breakBlock(targetObj->container);
 			break;
 	}

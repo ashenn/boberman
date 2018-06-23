@@ -333,6 +333,7 @@ short iteratePlayerKill(AnimParam* anim) {
 void killPlayer(Player* p) {
 	if (!p->alive)
 		return;
+
 	enableLogger(DBG_PLAYER);
 
 	logger->inf("==== KILL PLAYER ====");

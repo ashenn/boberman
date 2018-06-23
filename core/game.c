@@ -32,11 +32,12 @@ void* findGame() {
 
 	pthread_create(&game->clientThread, NULL, clientProcess, (void*)NULL);
 	logger->war("clientThread created");
+
 	loadMap();
 }
 
 void* hostGame() {
-	Game* game= getGame();
+	Game* game = getGame();
 	server_t* serv = getServer();
 
 	if(serv == NULL) {
@@ -50,6 +51,8 @@ void* hostGame() {
 			logger->err("-- faild");
 			return NULL;
 		}
+
+		game->isServer = 1;
 		clearObjects();
 		setServerIp("127.0.0.1");
 
@@ -203,6 +206,7 @@ Game* getGame() {
 	logger->inf("==== INIT Game* game ====");
 	game = malloc(sizeof(Game));
 
+	game->isServer = 0;
 	game->flags = NO_FLAG;
 	game->status = GAME_MENU;
 	initGameFlags(game);

@@ -168,6 +168,7 @@ void generateBlocks() {
 			blockObj = addSimpleObject(name, img, &pos, 2);
 			setHitBox(blockObj, hit, 1, COL_WALL);
 			block->obj = blockObj;
+			block->id = blockObj->id;
 
 			blockObj->visible = 1;
 			blockObj->container = block;
@@ -218,7 +219,10 @@ void iterateBlock(AnimParam* anim) {
 		bonuPos.w = BONUS_SIZE;
 		bonuPos.h = BONUS_SIZE;
 
-		generateBonus(bonuPos);
+		Game* game = getGame();
+		if(game->isServer) {
+			generateBonus(bonuPos);
+		}
 	}
 }
 

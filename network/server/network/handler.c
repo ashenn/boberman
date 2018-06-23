@@ -73,8 +73,10 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     logger->war("-- id: %d", client->id);
 
     char motd[43];
-    snprintf(motd, 43, "ok:%d", client->id);
-    logger->dbg("Send Message: %s", motd);
+    snprintf(motd, 43, " ok:%d", client->id);
+    motd[0] = 4;
+
+    logger->err("Send Message: %s", motd);
 
     if( send(new_socket, motd, strlen(motd), 0) != strlen(motd) ) {
         logger->err("Faild To Send Welcome Message");
@@ -170,27 +172,42 @@ void kill_client(int fd) {
 }
 
 void broadcast(char *msg) {
+    Node* tmp = NULL;
+    server_t* server = getServer();
+    int nc = server->clients->nodeCount;
+    int first = 0;
 
-  Node* tmp = NULL;
-  server_t* server = getServer();
-  int nc = server->clients->nodeCount;
-  int first = 0;
-  logger->err("Broadcast msg: %s for %d clients", msg, nc);
-  while((tmp = listIterate(server->clients, tmp)) != NULL) {
-    if (!first) {
-      first ++;
-      continue;
+    int length = strlen(msg) + 2;
+    char sendMsg[length];
+
+    memset(sendMsg, 0, length);
+    snprintf(sendMsg, length, " %s", msg);
+    
+    sendMsg[0] = length;
+
+    logger->err("Broadcast msg (%d): %s for %d clients", length, sendMsg, nc);
+  
+    while((tmp = listIterate(server->clients, tmp)) != NULL) {
+        if (!first) {
+            first ++;
+            continue;
+        }
+
+        client_t *client = tmp->value;
+        logger->err("Broadcast msg: %s", sendMsg);
+        logger->err("msg Length: %d", length + 2);
+        logger->err("msg Length: %d", strlen(sendMsg));
+
+
+        int i = send(client->fd, sendMsg, length + 2, 0);
+        
+        if (i != strlen(msg)) {
+          logger->err("Broadcast error for fd : %d, %d", client->fd, i);
+        }
+        else {
+          logger->err("Broadcast success for fd : %d", client->fd);
+        }
     }
-    client_t *client = tmp->value;
-    logger->err("Broadcast msg: %s", msg);
-    int i = send(client->fd, msg, strlen(msg), 0);
-    if (i != strlen(msg)) {
-      logger->err("Broadcast error for fd : %d, %d", client->fd, i);
-    }
-    else {
-      logger->err("Broadcast success for fd : %d", client->fd);
-    }
-  }
 }
 
 
@@ -240,18 +257,18 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
     server_t* serv = getServer();
 
     while((n = listIterate(serv->clients, n)) != NULL) {
-        logger->err("-- Node: #%d => %d", n->id, n->name);
+        //logger->err("-- Node: #%d => %d", n->id, n->name);
 
         client_t *client = n->value;
         int fd = client->fd;
 
 
-        logger->err("-- Checking fd: %d", fd);
+        //logger->err("-- Checking fd: %d", fd);
         if (FD_ISSET( fd , readfds)) {
 
-            logger->err("-- Getting Message");
+            //logger->err("-- Getting Message");
             if ((valread = recv( fd , buffer, MSG_SIZE, 0)) == 0) {
-                logger->err("-- Faild Deleting User");
+                //logger->err("-- Faild Deleting User");
                 //getpeername(fd , (struct sockaddr*)&server , (socklen_t*)&addrlen);
                 //Node *n = search_node_by_index(clients, find_client_by_fd(fd)).next;
 

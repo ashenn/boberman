@@ -49,10 +49,16 @@ Connexion* getConnexion() {
 }
 
 void getMessage(char* msg) {
-	logger->inf("Message recieved !!! %s", msg);
+	logger->err("Message recieved !!!");
 	memset(msg, 0, MSG_SIZE);
 	Connexion* co = getConnexion();
-	int i = recv(co->fd, msg, MSG_SIZE - 1, 0);
+
+	
+	int i = recv(co->fd, msg, 1, 0);
+	logger->err("Test Décode !!! %d", (int)msg[0]);
+
+	i = recv(co->fd, msg, (int)msg[0] +1, 0);
+	logger->err("Test MSG !!! %s", msg);
 
 	if(i < 0) {
 		logger->err("Faild To Receive Message !!!");
@@ -91,7 +97,12 @@ short findHost() {
 		logger->err("Connexion Refuse !!!");
 		return 0;
 	}
+
 	if(getServer() == NULL) {
+		lock(DBG_STATE);
+		clearObjects();
+		unlock(DBG_STATE);
+
 		char name[12];
 		memset(name, 0, 12);
 		for(int i = 1; i < id; i++) {
@@ -118,12 +129,12 @@ void* clientProcess() {
 	fd_set readfds;
 	struct timeval tv = {0, 20};
 	Connexion* co = getConnexion();
-  lock(DBG_CLIENT);
+  	lock(DBG_CLIENT);
+	
 	while(game->status < GAME_QUIT) {
 
-		//logger->war("Client: Un-Lock");
+		logger->err("Client: Un-Lock");
 	    unlock(DBG_CLIENT);
-		sleep(1);
 
 		enableLogger(DBG_CLIENT);
 
@@ -163,13 +174,13 @@ void* clientProcess() {
 		}
 
 		enableLogger(DBG_CLIENT);
-		logger->dbg("-- Getting Message");
+		logger->err("-- Getting Message");
 	  	getMessage(msg);
-		logger->dbg("-- Got Message %s, l:%d ", msg, strlen(msg));
+		logger->err("-- Got Message %s\nMsg Length:%d", msg, strlen(msg));
 	    
 	    if(strlen(msg) == 0) {
 			enableLogger(DBG_CLIENT);
-			logger->dbg("-- msg is empty continue...");
+			logger->err("-- msg is empty continue...");
 			//logger->war("Client: Ask-Lock");
 
 	    	lock(DBG_CLIENT);
@@ -178,7 +189,7 @@ void* clientProcess() {
 	    }
 
 		enableLogger(DBG_CLIENT);
-		logger->dbg("-- Msg: %s", msg);
+		logger->err("-- Msg: %s", msg);
 
 		char* resp[3];
 		explode(':', msg, 0, 0, resp);
@@ -210,6 +221,24 @@ void* clientProcess() {
 				Player *deadPlayer = tmp->value;
 				if (deadPlayer->id == str2int(resp[1]))
 					killPlayer(deadPlayer);
+			}
+		}
+		
+		if (strcmp(resp[0], "breackblock") == 0) {
+			logger->err("Break Block By Id: %d", resp[1]);
+			ListManager* objs = getObjectList();
+			
+			int id = str2int(resp[1]);
+			Node* blockNode = getNode(objs, id);
+
+			if(blockNode != NULL) {
+				Object* o = blockNode->value;
+
+				logger->err("Object Got: %s", o->name);
+
+				if(o->containerType == BLOCK) {
+					breakBlock(o->container);
+				}
 			}
 		}
 
