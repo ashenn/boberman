@@ -274,7 +274,7 @@ void* clientProcess() {
 			}
 		}
 
-		/*
+
 		if (strcmp(resp[0], "move") == 0) {
 			int id = str2int(resp[1]);
 			int direction = str2int(resp[2]);
@@ -308,7 +308,6 @@ void* clientProcess() {
 				}
 			}
 		}
-		*/
 	}
 
 	close(co->fd);

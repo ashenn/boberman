@@ -255,10 +255,14 @@ void playerTickMove(AnimParam* anim) {
 }
 
 void playerStop(Player* p) {
-	char msg[25];
-	memset(msg, 0, 25); 
-	snprintf(msg, 25, "stop:%d", p->id);
-	//broadcast(msg);
+
+	Game* game = getGame();
+	if(game->isServer) {
+		char msg[25];
+		memset(msg, 0, 25); 
+		snprintf(msg, 25, "stop:%d", p->id);
+		broadcast(msg);
+	}
 	
 	p->clipIndex = 0;
 	animRemoveObject(p->object);
@@ -270,10 +274,13 @@ void* playerMove(Player* p, short direction) {
 		return NULL;
 	}
 
-	char msg[25];
-	memset(msg, 0, 25); 
-	snprintf(msg, 25, "move:%d:%d", p->id, direction);
-	//broadcast(msg);
+	Game* game = getGame();
+	if(game->isServer) {
+		char msg[25];
+		memset(msg, 0, 25); 
+		snprintf(msg, 25, "move:%d:%d", p->id, direction);
+		broadcast(msg);
+	}
 
 	enableLogger(DBG_PLAYER);
 
