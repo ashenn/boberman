@@ -194,7 +194,7 @@ void* clientProcess() {
 			Node *tmp = NULL;
 			while((tmp = listIterate(players, tmp)) != NULL) {
 				Player *deadPlayer = tmp->value;
-				if (deadPlayer->id == str2int(resp[1]) )
+				if (deadPlayer->id == str2int(resp[1]))
 					killPlayer(deadPlayer);
 			}
 		}

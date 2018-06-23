@@ -262,6 +262,8 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
                     snprintf(playerLeft, 43, "playerLeft:%d", client->player->id);
                     broadcast(playerLeft);
                     killPlayer(client->player);
+                    close(client->fd);
+                    deleteNode(serv->clients, client->id);
                 }
             } else {
                 logger->err("-- Receiving Message");
