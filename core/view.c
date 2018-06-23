@@ -278,13 +278,14 @@ void* render(void* arg) {
     while(game->status != GAME_QUIT) {
 
 	    
-	    //logger->err("Start: %d", now);
+	    logger->err("RENDER: %d", now);
 	    //logger->err("Add: %d", add);
 	    //logger->err("TOTAL: %d", nextFrame);
 		
     	t = SDL_GetTicks();
 		
 		if (--nextTick <= 0) {
+	    	logger->err("NEW TICK", now);
 			nextTick = TICK_FRAMES;
 	    	tick();
 		}

@@ -6,7 +6,7 @@ void clearOutdatedObjects() {
 
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_OBJ;
-	logger->inf("==== Clear Outdated Objects ====");
+	logger->err("==== Clear Outdated Objects ====");
 
 	while((n = listIterate(objects, n)) != NULL) {
 	    Object* o = (Object*) n->value;
@@ -15,11 +15,11 @@ void clearOutdatedObjects() {
 	    }
 
 	    o->lifetime--;
-		logger->dbg("--obj: %s", o->name);
-		logger->dbg("--life: %d", o->lifetime);
+		logger->err("--obj: %s", o->name);
+		logger->err("--life: %d", o->lifetime);
 
 	    if (o->lifetime <= 0){
-			logger->dbg("-- Deleting : %s", o->name);
+			logger->err("-- Deleting : %s", o->name);
 	    	n = n->prev;
 	    	deleteObject(o);
 	    }

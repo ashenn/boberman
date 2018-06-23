@@ -293,8 +293,8 @@ void* clientProcess() {
 		}
 
 		if (strcmp(resp[0], "stop") == 0) {
-			logger->err("Stopping Player #%d", resp[1]);
 			int id = str2int(resp[1]);
+			logger->err("Stopping Player #%d", id);
 
 			ListManager* players = getPlayerList();
 			Node* playerNode = getNode(players, id);
@@ -306,6 +306,28 @@ void* clientProcess() {
 
 					playerStop(player);
 				}
+			}
+		}
+
+		if (strcmp(resp[0], "bonus") == 0) {
+			int id = str2int(resp[1]);
+			logger->err("Removing Bonus #%d", id);
+
+			ListManager* bonusList = getBonusList();
+			Node* bonusNode = getNode(bonusList, id);
+
+			if(bonusNode != NULL) {
+				int bnsId = bonusNode->id;
+				
+				Bonus* bns = bonusNode->value;
+				
+				
+				deleteObject(bns->obj);
+				if(bns != NULL) {
+					deleteObject(bns->obj);
+				}
+
+				deleteNode(bonusList, bnsId);
 			}
 		}
 	}

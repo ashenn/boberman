@@ -105,6 +105,11 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     }
 
     broadcast(newPlayer);
+
+    if(serv->clients->nodeCount == 2) {
+        logger->err("#### LAUNCHING GAME ####");
+        changeGameStatus(GAME_START);
+    }
     //logger->war("HANDLER: Un-Lock");
     //unlock(DBG_SERVER);
 

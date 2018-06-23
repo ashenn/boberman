@@ -299,7 +299,7 @@ void prepareColAtPos(Object* obj, Collision* col, int x, int y) {
 
 short canMoveTo(Object* obj, int x, int y) {
 	Game* game = getGame();
-	if (game->status != GAME_LOBY){
+	if (game->status < GAME_LOBY){
 		return true;
 	}
 

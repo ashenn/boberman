@@ -29,7 +29,7 @@ int EventKeyDown(int key, int curKey) {
 		return curKey;
 	}
 
-	if(game->status != GAME_LOBY && game->status != GAME_START && game->status != GAME_RUNNING) {
+	if(game->status != GAME_RUNNING) {
 		return curKey;
 	}
 

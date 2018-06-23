@@ -1,8 +1,29 @@
 #include <time.h>
 #include "bonus.h"
 
+ListManager* getBonusList() {
+	static ListManager* bonus = NULL;
+	if(bonus != NULL) {
+		return bonus;
+	}
+
+	bonus = initListMgr();
+	return bonus;
+}
+
 void incSpeed(Object* bnsObj, Object* playerObj) {
 	if (playerObj->containerType == PLAYER) {
+
+		Game* game = getGame();
+		if(game->isServer) {
+			Bonus* bns = bnsObj->container;
+			
+			char msg[25];
+			memset(msg, 0, 25);
+			//snprintf(msg, 25, "bonus:%d:%d", bns->id, player->id);
+			//broadcast(msg);
+		}
+
 		Player* p = (Player*) playerObj->container;
 		if (p->speed < 2) {
 			p->speed += 0.25f;
@@ -18,6 +39,17 @@ void incSpeed(Object* bnsObj, Object* playerObj) {
 void decSpeed(Object* bnsObj, Object* playerObj) {
 	if (playerObj->containerType == PLAYER) {
 		Player* p = (Player*) playerObj->container;
+
+		Game* game = getGame();
+		if(game->isServer) {
+			Bonus* bns = bnsObj->container;
+			
+			char msg[25];
+			memset(msg, 0, 25);
+			//snprintf(msg, 25, "bonus:%d:%d", bns->id, player->id);
+			//broadcast(msg);
+		}
+
 		if (p->speed > 0.5f) {
 			p->speed -= 0.25f;
 			enableLogger(DBG_BONUS);
@@ -30,8 +62,18 @@ void decSpeed(Object* bnsObj, Object* playerObj) {
 
 void incExpl(Object* bnsObj, Object* playerObj) {
 	if (playerObj->containerType == PLAYER) {
-
 		Player* p = (Player*) playerObj->container;
+
+		Game* game = getGame();
+		if(game->isServer) {
+			Bonus* bns = bnsObj->container;
+			
+			char msg[25];
+			memset(msg, 0, 25);
+			//snprintf(msg, 25, "bonus:%d:%d", bns->id, player->id);
+			//broadcast(msg);
+		}
+
 		if (p->bombPower < 4) {
 			enableLogger(DBG_BONUS);
 			logger->dbg("Inc Explosion %s: %d", p->name, p->bombPower);
@@ -44,8 +86,18 @@ void incExpl(Object* bnsObj, Object* playerObj) {
 
 void decExpl(Object* bnsObj, Object* playerObj) {
 	if (playerObj->containerType == PLAYER) {
-
 		Player* p = (Player*) playerObj->container;
+
+		Game* game = getGame();
+		if(game->isServer) {
+			Bonus* bns = bnsObj->container;
+			
+			char msg[25];
+			memset(msg, 0, 25);
+			//snprintf(msg, 25, "bonus:%d:%d", bns->id, player->id);
+			//broadcast(msg);
+		}
+
 		if (p->bombPower > 1) {
 			enableLogger(DBG_BONUS);
 			logger->dbg("Dec Explosion %s: %d", p->name, p->bombPower);
@@ -58,8 +110,18 @@ void decExpl(Object* bnsObj, Object* playerObj) {
 
 void incBomb(Object* bnsObj, Object* playerObj) {
 	if (playerObj->containerType == PLAYER) {
-
 		Player* p = (Player*) playerObj->container;
+
+		Game* game = getGame();
+		if(game->isServer) {
+			Bonus* bns = bnsObj->container;
+			
+			char msg[25];
+			memset(msg, 0, 25);
+			//snprintf(msg, 25, "bonus:%d:%d", bns->id, player->id);
+			//broadcast(msg);
+		}
+
 		if (p->bombMax < 3) {
 			enableLogger(DBG_BONUS);
 
@@ -74,8 +136,18 @@ void incBomb(Object* bnsObj, Object* playerObj) {
 
 void decBomb(Object* bnsObj, Object* playerObj) {
 	if (playerObj->containerType == PLAYER) {
-
 		Player* p = (Player*) playerObj->container;
+		
+		Game* game = getGame();
+		if(game->isServer) {
+			Bonus* bns = bnsObj->container;
+			
+			char msg[25];
+			memset(msg, 0, 25);
+			//snprintf(msg, 25, "bonus:%d:%d", bns->id, player->id);
+			//broadcast(msg);
+		}
+
 		if (p->bombMax > 1) {
 			enableLogger(DBG_BONUS);
 
@@ -162,6 +234,10 @@ void generateBonus(SDL_Rect pos, BonusType type) {
 	bns->clip.y = 0;
 	bns->clip.w = BONUS_SIZE;
 	bns->clip.h = BONUS_SIZE;
+
+	ListManager* bonusList = getBonusList();
+	Node* bnsNode = addNodeV(bonusList, "bonus", bns, 0);
+	bns->id = bnsNode->id;
 
 	switch	(type) {
 		case BNS_BOMB:

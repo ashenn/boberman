@@ -69,4 +69,6 @@ void parseGameArgs(int argc, char* argv[]);
 void tick();
 void launchSate(short status);
 
+void startGame();
+
 #endif

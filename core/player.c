@@ -15,10 +15,6 @@ void resetPlayersBomb() {
 	}
 }
 
-void playerHit(Object* o1, Object*o2) {
-
-}
-
 Player* initPlayer(Player* p) {
 	static Player* player = NULL;
 	if (p != NULL) {
