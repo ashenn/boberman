@@ -89,6 +89,34 @@ void signalCond() {
 	pthread_cond_signal(&game->cond);
 }
 
+void getWinner() {
+	logger->err("=== GETTING WINNER ===");
+	Node* n = NULL;
+	ListManager* players = getPlayerList();
+
+	Player* p = NULL;
+	Player* winner = NULL;
+	while((n = listIterate(players, n)) != NULL) {
+		p = n->value;
+		logger->war("# %s => %d", p->name, p->alive);
+
+	    if(p->alive) {
+	    	winner = p;
+	    	break;
+	    }
+	}
+
+	if(winner != NULL) {
+		char msg[45];
+		memset(msg, 0, 45);
+		snprintf(msg, 45, "THE WINNER IS %s !!!!", p->name);
+		Object* txt = generateText(msg, "pf", FONT_LG);
+		txt->lifetime = -1;
+		
+		logger->war("Winner Msg: \n %s", msg);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	logger = initLogger(argc, argv);
@@ -159,6 +187,12 @@ int main(int argc, char *argv[])
 			case GAME_RUNNING:
 				logger->err("#### RUNNING GAME ####");
 				launchSate(GAME_RUNNING);
+				break;
+
+			case GAME_END:
+				logger->err("#### END GAME ####");
+				getWinner();
+				launchSate(GAME_END);
 				break;
 		}
 	}

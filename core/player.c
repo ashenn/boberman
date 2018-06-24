@@ -382,4 +382,20 @@ void killPlayer(Player* p) {
 
 
 	AnimParam* anim = customAnim(p->object, 0.1f, 0, iteratePlayerKill);
+
+	p = NULL;
+	Node* n = NULL;
+	int alives = 0;
+	ListManager* players = getPlayerList();
+	while((n = listIterate(players, n)) != NULL) {
+		p = n->value;
+		alives += p->alive;
+	}
+
+	if(alives == 1) {
+		Game* game = getGame();
+		if(game->isServer) {
+			changeGameStatus(GAME_END);
+		}
+	}
 }
