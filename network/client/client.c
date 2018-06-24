@@ -91,8 +91,6 @@ short findHost() {
 	printf("%s\n", resp[1]);
 	int id = char2int(resp[1][0]);
 	logger->err("id : %d", id);
-	free(resp[0]);
-	free(resp[1]);
 
 	if(!id) {
 		logger->err("Connexion Refuse !!!");
@@ -192,7 +190,9 @@ void* clientProcess() {
 		enableLogger(DBG_CLIENT);
 		logger->err("-- Msg: %s", msg);
 
-		char* resp[3];
+		char* resp[5];
+		resp[4] = '\0';
+
 		explode(':', msg, 0, 0, resp);
 		Player *pl = getPlayer();
 		logger->dbg("%d", pl->id);
@@ -349,6 +349,42 @@ void* clientProcess() {
 			}
 			else{
 				logger->war("### BONUS NOT FOUND !!!!");
+			}
+		}
+
+
+		if (strcmp(resp[0], "refresh") == 0) {
+			logger->war("#### Refreshing Players");
+
+			ListManager* players = getPlayerList();
+			int index;
+			for (index = 1; index < 4 && resp[index] != '\0'; ++index) {
+				logger->war("#%d: %s", index, resp[index]);
+
+				char* infos[4];
+				infos[3] = '\0';
+
+				explode('-', resp[index], 0, 0, infos);
+				int pId = str2int(infos[0]);
+				int x = str2int(infos[1]);
+				int y = str2int(infos[2]);
+
+				logger->war("Player #%d\nPosition: %d | %d", pId, x, y);
+				Node* n = getNode(players, pId);
+				if(n != NULL) {
+					logger->war("Setting Pos: %d | %d", x, y);
+					Player* p = n->value;
+					p->object->pos.x = x;
+					p->object->pos.y = y;
+
+					logger->war("Player Moved Pos: %d | %d", x, y);
+				}
+
+				logger->war("Free Params");
+				free(infos[0]);
+				free(infos[1]);
+				free(infos[2]);
+
 			}
 		}
 	}

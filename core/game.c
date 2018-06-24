@@ -63,14 +63,15 @@ void* hostGame() {
 }
 
 void refreshPlayers() {
+	Node* n = NULL;
 	ListManager* players = getPlayerList();
-	Node* n = players->first;
 
 	char tmp[15];
 
-	char msg[28];
-	memset(msg, 0, 28);
-	
+	char msg[50];
+
+	memset(msg, 0, 50);
+	snprintf(msg, 40, "refresh:");
 	while((n = listIterate(players, n)) != NULL) {
 		Player* p = n->value;
 
@@ -85,6 +86,8 @@ void refreshPlayers() {
 
 	logger->war("##### REFRESH PLAYERS ####");
 	logger->war("msg: %s", msg);
+
+	broadcast(msg, getClient());
 }
 
 void tick() {
@@ -99,7 +102,11 @@ void tick() {
 	if(++cnt == TICK_REFRESH) {
 		resetPlayersBomb();
 		clearOutdatedObjects();
-		//refreshPlayers();
+
+		if(game->isServer) {
+			refreshPlayers();
+		}
+
 		cnt = 0;
 	}
 }
