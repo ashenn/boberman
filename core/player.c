@@ -269,7 +269,20 @@ void playerStop(Player* p) {
 	updatePlayerClip(p);
 }
 
+void broadcastStop(Player* p) {
+	logger->war("!!!!!! BROADCAST STOOOP !!!!!!!");
+	Game* game = getGame();
+
+	if(game->isServer) {
+		char msg[25];
+		memset(msg, 0, 25); 
+		snprintf(msg, 25, "stop:%d", p->id);
+		broadcast(msg, NULL);
+	}
+}
+
 void broadcastMove(Player* p, int direction) {
+	logger->war("!!!!!! BROADCAST MOOOVE !!!!!!!");
 	Game* game = getGame();
 	if(game->isServer) {
 		char msg[25];

@@ -192,15 +192,14 @@ void broadcast(char *msg, client_t* ignore) {
         }
 
         client_t *client = tmp->value;
-        logger->err("Broadcast msg: %s", sendMsg);
+        logger->war("Broadcast msg: %s", sendMsg);
         logger->err("msg Length: %d", length + 2);
-        logger->err("msg Length: %d", strlen(sendMsg));
 
 
         int i = send(client->fd, sendMsg, length + 2, 0);
         
-        if (i != strlen(msg)) {
-          logger->err("Broadcast error for fd : %d, %d", client->fd, i);
+        if (i != length + 2) {
+          logger->err("Broadcast error for fd : %d / %d", i, length + 2);
         }
         else {
           logger->err("Broadcast success for fd : %d", client->fd);

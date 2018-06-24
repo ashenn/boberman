@@ -19,6 +19,8 @@ void calcPlayerObjectPos(SDL_Rect playPos, SDL_Rect* objPos);
 
 void clearPlayers();
 void* deletePlayer(Player* p);
+
 void broadcastMove(Player* p, int direction);
+void broadcastStop();
 
 #endif

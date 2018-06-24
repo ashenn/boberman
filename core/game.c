@@ -62,6 +62,31 @@ void* hostGame() {
 	}
 }
 
+void refreshPlayers() {
+	ListManager* players = getPlayerList();
+	Node* n = players->first;
+
+	char tmp[15];
+
+	char msg[28];
+	memset(msg, 0, 28);
+	
+	while((n = listIterate(players, n)) != NULL) {
+		Player* p = n->value;
+
+		memset(tmp, 0, 15);
+	    snprintf(tmp, 15, "%d-%d-%d", p->id, p->object->pos.x, p->object->pos.y);
+
+	    strcat(msg, tmp);
+	    if(n != players->last) {
+	    	strcat(msg, ":");
+	    }
+	}
+
+	logger->war("##### REFRESH PLAYERS ####");
+	logger->war("msg: %s", msg);
+}
+
 void tick() {
 	Game* game = getGame();
 
@@ -74,6 +99,7 @@ void tick() {
 	if(++cnt == TICK_REFRESH) {
 		resetPlayersBomb();
 		clearOutdatedObjects();
+		//refreshPlayers();
 		cnt = 0;
 	}
 }
@@ -128,7 +154,7 @@ void launchSate(short status) {
 		//logger->err("GAME: Un-Lock");
 		unlock(DBG_VIEW);
 
-		SDL_Delay(25);
+		SDL_Delay(15);
 	}
 
 	logger->dbg("===== STATE END =====");

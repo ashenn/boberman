@@ -17,7 +17,7 @@ void init_commands () {
 
 
     arg = malloc(sizeof(Arg));    
-    arg->function = (void*) playerStop;
+    arg->function = (void*) broadcastStop;
     
     logger->dbg("-- Player Stop Move");
     n = addNodeV(server->commands, "stopmove", arg, 1);

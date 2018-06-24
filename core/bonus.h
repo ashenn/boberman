@@ -30,4 +30,6 @@ struct Bonus {
 void generateBonus(SDL_Rect pos, BonusType type);
 BonusType prepareBonus();
 
+ListManager* getBonusList();
+Bonus* getBonusById(int id);
 #endif

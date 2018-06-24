@@ -58,7 +58,7 @@ void getMessage(char* msg) {
 	logger->err("Test Décode !!! %d", (int)msg[0]);
 
 	i = recv(co->fd, msg, (int)msg[0] +1, 0);
-	logger->err("Test MSG !!! %s", msg);
+	logger->war("Test MSG !!! %s", msg);
 
 	if(i < 0) {
 		logger->err("Faild To Receive Message !!!");
@@ -306,6 +306,49 @@ void* clientProcess() {
 
 					playerStop(player);
 				}
+			}
+		}
+
+		if (strcmp(resp[0], "bonus") == 0) {
+			int bId = str2int(resp[1]);
+			int pId = str2int(resp[2]);
+
+			logger->war("Bonus #%d Taken By Player #%d", bId, pId);
+
+
+			ListManager* bonusList = getBonusList();
+			logger->war("### PRINTING BONUS LIST");
+			printNodes(bonusList);
+
+			Node* bonusNode = getNode(bonusList, bId);
+
+			if(bonusNode != NULL) {
+				ListManager* players = getPlayerList();
+				Node* playerNode = getNode(players, pId);
+
+				if(playerNode != NULL) {
+					Player* player = playerNode->value;
+					
+					if(player != NULL) {
+						Bonus* bonus = bonusNode->value;
+						logger->war("### Applying Bonus");
+						bonus->obj->collision->fnc(bonus->obj, player->object);
+						
+						logger->war("### Deleting Bonus");
+						deleteObject(bonus->obj);
+					}
+					else{
+						logger->war("### PLAYER IS NULL !!!!");
+					}
+				}
+				else{
+					logger->war("### PLAYER NOT FOUND !!!!");
+				}
+
+				deleteNode(bonusList, bonusNode->id);
+			}
+			else{
+				logger->war("### BONUS NOT FOUND !!!!");
 			}
 		}
 	}
