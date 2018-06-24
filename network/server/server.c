@@ -1,5 +1,18 @@
 #include "server.h"
 
+client_t* getClient() {
+	server_t* server = getServer();
+	if(server == NULL) {
+		return NULL;
+	}
+
+	Node* node = server->clients->first;
+	if (node == NULL) {
+		return NULL;
+	}
+
+	return node->value;
+}
 
 server_t* initServer(short init) {
 	static server_t* server = NULL;

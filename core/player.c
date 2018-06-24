@@ -261,7 +261,7 @@ void playerStop(Player* p) {
 		char msg[25];
 		memset(msg, 0, 25); 
 		snprintf(msg, 25, "stop:%d", p->id);
-		broadcast(msg);
+		broadcast(msg, getClient());
 	}
 	
 	p->clipIndex = 0;
@@ -269,18 +269,21 @@ void playerStop(Player* p) {
 	updatePlayerClip(p);
 }
 
-void* playerMove(Player* p, short direction) {
-	if(p == NULL || !p->alive) {
-		return NULL;
-	}
-
+void broadcastMove(Player* p, int direction) {
 	Game* game = getGame();
 	if(game->isServer) {
 		char msg[25];
 		memset(msg, 0, 25); 
 		snprintf(msg, 25, "move:%d:%d", p->id, direction);
-		broadcast(msg);
+		broadcast(msg, NULL);
 	}
+}
+
+void* playerMove(Player* p, short direction) {
+	if(p == NULL || !p->alive) {
+		return NULL;
+	}
+
 
 	enableLogger(DBG_PLAYER);
 

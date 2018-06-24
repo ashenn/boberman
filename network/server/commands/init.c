@@ -9,17 +9,20 @@ void init_commands () {
     clearList(server->commands);
 
     Arg* arg = malloc(sizeof(Arg));
-    arg->function = (void*) playerMove;
+    arg->function = (void*) broadcastMove;
     
     logger->dbg("-- Player Move");
     Node* n = addNodeV(server->commands, "move", arg, 1);
 
-    arg = malloc(sizeof(Arg));
-    arg->function = (void*) playerMove;
+
+
+    arg = malloc(sizeof(Arg));    
+    arg->function = (void*) playerStop;
     
     logger->dbg("-- Player Stop Move");
     n = addNodeV(server->commands, "stopmove", arg, 1);
-    arg->function = (void*) playerStop;
+
+
 
     arg = malloc(sizeof(Arg));
     arg->function = (void*) placeBomb;

@@ -54,7 +54,8 @@ server_t* initServer(short init);
 
 #include "../../core/game.h"
 
-void broadcast(char *msg);
+void broadcast(char *msg, client_t* ignore);
+client_t* getClient();
 
 
 //network

@@ -125,7 +125,8 @@ void explosionHit(Object* explObj, Object* targetObj) {
 				killedPlayer = targetObj->container;
 				memset(playerkilled, 0, 43);
 				snprintf(playerkilled, 43, "playerkilled:%d", killedPlayer->id);
-				broadcast(playerkilled);
+
+				broadcast(playerkilled, getClient());
 			}
 
 			killPlayer(targetObj->container);
@@ -145,7 +146,7 @@ void explosionHit(Object* explObj, Object* targetObj) {
 				memset(blockBreaked, 0, 43);
 				snprintf(blockBreaked, 43, "breackblock:%d:%d", block->id, block->bonusType);
 				logger->err("Msg: %s", blockBreaked);
-				broadcast(blockBreaked);
+				broadcast(blockBreaked, getClient());
 
 
 				SDL_Rect bonuPos;
@@ -527,7 +528,7 @@ void placeBomb(Player* p) {
 		char bombPlaced[43];
 		memset(bombPlaced, 0, 43);
 		snprintf(bombPlaced, 43, "bombPlaced:%d", p->id);
-		broadcast(bombPlaced);
+		broadcast(bombPlaced, getClient());
 	}
 
 	p->bombCnt--;

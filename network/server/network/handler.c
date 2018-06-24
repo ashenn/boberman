@@ -104,7 +104,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
         initPlayer(client->player);
     }
 
-    broadcast(newPlayer);
+    broadcast(newPlayer, getClient());
     //logger->war("HANDLER: Un-Lock");
     //unlock(DBG_SERVER);
 
@@ -171,11 +171,10 @@ void kill_client(int fd) {
         deleteNode(server->clients, id);
 }
 
-void broadcast(char *msg) {
+void broadcast(char *msg, client_t* ignore) {
     Node* tmp = NULL;
     server_t* server = getServer();
     int nc = server->clients->nodeCount;
-    int first = 0;
 
     int length = strlen(msg) + 2;
     char sendMsg[length];
@@ -188,8 +187,7 @@ void broadcast(char *msg) {
     logger->err("Broadcast msg (%d): %s for %d clients", length, sendMsg, nc);
   
     while((tmp = listIterate(server->clients, tmp)) != NULL) {
-        if (!first) {
-            first ++;
+        if (tmp->value == ignore) {
             continue;
         }
 
@@ -281,7 +279,9 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
 
                     char playerLeft[43];
                     snprintf(playerLeft, 43, "playerLeft:%d", client->player->id);
-                    broadcast(playerLeft);
+                    
+                    broadcast(playerLeft, getClient());
+                    
                     killPlayer(client->player);
                     close(client->fd);
                     n = n->prev;
