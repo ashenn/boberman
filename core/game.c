@@ -1,6 +1,39 @@
 #include <sys/time.h>
 #include "game.h"
 
+void countDown() {
+	static short cnt = 5;
+
+	char msg[25];
+	memset(msg, 0, 25);
+
+	if(cnt == -1) {
+		changeGameStatus(GAME_RUNNING);
+		snprintf(msg, 25, "GO !!!"); 
+	}
+	else if(cnt < -1) {
+		return;
+	}
+	else {
+		snprintf(msg, 25, "%d", cnt); 
+	}
+
+	Object* txt = generateText(msg, "pf", FONT_LG);
+	
+	txt->lifetime = 3;
+	txt->onDelete = countDown;
+
+	cnt--;
+}
+
+void startGame() {
+	Object* txt = generateText("Get Ready !", "pf", FONT_LG);
+	txt->lifetime = 5;
+	txt->onDelete = countDown;
+
+	launchSate(GAME_START);
+}
+
 void* setServerPort(int port) {
 	Game* game = getGame();
 	game->options.port = port;
@@ -84,8 +117,8 @@ void refreshPlayers() {
 	    }
 	}
 
-	logger->war("##### REFRESH PLAYERS ####");
-	logger->war("msg: %s", msg);
+	//logger->war("##### REFRESH PLAYERS ####");
+	//logger->war("msg: %s", msg);
 
 	broadcast(msg, getClient());
 }
@@ -93,7 +126,7 @@ void refreshPlayers() {
 void tick() {
 	Game* game = getGame();
 
-	if (game->status != GAME_LOBY) {
+	if (game->status < GAME_LOBY) {
 		return;
 	}
 
@@ -150,7 +183,7 @@ void launchSate(short status) {
 
 		handleEvents();
 
-    	if (game->status == GAME_LOBY && game->isServer) {
+    	if (game->status > GAME_LOBY && game->isServer) {
     		handleHits();
     	}
 
@@ -451,10 +484,15 @@ void changeGameStatus(short status) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_STATE;
 
-	logger->inf("==== Changing Status: %d ====", status);
-	
-	generateText("Changing status", "pf", FONT_LG);
+	logger->war("==== Changing Status: %d ====", status);	
 	game->status = status;
+
+	if(game->isServer) {
+		char msg[10];
+		memset(msg, 0, 10);
+		snprintf(msg, 10, "status:%d", status);
+		broadcast(msg, getClient());
+	}
 }
 
 void* addDebugFlag(char* flag) {

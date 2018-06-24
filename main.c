@@ -152,7 +152,13 @@ int main(int argc, char *argv[])
 				break;
 
 			case GAME_START:
-				launchSate(GAME_START);
+				logger->err("#### STARTING GAME ####");
+				startGame();
+				break;
+
+			case GAME_RUNNING:
+				logger->err("#### RUNNING GAME ####");
+				launchSate(GAME_RUNNING);
 				break;
 		}
 	}

@@ -208,7 +208,7 @@ void* clientProcess() {
 		}
 
 		if (strcmp(resp[0], "playerLeft") == 0) {
-			logger->err("Player left Recieved : %s (I am %d)", resp[1], pl->id);
+			logger->dbg("Player left Recieved : %s (I am %d)", resp[1], pl->id);
 			ListManager* players = getPlayerList();
 			Node *tmp = NULL;
 			while((tmp = listIterate(players, tmp)) != NULL) {
@@ -219,7 +219,7 @@ void* clientProcess() {
 		}
 
 		if (strcmp(resp[0], "playerkilled") == 0) {
-			logger->err("player killed Recieved : %s (I am %d)", resp[1], pl->id);
+			logger->dbg("player killed Recieved : %s (I am %d)", resp[1], pl->id);
 			ListManager* players = getPlayerList();
 			Node *tmp = NULL;
 			while((tmp = listIterate(players, tmp)) != NULL) {
@@ -230,7 +230,7 @@ void* clientProcess() {
 		}
 
 		if (strcmp(resp[0], "breackblock") == 0) {
-			logger->err("Break Block By Id: %d", resp[1]);
+			logger->dbg("Break Block By Id: %d", resp[1]);
 			ListManager* blockList = getBlockList();
 
 			int id = str2int(resp[1]);
@@ -240,7 +240,7 @@ void* clientProcess() {
 				Block* block = blockNode->value;
 				Object* o = block->obj;
 
-				logger->err("Object Got: %s", o->name);
+				logger->dbg("Object Got: %s", o->name);
 
 				breakBlock(block);
 				SDL_Rect bonuPos;
@@ -260,7 +260,7 @@ void* clientProcess() {
 		}
 
 		if (strcmp(resp[0], "bombPlaced") == 0) {
-			logger->err("Bomb Placed By Id: %d", resp[1]);
+			logger->dbg("Bomb Placed By Id: %d", resp[1]);
 			int id = str2int(resp[1]);
 			ListManager* players = getPlayerList();
 			Node* playerNode = getNode(players, id);
@@ -278,7 +278,7 @@ void* clientProcess() {
 		if (strcmp(resp[0], "move") == 0) {
 			int id = str2int(resp[1]);
 			int direction = str2int(resp[2]);
-			logger->err("Moving Player #%d: %d", id, direction);
+			logger->dbg("Moving Player #%d: %d", id, direction);
 
 			ListManager* players = getPlayerList();
 			Node* playerNode = getNode(players, id);
@@ -293,7 +293,7 @@ void* clientProcess() {
 		}
 
 		if (strcmp(resp[0], "stop") == 0) {
-			logger->err("Stopping Player #%d", resp[1]);
+			logger->dbg("Stopping Player #%d", resp[1]);
 			int id = str2int(resp[1]);
 
 			ListManager* players = getPlayerList();
@@ -309,15 +309,21 @@ void* clientProcess() {
 			}
 		}
 
+		if (strcmp(resp[0], "status") == 0) {
+			int status = str2int(resp[1]);
+			logger->war("CHANGING STAUS %d", status);
+			changeGameStatus(status);
+		}
+
 		if (strcmp(resp[0], "bonus") == 0) {
 			int bId = str2int(resp[1]);
 			int pId = str2int(resp[2]);
 
-			logger->war("Bonus #%d Taken By Player #%d", bId, pId);
+			logger->dbg("Bonus #%d Taken By Player #%d", bId, pId);
 
 
 			ListManager* bonusList = getBonusList();
-			logger->war("### PRINTING BONUS LIST");
+			logger->dbg("### PRINTING BONUS LIST");
 			printNodes(bonusList);
 
 			Node* bonusNode = getNode(bonusList, bId);
@@ -331,35 +337,35 @@ void* clientProcess() {
 					
 					if(player != NULL) {
 						Bonus* bonus = bonusNode->value;
-						logger->war("### Applying Bonus");
+						logger->dbg("### Applying Bonus");
 						bonus->obj->collision->fnc(bonus->obj, player->object);
 						
-						logger->war("### Deleting Bonus");
+						logger->dbg("### Deleting Bonus");
 						deleteObject(bonus->obj);
 					}
 					else{
-						logger->war("### PLAYER IS NULL !!!!");
+						logger->dbg("### PLAYER IS NULL !!!!");
 					}
 				}
 				else{
-					logger->war("### PLAYER NOT FOUND !!!!");
+					logger->dbg("### PLAYER NOT FOUND !!!!");
 				}
 
 				deleteNode(bonusList, bonusNode->id);
 			}
 			else{
-				logger->war("### BONUS NOT FOUND !!!!");
+				logger->dbg("### BONUS NOT FOUND !!!!");
 			}
 		}
 
 
 		if (strcmp(resp[0], "refresh") == 0) {
-			logger->war("#### Refreshing Players");
+			logger->dbg("#### Refreshing Players");
 
 			ListManager* players = getPlayerList();
 			int index;
 			for (index = 1; index < 4 && resp[index] != '\0'; ++index) {
-				logger->war("#%d: %s", index, resp[index]);
+				logger->dbg("#%d: %s", index, resp[index]);
 
 				char* infos[4];
 				infos[3] = '\0';
@@ -369,18 +375,18 @@ void* clientProcess() {
 				int x = str2int(infos[1]);
 				int y = str2int(infos[2]);
 
-				logger->war("Player #%d\nPosition: %d | %d", pId, x, y);
+				logger->dbg("Player #%d\nPosition: %d | %d", pId, x, y);
 				Node* n = getNode(players, pId);
 				if(n != NULL) {
-					logger->war("Setting Pos: %d | %d", x, y);
+					logger->dbg("Setting Pos: %d | %d", x, y);
 					Player* p = n->value;
 					p->object->pos.x = x;
 					p->object->pos.y = y;
 
-					logger->war("Player Moved Pos: %d | %d", x, y);
+					logger->dbg("Player Moved Pos: %d | %d", x, y);
 				}
 
-				logger->war("Free Params");
+				logger->dbg("Free Params");
 				free(infos[0]);
 				free(infos[1]);
 				free(infos[2]);
