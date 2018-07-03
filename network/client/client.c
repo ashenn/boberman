@@ -411,19 +411,10 @@ void getMessage(char* msg) {
 }
 
 short findHost() {
-	logger->err("============== FIND HOST =============");
 	enableLogger(DBG_CLIENT);
 	logger->inf("==== Findding Host ====");
 
-
-	/*
-	logger->war("Find: Ask-Lock");
-	lock(DBG_STATE);
-	logger->war("Find: Lock");
-	*/
-
 	Connexion* co = initConnexion(1);
-
 
 	//logger->war("Find: Un-Lock");
 	unlock(DBG_STATE);
@@ -433,16 +424,11 @@ short findHost() {
 	}
 
 	char msg[MSG_SIZE];
-	logger->inf("-- Checking Response");
-
 	getMessage(msg);
-	logger->inf("-- msg: %s");
+	logger->dbg("Response: %s");
 
 	char* resp[3];
 	explode(':', msg, 0, 0, resp);
-
-	logger->dbg("-- Checking explode");
-	logger->dbg("-- 0: %s\n--1: %s", resp[0], resp[1]);
 
 	int id = char2int(resp[1][0]);
 	logger->dbg("id : %d", id);
@@ -450,7 +436,7 @@ short findHost() {
 	free(resp[0]);
 	free(resp[1]);
 
-	if(!id) {
+	if(id <= 0) {
 		logger->err("Connexion Refuse !!!");
 		return 0;
 	}
@@ -462,7 +448,6 @@ short findHost() {
 		
 		clearObjects();
 
-		logger->war("========== INIT PLAYER LIST ==============");
 		char name[12];
 		Player* p = NULL;
 		for(int i = 1; i <= id; i++) {
@@ -472,11 +457,6 @@ short findHost() {
 		}
 
 		initPlayer(p);
-		
-		/*
-		logger->war("Find: Un-Lock");
-		unlock(DBG_STATE);
-		*/
 	}
 
 	logger->inf("Connexion Accepted");

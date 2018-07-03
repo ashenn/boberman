@@ -72,7 +72,6 @@ void* setServerIp(char* ip) {
 }
 
 void* findGame() {
-	logger->err("============== FIND GAME =============");
 	Game* game = getGame();
 	enableLogger(DBG_CLIENT);
 
@@ -80,16 +79,18 @@ void* findGame() {
 	Connexion* co = getConnexion();
 
 	if(co->init) {
-		logger->inf("GAME ALREADY INIT");
+		logger->war("GAME ALREADY INIT");
+		changeGameStatus(GAME_MENU);
 		return NULL;
 	}
 
 	if(!findHost()) {
-		logger->err("Faild To Find Host !!!");
+		logger->war("Faild To Find Host !!!");
+		changeGameStatus(GAME_MENU);
 		return NULL;
 	}
 
-	logger->inf("Host Found Host !!!");
+	logger->war("Host Found Host !!!");
 
 	pthread_create(&game->clientThread, NULL, clientProcess, (void*)NULL);
 	logger->dbg("clientThread created");
@@ -98,7 +99,6 @@ void* findGame() {
 }
 
 void* hostGame() {
-	logger->err("============== HOST GAME =============");
 	Game* game = getGame();
 	server_t* serv = getServer();
 
@@ -254,7 +254,6 @@ void launchSate(short status) {
 }
 
 void renderMap() {
-	logger->err("============== RENDER MAP =============");
 	
 	/*
 		logger->war("MAP: Ask-Lock");

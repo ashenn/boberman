@@ -365,8 +365,8 @@ void killPlayer(Player* p) {
 
 	enableLogger(DBG_PLAYER);
 
-	logger->war("==== KILL PLAYER ====");
-	logger->war("-- Player #%d: %s", p->id, p->name);
+	logger->inf("==== KILL PLAYER ====");
+	logger->dbg("-- Player #%d: %s", p->id, p->name);
 
 	animRemoveObject(p->object);
 
