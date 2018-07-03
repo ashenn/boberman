@@ -133,10 +133,10 @@ void explosionHit(Object* explObj, Object* targetObj) {
 			break;
 
 		case BLOCK:
-			logger->err("Breaking Block");
+			logger->dbg("Breaking Block");
 
 			if(game->isServer) {
-				logger->err("Is Server");
+				logger->dbg("Is Server");
 				block = targetObj->container;
 				if(block->destroyed) {
 					return;
@@ -145,7 +145,7 @@ void explosionHit(Object* explObj, Object* targetObj) {
 
 				memset(blockBreaked, 0, 43);
 				snprintf(blockBreaked, 43, "breackblock:%d:%d", block->id, block->bonusType);
-				logger->err("Msg: %s", blockBreaked);
+				logger->inf("Msg: %s", blockBreaked);
 				broadcast(blockBreaked, getClient());
 
 
@@ -159,10 +159,10 @@ void explosionHit(Object* explObj, Object* targetObj) {
 				Game* game = getGame();
 				generateBonus(bonuPos, block->bonusType);
 
-				logger->err("BroadCast DONE");
+				logger->dbg("BroadCast DONE");
 			}
 
-			logger->err("Breaking");
+			logger->dbg("Breaking");
 			breakBlock(targetObj->container);
 			break;
 	}
@@ -476,15 +476,16 @@ void iterateBomb(AnimParam* anim) {
 		posY = bomb->pos.y;
 		bomb->clip.y = 1;
 
-		/*if (bomb->state == 4)
+		if (bomb->state == 4)
 		{
-			logger->dbg("-- Add Collision");
+			/*logger->dbg("-- Add Collision");
 			SDL_Rect hit = {0,0,BOMB_SIZE, BOMB_SIZE};
-			setHitBox(obj, hit, 0, COL_BOMB);
+			setHitBox(obj, hit, 1, COL_BOMB);
 
 			obj->collision->colFlags = COL_PLAYER | COL_WALL;
-			obj->collision->fnc = bombHit;
-		}*/
+			obj->collision->fnc = NULL;
+			*/
+		}
 
 		if (bomb->state < 6) {
 			if (bomb->clip.x >= BOMB_SIZE){
@@ -517,8 +518,6 @@ void placeBomb(Player* p) {
 
 	AssetMgr* ast = getAssets();
 
-
-
 	if (p->bombCnt <= 0 || !p->canPlaceBomb) {
 		return;
 	}
@@ -547,8 +546,11 @@ void placeBomb(Player* p) {
 
 
 	logger->dbg("-- Setting Pos");
-	obj->pos.x = p->object->pos.x + (PLAYER_W / 2) - 20;
-	obj->pos.y = p->object->pos.y + (PLAYER_H / 2);
+	//obj->pos.x = p->object->pos.x + (PLAYER_W / 2) - 20;
+	//obj->pos.y = p->object->pos.y + (PLAYER_H / 2);
+
+	obj->pos.x = MAP_X + (p->pos.x * CELL_SIZE) + (BOMB_SIZE / 4);
+	obj->pos.y = MAP_Y + (p->pos.y * CELL_SIZE) + (BOMB_SIZE / 4);
 
 	logger->dbg("-- Setting Clip");
 	bomb->owner = p;
@@ -565,8 +567,12 @@ void placeBomb(Player* p) {
 	bomb->power = p->bombPower;
 
 	logger->dbg("-- Setting Anim Pos");
-	bomb->pos.x = p->object->pos.x + (PLAYER_W / 2) - 20;
-	bomb->pos.y = p->object->pos.y + (PLAYER_H - 30);
+	//bomb->pos.x = p->object->pos.x + (PLAYER_W / 2) - 20;
+	//bomb->pos.y = p->object->pos.y + (PLAYER_H - 30);
+	
+
+	bomb->pos.x = MAP_X + (p->pos.x * CELL_SIZE) + (BOMB_SIZE / 4);
+	bomb->pos.y = MAP_Y + (p->pos.y * CELL_SIZE) + (BOMB_SIZE / 4);
 
 	logger->dbg("-- Link Clip");
 	obj->clip = &bomb->clip;

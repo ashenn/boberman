@@ -7,7 +7,11 @@ void countDown() {
 	char msg[25];
 	memset(msg, 0, 25);
 
-	if(cnt == -1) {
+	Game* game = getGame();
+	if(game->status >= GAME_RUNNING) {
+		return;
+	}
+	else if(cnt == -1) {
 		changeGameStatus(GAME_RUNNING);
 		snprintf(msg, 25, "GO !!!"); 
 	}
@@ -45,6 +49,7 @@ void* setServerIp(char* ip) {
 }
 
 void* findGame() {
+	logger->err("============== FIND GAME =============");
 	Game* game = getGame();
 	enableLogger(DBG_CLIENT);
 
@@ -61,22 +66,36 @@ void* findGame() {
 		return NULL;
 	}
 
-	logger->war("Host Found Host !!!");
+	logger->inf("Host Found Host !!!");
 
 	pthread_create(&game->clientThread, NULL, clientProcess, (void*)NULL);
-	logger->war("clientThread created");
+	logger->dbg("clientThread created");
 
 	loadMap();
 }
 
 void* hostGame() {
+	logger->err("============== HOST GAME =============");
 	Game* game = getGame();
 	server_t* serv = getServer();
 
 	if(serv == NULL) {
+		//logger->war("Host: Un-lock");
+		unlock(DBG_SERVER);
+		//logger->war("Host: Test");
+		
 		pthread_create(&game->serverThread, NULL, serverProcess, (void*)NULL);
 
+		//logger->war("Host: WAIT !!!");
+		lock(DBG_SERVER);
 		waitCond();
+		unlock(DBG_SERVER);
+		//logger->war("Host: WAIT DONE !!!");
+
+		//logger->war("Host: Ask-lock");
+		lock(DBG_SERVER);
+		//logger->war("Host: lock");
+		
 		serv = getServer();
 
 		if(serv == NULL || serv->fd < 0) {
@@ -89,9 +108,17 @@ void* hostGame() {
 		clearObjects();
 		setServerIp("127.0.0.1");
 
+		/*
+		logger->war("Host: Un-lock");
 		unlock(DBG_SERVER);
+		*/
+		
 		loadMap();
 		findGame();
+
+		//logger->war("Host: Ask-lock");
+		lock(DBG_SERVER);
+		//logger->war("Host: lock");
 	}
 }
 
@@ -166,13 +193,12 @@ void launchSate(short status) {
 	Game* game = getGame();
 	game->status = status;
 
-	//logger->err("GAME: Un-Lock");
-	unlock(DBG_VIEW);
+	/*
+		logger->err("GAME: Un-Lock");
+		unlock(DBG_STATE);
+	*/
 
 	while(game->status == status) {
-		//logger->war("GAME: Ask-Lock");
-		lock(DBG_VIEW);
-		//logger->war("GAME: Lock");
 
 		logger->enabled = game->flags & DBG_STATE;
 
@@ -183,7 +209,7 @@ void launchSate(short status) {
 
 		handleEvents();
 
-    	if (game->status > GAME_LOBY && game->isServer) {
+    	if (game->isServer && game->status > GAME_LOBY && game->status <= GAME_RUNNING) {
     		handleHits();
     	}
 
@@ -191,19 +217,27 @@ void launchSate(short status) {
 		logger->inf("==== Tick END ====");
 
 
-		//logger->err("GAME: Un-Lock");
-		unlock(DBG_VIEW);
+		//logger->war("GAME: Un-Lock");
+		unlock(DBG_STATE);
 
 		SDL_Delay(15);
+
+		//logger->war("GAME: Ask-Lock");
+		lock(DBG_STATE);
+		//logger->war("GAME: Lock");
 	}
 
 	logger->dbg("===== STATE END =====");
 }
 
 void renderMap() {
-	//logger->err("MAP: Ask-Lock");
-	lock(DBG_STATE);
-	//logger->err("MAP: Lock");
+	logger->err("============== RENDER MAP =============");
+	
+	/*
+		logger->war("MAP: Ask-Lock");
+		lock(DBG_STATE);
+		logger->war("MAP: Lock");
+	*/
 
 	Game* game = getGame();
 
@@ -484,7 +518,7 @@ void changeGameStatus(short status) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_STATE;
 
-	logger->war("==== Changing Status: %d ====", status);	
+	logger->inf("==== Changing Status: %d ====", status);	
 	game->status = status;
 
 	if(game->isServer) {

@@ -1,5 +1,351 @@
 #include "client.h"
 
+void cmdRefresh(char* resp[]) {
+	//logger->war("#### Refreshing Players");
+
+	//logger->war("#### Getting Players");
+	ListManager* players = getPlayerList();
+	//logger->war("#### Players Count: %d", players->nodeCount);
+	//logger->war("#### TEST");
+	//logger->war("#### %p", resp[0]);
+	//logger->war("#### TEST2");
+	//logger->war("#### %p", resp[1]);
+	//logger->war("#### TEST3");
+
+	int index;
+	for (index = 1; index < 4 && resp[index] != '\0'; ++index) {
+		//logger->war("#%d", index);
+		//logger->war("%s", resp[index]);
+
+		char* infos[4];
+		memset(infos, 0, 4);
+
+		explode('-', resp[index], 0, 0, infos);
+		int pId = str2int(infos[0]);
+		int x = str2int(infos[1]);
+		int y = str2int(infos[2]);
+
+		//logger->war("Player #%d\nPosition: %d | %d", pId, x, y);
+		Node* n = getNode(players, pId);
+		if(n != NULL) {
+			//logger->war("Setting Pos: %d | %d", x, y);
+			Player* p = n->value;
+			p->object->pos.x = x;
+			p->object->pos.y = y;
+
+			//logger->war("Player Moved Pos: %d | %d", x, y);
+		}
+
+		//logger->war("Free Params");
+		int z;
+		for (z = 0; infos[z] != 0; ++z){
+			free(infos[z]);
+			infos[z] = 0;
+		}
+		memset(infos, 0, 4);
+	}
+}
+
+void cmdNewPlayer(int id) {
+	Player* curPlayer = getPlayer();
+	logger->err("New player Recieved : %d (I am %d)", id, curPlayer->id);
+
+	if (curPlayer->id == id) {
+		return;
+	}
+
+	char name[15];
+	memset(name, 0, 15);
+	snprintf(name, 15, "Player-%d", id);
+	genPlayer(name);
+}
+
+void cmdPlayerLeft(int id) {
+	Player* pl = getPlayer();
+	ListManager* players = getPlayerList();
+	logger->inf("player killed Recieved : %d (I am %d)", id, pl->id);
+
+
+	Node *tmp = NULL;
+	while((tmp = listIterate(players, tmp)) != NULL) {
+		Player *deadPlayer = tmp->value;
+		
+		if (deadPlayer->id == id) {
+			killPlayer(deadPlayer);
+		}
+	}
+}
+
+void cmdBreakBlock(int id, BonusType type) {
+	logger->dbg("Break Block By Id: %d", id);
+	ListManager* blockList = getBlockList();
+
+	Node* blockNode = getNode(blockList, id);
+	if(blockNode != NULL) {
+		Block* block = blockNode->value;
+		Object* o = block->obj;
+
+		logger->dbg("Object Got: %s", o->name);
+		breakBlock(block);
+
+		SDL_Rect bonuPos;
+		bonuPos.x = block->obj->pos.x + (BONUS_SIZE / 4);
+		bonuPos.y = block->obj->pos.y + (BONUS_SIZE / 4);
+
+		bonuPos.w = BONUS_SIZE;
+		bonuPos.h = BONUS_SIZE;
+
+
+		generateBonus(bonuPos, type);
+		deleteNode(blockList, block->id);
+	}
+}
+
+void cmdBomb(int id) {
+	logger->dbg("Bomb Placed By Id: %d", id);
+	
+	ListManager* players = getPlayerList();
+	Node* playerNode = getNode(players, id);
+	
+	if(playerNode != NULL) {
+		Player *player = playerNode->value;
+
+		if(player != NULL && player->alive) {
+			placeBomb(player);
+		}
+	}
+}
+
+void cmdMove(int id, int direction) {
+	logger->dbg("Moving Player #%d: %d", id, direction);
+
+	ListManager* players = getPlayerList();
+	Node* playerNode = getNode(players, id);
+
+	if(playerNode != NULL) {
+		Player *player = playerNode->value;
+
+		if(player != NULL && player->alive) {
+			playerMove(player, direction);
+		}
+	}
+}
+
+void cmdStop(int id) {
+	logger->dbg("Stopping Player #%d", id);
+
+	ListManager* players = getPlayerList();
+	Node* playerNode = getNode(players, id);
+
+	if(playerNode != NULL) {
+		Player *player = playerNode->value;
+
+		if(player != NULL) {
+			playerStop(player);
+		}
+	}
+}
+
+void cmdStatus(int status) {
+	logger->inf("CHANGING STAUS %d", status);
+	changeGameStatus(status);
+}
+
+void cmdBonus(int bId, int pId) {
+	logger->dbg("Bonus #%d Taken By Player #%d", bId, pId);
+
+
+	ListManager* bonusList = getBonusList();
+	logger->dbg("### PRINTING BONUS LIST");
+
+	Node* bonusNode = getNode(bonusList, bId);
+
+	if(bonusNode != NULL) {
+		ListManager* players = getPlayerList();
+		Node* playerNode = getNode(players, pId);
+
+		if(playerNode != NULL) {
+			Player* player = playerNode->value;
+			
+			if(player != NULL) {
+				Bonus* bonus = bonusNode->value;
+				logger->dbg("### Applying Bonus");
+				bonus->obj->collision->fnc(bonus->obj, player->object);
+				
+				logger->dbg("### Deleting Bonus");
+				deleteObject(bonus->obj);
+			}
+			else{
+				logger->dbg("### PLAYER IS NULL !!!!");
+			}
+		}
+		else{
+			logger->dbg("### PLAYER NOT FOUND !!!!");
+		}
+
+		deleteNode(bonusList, bonusNode->id);
+	}
+	else{
+		logger->dbg("### BONUS NOT FOUND !!!!");
+	}
+}
+
+
+void clientCommand(char* msg) {
+    //logger->err("Handeling Command: %s", msg);
+
+  	char* resp[5];
+  	memset(resp, 0, 5);
+    int z;
+  	for (z = 0; z < 5; ++z){
+  		resp[z] = 0;
+  	}
+
+    explode(':', msg, 0, 0, resp);
+    Player *pl = getPlayer();
+
+    char* cmd = resp[0];
+
+
+
+    Connexion* co = getConnexion();
+    Node* n = getNodeByName(co->commands, cmd);
+
+    //logger->err("Calling Command");
+    //logger->err("Existing Commands: %d", co->commands->nodeCount);
+
+    if(n != NULL) {
+        Arg* arg = n->value;
+	    logger->err("CMD FOUND");
+    	logger->err("CMD: %s", cmd);
+	    
+	    if(arg->function == (void*)cmdRefresh) {
+    		logger->err("CMD REFRESH");
+    		
+    		logger->war("t: %s", resp[0]);
+    		logger->war("t: %s", resp[1]);
+    		logger->war("t: %s", resp[2]);
+    		
+    		logger->err("CMD REFRESH 2");
+        	arg->function(resp);
+	    }
+	    else if(resp[2] != 0) {
+	    	logger->err("Double Values");
+    		int val = str2int(resp[1]);
+	    	int val2 = str2int(resp[2]);
+        	arg->function(val, val2);
+	    }
+	    else{
+	    	logger->err("Single Values");
+    		int val = str2int(resp[1]);
+        	arg->function(val);
+	    }
+    }
+    else{
+        //logger->err("Fail To Find Command: %s", cmd);
+    }
+
+    for (z = 0; resp[z] != 0; ++z){
+    	free(resp[z]);
+    	resp[z] = 0;
+    }
+}
+
+void initClientCommands(Connexion* co) {
+	enableLogger(DBG_CLIENT);
+	
+	logger->inf("==== INIT CLIENT COMMANDS ====");
+	co->commands = initListMgr();
+
+	/*  NEW PLAYER  */
+	Arg* arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdNewPlayer;
+	
+	logger->dbg("-- New Player");
+	Node * n = addNodeV(co->commands, "newPlayer", arg, 1);
+
+
+
+	/*  PLAYER DISCONNECT  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdPlayerLeft;
+	
+	logger->dbg("-- Player Left");
+	n = addNodeV(co->commands, "playerLeft", arg, 1);
+
+
+
+	/*  PLAYER KILLED  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdPlayerLeft;
+	
+	logger->dbg("-- Player Killed");
+	n = addNodeV(co->commands, "playerkilled", arg, 1);
+	
+
+
+	/*  Block Break  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdBreakBlock;
+	
+	logger->dbg("-- Block Break");
+	n = addNodeV(co->commands, "breackblock", arg, 1);
+	
+
+
+	/*  BOMB  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdBomb;
+	
+	logger->dbg("-- Place Bomb");
+	n = addNodeV(co->commands, "bombPlaced", arg, 1);
+	
+
+
+	/*  MOVE  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdMove;
+	
+	logger->dbg("-- Player Move");
+	n = addNodeV(co->commands, "move", arg, 1);
+	
+
+
+	/*  STOP  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdStop;
+	
+	logger->dbg("-- Player Stop");
+	n = addNodeV(co->commands, "stop", arg, 1);
+	
+
+
+	/*  STATUS  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdStatus;
+	
+	logger->dbg("-- Change Status");
+	n = addNodeV(co->commands, "status", arg, 1);
+	
+
+
+	/*  BONUS  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdBonus;
+	
+	logger->dbg("-- Bonus Taken");
+	n = addNodeV(co->commands, "bonus", arg, 1);
+	
+
+
+	/*  REFRESH  */
+	arg = malloc(sizeof(Arg));
+	arg->function = (void*) cmdRefresh;
+	
+	logger->dbg("-- Refresh");
+	n = addNodeV(co->commands, "refresh", arg, 1);
+}
+
 Connexion* initConnexion(short init) {
 	static Connexion connexion = {
 		.id = 0,
@@ -39,6 +385,7 @@ Connexion* initConnexion(short init) {
 	}
 
 	connexion.init = 1;
+	initClientCommands(&connexion);
 
 	logger->dbg("-- Connection SUCCESS");
 	return &connexion;
@@ -49,16 +396,14 @@ Connexion* getConnexion() {
 }
 
 void getMessage(char* msg) {
-	logger->err("Message recieved !!!");
 	memset(msg, 0, MSG_SIZE);
 	Connexion* co = getConnexion();
 
 
 	int i = recv(co->fd, msg, 1, 0);
-	logger->err("Test Décode !!! %d", (int)msg[0]);
 
 	i = recv(co->fd, msg, (int)msg[0] +1, 0);
-	logger->war("Test MSG !!! %s", msg);
+	logger->dbg("Received Msg: %s", msg);
 
 	if(i < 0) {
 		logger->err("Faild To Receive Message !!!");
@@ -66,10 +411,22 @@ void getMessage(char* msg) {
 }
 
 short findHost() {
+	logger->err("============== FIND HOST =============");
 	enableLogger(DBG_CLIENT);
 	logger->inf("==== Findding Host ====");
 
+
+	/*
+	logger->war("Find: Ask-Lock");
+	lock(DBG_STATE);
+	logger->war("Find: Lock");
+	*/
+
 	Connexion* co = initConnexion(1);
+
+
+	//logger->war("Find: Un-Lock");
+	unlock(DBG_STATE);
 
 	if(co == NULL || !co->init) {
 		return 0;
@@ -78,19 +435,20 @@ short findHost() {
 	char msg[MSG_SIZE];
 	logger->inf("-- Checking Response");
 
-	unlock(DBG_CLIENT);
 	getMessage(msg);
 	logger->inf("-- msg: %s");
 
 	char* resp[3];
 	explode(':', msg, 0, 0, resp);
 
-	logger->err("-- Checking explode");
-	logger->err("-- 0: %s\n--1: %s", resp[0], resp[1]);
+	logger->dbg("-- Checking explode");
+	logger->dbg("-- 0: %s\n--1: %s", resp[0], resp[1]);
 
-	printf("%s\n", resp[1]);
 	int id = char2int(resp[1][0]);
-	logger->err("id : %d", id);
+	logger->dbg("id : %d", id);
+
+	free(resp[0]);
+	free(resp[1]);
 
 	if(!id) {
 		logger->err("Connexion Refuse !!!");
@@ -98,17 +456,27 @@ short findHost() {
 	}
 
 	if(getServer() == NULL) {
+		//logger->war("Find: Ask-Lock");
 		lock(DBG_STATE);
+		//logger->war("Find: Lock");
+		
 		clearObjects();
-		unlock(DBG_STATE);
 
+		logger->war("========== INIT PLAYER LIST ==============");
 		char name[12];
-		memset(name, 0, 12);
-		for(int i = 1; i < id; i++) {
-			Player* p = genPlayer("Player-1");
+		Player* p = NULL;
+		for(int i = 1; i <= id; i++) {
+			memset(name, 0, 12);
+			snprintf(name, 12, "player-%d", i);
+			p = genPlayer(name);
 		}
-		snprintf(name, 12, "player-%d", id);
-		initPlayer(genPlayer(name));
+
+		initPlayer(p);
+		
+		/*
+		logger->war("Find: Un-Lock");
+		unlock(DBG_STATE);
+		*/
 	}
 
 	logger->inf("Connexion Accepted");
@@ -118,6 +486,8 @@ short findHost() {
 
 
 void* clientProcess() {
+	logger->err("============== LAUNCH CLIENT =============");
+
 	enableLogger(DBG_CLIENT);
 	logger->inf("==== INIT CLIENT THREAD ====");
 
@@ -128,14 +498,25 @@ void* clientProcess() {
 	fd_set readfds;
 	struct timeval tv = {0, 20};
 	Connexion* co = getConnexion();
+
+	//logger->war("Client: Ask-Lock");
   	lock(DBG_CLIENT);
+	//logger->war("Client: Lock");
 
+
+	int z;
+  	char* resp[5];
+  	memset(resp, 0, 5);
 	while(game->status < GAME_QUIT) {
-
-		//logger->err("Client: Un-Lock");
+		//logger->war("Client: Un-Lock");
 	    unlock(DBG_CLIENT);
-
 		enableLogger(DBG_CLIENT);
+
+		for (z = 0; resp[z] != 0; ++z){
+			free(resp[z]);
+			resp[z] = 0;
+		}
+  		memset(resp, 0, 5);
 
 		logger->dbg("-- Resetting fd");
 
@@ -151,7 +532,7 @@ void* clientProcess() {
 		if ((activity < 0) && (errno != EINTR)) {
 			enableLogger(DBG_CLIENT);
 
-		    logger->war("No Activity");
+		    logger->dbg("No Activity");
 
 			//logger->war("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
@@ -165,49 +546,50 @@ void* clientProcess() {
 			enableLogger(DBG_CLIENT);
 
 			logger->dbg("-- read fd is empty skipping");
-			//logger->war("Client: Ask-Lock");
 
+			//logger->war("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
 			//logger->war("Client: Lock");
+
 		    continue;
 		}
 
 		enableLogger(DBG_CLIENT);
-		logger->err("-- Getting Message");
+		logger->dbg("-- Getting Message");
 	  	getMessage(msg);
-		logger->err("-- Got Message %s\nMsg Length:%d", msg, strlen(msg));
+		logger->dbg("-- Got Message %s\nMsg Length:%d", msg, strlen(msg));
 
 	    if(strlen(msg) == 0) {
 			enableLogger(DBG_CLIENT);
-			logger->err("-- msg is empty continue...");
-			//logger->war("Client: Ask-Lock");
+			logger->dbg("-- msg is empty continue...");
 
+			//logger->war("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
 			//logger->war("Client: Lock");
 	    	continue;
 	    }
 
 		enableLogger(DBG_CLIENT);
-		logger->err("-- Msg: %s", msg);
+		logger->dbg("-- Msg: %s", msg);
 
-		char* resp[5];
-		resp[4] = '\0';
-
-		explode(':', msg, 0, 0, resp);
-		Player *pl = getPlayer();
-		logger->dbg("%d", pl->id);
+		//explode(':', msg, 0, 0, resp);
+		//Player *pl = getPlayer();
+		//logger->dbg("%d", pl->id);
 
 		//logger->war("Client: Ask-Lock");
 	    lock(DBG_CLIENT);
 		//logger->war("Client: Lock");
+		
+		clientCommand(msg);
 
-		if (strcmp(resp[0], "newPlayer") == 0) {
-			logger->err("New player Recieved : %s (I am %d)", resp[1], pl->id);
-			if (pl->id != str2int(resp[1]))
+		/*if (strcmp(resp[0], "newPlayer") == 0) {
+			logger->inf("New player Recieved : %s (I am %d)", resp[1], pl->id);
+			if (pl->id != str2int(resp[1])) {
 				genPlayer("Player-n");
-		}
+			}
+		}*/
 
-		if (strcmp(resp[0], "playerLeft") == 0) {
+		/*if (strcmp(resp[0], "playerLeft") == 0) {
 			logger->dbg("Player left Recieved : %s (I am %d)", resp[1], pl->id);
 			ListManager* players = getPlayerList();
 			Node *tmp = NULL;
@@ -216,20 +598,25 @@ void* clientProcess() {
 				if (deadPlayer->id == str2int(resp[1]))
 					killPlayer(deadPlayer);
 			}
-		}
+		}*/
 
-		if (strcmp(resp[0], "playerkilled") == 0) {
-			logger->dbg("player killed Recieved : %s (I am %d)", resp[1], pl->id);
+		/*if (strcmp(resp[0], "playerkilled") == 0) {
 			ListManager* players = getPlayerList();
+			int id = str2int(resp[1]);
+
+			logger->err("player killed Recieved : %d (I am %d)", id, pl->id);
+
 			Node *tmp = NULL;
 			while((tmp = listIterate(players, tmp)) != NULL) {
 				Player *deadPlayer = tmp->value;
-				if (deadPlayer->id == str2int(resp[1]))
+				
+				if (deadPlayer->id == id) {
 					killPlayer(deadPlayer);
+				}
 			}
-		}
+		}*/
 
-		if (strcmp(resp[0], "breackblock") == 0) {
+		/*if (strcmp(resp[0], "breackblock") == 0) {
 			logger->dbg("Break Block By Id: %d", resp[1]);
 			ListManager* blockList = getBlockList();
 
@@ -257,9 +644,9 @@ void* clientProcess() {
 				generateBonus(bonuPos, bonusType);
 				deleteNode(blockList, block->id);
 			}
-		}
+		}*/
 
-		if (strcmp(resp[0], "bombPlaced") == 0) {
+		/*if (strcmp(resp[0], "bombPlaced") == 0) {
 			logger->dbg("Bomb Placed By Id: %d", resp[1]);
 			int id = str2int(resp[1]);
 			ListManager* players = getPlayerList();
@@ -272,10 +659,10 @@ void* clientProcess() {
 						placeBomb(player);
 					}
 			}
-		}
+		}*/
 
 
-		if (strcmp(resp[0], "move") == 0) {
+		/*if (strcmp(resp[0], "move") == 0) {
 			int id = str2int(resp[1]);
 			int direction = str2int(resp[2]);
 			logger->dbg("Moving Player #%d: %d", id, direction);
@@ -290,11 +677,11 @@ void* clientProcess() {
 					playerMove(player, direction);
 				}
 			}
-		}
+		}*/
 
-		if (strcmp(resp[0], "stop") == 0) {
-			logger->dbg("Stopping Player #%d", resp[1]);
+		/*if (strcmp(resp[0], "stop") == 0) {
 			int id = str2int(resp[1]);
+			logger->dbg("Stopping Player #%d", id);
 
 			ListManager* players = getPlayerList();
 			Node* playerNode = getNode(players, id);
@@ -302,20 +689,18 @@ void* clientProcess() {
 			if(playerNode != NULL) {
 				Player *player = playerNode->value;
 				if(player != NULL) {
-					int direction = str2int(resp[1]);
-
 					playerStop(player);
 				}
 			}
-		}
+		}*/
 
-		if (strcmp(resp[0], "status") == 0) {
+		/*if (strcmp(resp[0], "status") == 0) {
 			int status = str2int(resp[1]);
-			logger->war("CHANGING STAUS %d", status);
+			logger->inf("CHANGING STAUS %d", status);
 			changeGameStatus(status);
-		}
+		}*/
 
-		if (strcmp(resp[0], "bonus") == 0) {
+		/*if (strcmp(resp[0], "bonus") == 0) {
 			int bId = str2int(resp[1]);
 			int pId = str2int(resp[2]);
 
@@ -324,7 +709,7 @@ void* clientProcess() {
 
 			ListManager* bonusList = getBonusList();
 			logger->dbg("### PRINTING BONUS LIST");
-			printNodes(bonusList);
+			//printNodes(bonusList);
 
 			Node* bonusNode = getNode(bonusList, bId);
 
@@ -356,10 +741,10 @@ void* clientProcess() {
 			else{
 				logger->dbg("### BONUS NOT FOUND !!!!");
 			}
-		}
+		}*/
 
 
-		if (strcmp(resp[0], "refresh") == 0) {
+		/*if (strcmp(resp[0], "refresh") == 0) {
 			logger->dbg("#### Refreshing Players");
 
 			ListManager* players = getPlayerList();
@@ -368,7 +753,7 @@ void* clientProcess() {
 				logger->dbg("#%d: %s", index, resp[index]);
 
 				char* infos[4];
-				infos[3] = '\0';
+				memset(infos, 0, 4);
 
 				explode('-', resp[index], 0, 0, infos);
 				int pId = str2int(infos[0]);
@@ -387,18 +772,26 @@ void* clientProcess() {
 				}
 
 				logger->dbg("Free Params");
-				free(infos[0]);
-				free(infos[1]);
-				free(infos[2]);
-
+				for (z = 0; infos[z] != 0; ++z){
+					free(infos[z]);
+					infos[z] = 0;
+				}
+				memset(infos, 0, 4);
 			}
-		}
+		}*/
 	}
+
+	/*for (z = 0; resp[z] != 0; ++z){
+		free(resp[z]);
+		resp[z] = 0;
+	}
+	memset(resp, 0, 5);*/
 
 	close(co->fd);
 
 	//logger->war("Client: Un-Lock");
     unlock(DBG_CLIENT);
+    pthread_exit(NULL);
 }
 
 void sendCommand(char* cmd, int val) {
@@ -414,6 +807,6 @@ void sendCommand(char* cmd, int val) {
 	memset(msg, 0, MSG_SIZE);
 	snprintf(msg, MSG_SIZE, "%s:%d", cmd, val);
 
-	logger->err("#### Sending Comand %s", msg);
+	logger->dbg("#### Sending Comand %s", msg);
 	send(co->fd, msg, MSG_SIZE, 0);
 }

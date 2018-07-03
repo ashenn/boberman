@@ -26,7 +26,7 @@ void broadcastBonus(int id, Player* p) {
 	Game* game = getGame();
 
 	if(game->isServer) {
-		logger->war("!!!!!! BROADCAST BONS %d !!!!!!!", id);
+		logger->dbg("!!!!!! BROADCAST BONS %d !!!!!!!", id);
 		
 		char msg[25];
 		memset(msg, 0, 25); 
@@ -48,7 +48,7 @@ void incSpeed(Object* bnsObj, Object* playerObj) {
 			p->speed += 0.25f;
 
 			enableLogger(DBG_BONUS);
-			logger->war("Inc Speed %s: %d", p->name, p->speed);
+			logger->dbg("Inc Speed %s: %d", p->name, p->speed);
 		}
 
 		bnsObj->collision->enabled = 0;
@@ -65,7 +65,7 @@ void decSpeed(Object* bnsObj, Object* playerObj) {
 		if (p->speed > 0.5f) {
 			p->speed -= 0.25f;
 			enableLogger(DBG_BONUS);
-			logger->war("Dec Speed %s: %d", p->name, p->speed);
+			logger->dbg("Dec Speed %s: %d", p->name, p->speed);
 		}
 
 		bnsObj->collision->enabled = 0;
@@ -82,7 +82,7 @@ void incExpl(Object* bnsObj, Object* playerObj) {
 
 		if (p->bombPower < 4) {
 			enableLogger(DBG_BONUS);
-			logger->war("Inc Explosion %s: %d", p->name, p->bombPower);
+			logger->dbg("Inc Explosion %s: %d", p->name, p->bombPower);
 			p->bombPower ++;
 		}
 
@@ -100,7 +100,7 @@ void decExpl(Object* bnsObj, Object* playerObj) {
 
 		if (p->bombPower > 1) {
 			enableLogger(DBG_BONUS);
-			logger->war("Dec Explosion %s: %d", p->name, p->bombPower);
+			logger->dbg("Dec Explosion %s: %d", p->name, p->bombPower);
 			p->bombPower--;
 		}
 
@@ -121,7 +121,7 @@ void incBomb(Object* bnsObj, Object* playerObj) {
 
 			p->bombCnt++;
 			p->bombMax++;
-			logger->war("Inc Bomb Count %s: %d", p->name, p->bombMax);
+			logger->dbg("Inc Bomb Count %s: %d", p->name, p->bombMax);
 		}
 
 		bnsObj->collision->enabled = 0;
@@ -137,7 +137,7 @@ void decBomb(Object* bnsObj, Object* playerObj) {
 
 			p->bombCnt--;
 			p->bombMax--;
-			logger->war("Dec Bomb Count %s: %d", p->name, p->bombMax);
+			logger->dbg("Dec Bomb Count %s: %d", p->name, p->bombMax);
 		}
 
 		bnsObj->collision->enabled = 0;

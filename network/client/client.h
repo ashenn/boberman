@@ -24,6 +24,8 @@ typedef struct {
     char* name;
     struct sockaddr_in client;
     struct sockaddr_in server;
+    
+    ListManager* commands;
 } Connexion;
 
 short findHost();

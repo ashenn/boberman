@@ -20,7 +20,7 @@ void EventKeyUp(int key, int curKey) {
 int EventKeyDown(int key, int curKey) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_EVNT;
-	logger->err("=== Key Event ===");
+	logger->inf("=== Key Event ===");
 
 	if (key == SDLK_ESCAPE) {
 		logger->dbg("-- Event: Quit");

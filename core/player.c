@@ -15,10 +15,6 @@ void resetPlayersBomb() {
 	}
 }
 
-void playerHit(Object* o1, Object*o2) {
-
-}
-
 Player* initPlayer(Player* p) {
 	static Player* player = NULL;
 	if (p != NULL) {
@@ -162,7 +158,7 @@ Player* genPlayer(char* name) {
 		return NULL;
 	}
 
-	logger->err("#### GEN PLAYER %s/%d", name, cnt);
+	logger->inf("#### GEN PLAYER %s/%d", name, cnt);
 
 	enableLogger(DBG_PLAYER);
 
@@ -221,7 +217,6 @@ Player* genPlayer(char* name) {
 	Object* obj = p->object = addSimpleObject(name, img, &pos, 3);
 
 
-
 	p->clip.w = PLAYER_W;
 	p->clip.h = PLAYER_H;
 
@@ -257,12 +252,12 @@ void playerTickMove(AnimParam* anim) {
 void playerStop(Player* p) {
 
 	Game* game = getGame();
-	if(game->isServer) {
+	/*if(game->isServer) {
 		char msg[25];
 		memset(msg, 0, 25); 
 		snprintf(msg, 25, "stop:%d", p->id);
 		broadcast(msg, getClient());
-	}
+	}*/
 	
 	p->clipIndex = 0;
 	animRemoveObject(p->object);
@@ -270,19 +265,20 @@ void playerStop(Player* p) {
 }
 
 void broadcastStop(Player* p) {
-	logger->war("!!!!!! BROADCAST STOOOP !!!!!!!");
+	logger->dbg("!!!!!! BROADCAST STOOOP !!!!!!!");
 	Game* game = getGame();
 
 	if(game->isServer) {
 		char msg[25];
 		memset(msg, 0, 25); 
 		snprintf(msg, 25, "stop:%d", p->id);
+
 		broadcast(msg, NULL);
 	}
 }
 
 void broadcastMove(Player* p, int direction) {
-	logger->war("!!!!!! BROADCAST MOOOVE !!!!!!!");
+	logger->dbg("!!!!!! BROADCAST MOOOVE !!!!!!!");
 	Game* game = getGame();
 	if(game->isServer) {
 		char msg[25];
@@ -369,9 +365,8 @@ void killPlayer(Player* p) {
 
 	enableLogger(DBG_PLAYER);
 
-	logger->inf("==== KILL PLAYER ====");
-	logger->dbg("-- Player: %p", p);
-	logger->dbg("-- Player: %s", p->name);
+	logger->war("==== KILL PLAYER ====");
+	logger->war("-- Player #%d: %s", p->id, p->name);
 
 	animRemoveObject(p->object);
 
@@ -383,6 +378,11 @@ void killPlayer(Player* p) {
 
 	AnimParam* anim = customAnim(p->object, 0.1f, 0, iteratePlayerKill);
 
+	Game* game = getGame();
+	if(!game->isServer) {
+		return;
+	}
+	
 	p = NULL;
 	Node* n = NULL;
 	int alives = 0;
@@ -392,10 +392,7 @@ void killPlayer(Player* p) {
 		alives += p->alive;
 	}
 
-	if(alives == 1) {
-		Game* game = getGame();
-		if(game->isServer) {
-			changeGameStatus(GAME_END);
-		}
+	if(alives <= 1) {
+		changeGameStatus(GAME_END);
 	}
 }

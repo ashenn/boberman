@@ -44,48 +44,77 @@ server_t* getServer() {
 	return initServer(0);
 }
 
+void closeServer() {
+	logger->inf("===== Closing Server =====");
+	
+	server_t* server = getServer();
+	if(server == NULL) {
+		logger->dbg("Nothing to do");
+		return;
+	}
+
+	logger->dbg("deleting Commands");
+	deleteList(server->commands);
+
+	logger->dbg("Cleaning Clients");
+	Node* n = NULL;
+
+	while((n = listIterate(server->clients, n))) {
+	    client_t* cli = n->value;
+	    free(cli->name);
+	}
+
+	deleteList(server->clients);
+	
+	logger->dbg("Closing Socket");
+	close(server->fd);
+	
+	logger->dbg("Free Server");
+	free(server);
+}
+
 void* serverProcess() {
+	logger->err("============== LAUNCH SERVER =============");
 	Game* game = getGame();
 
 	logger->inf("==== LAUNCHING SERVER THREAD ====");
 
-	//logger->dbg("-- Server Ask-Lock");
+	//logger->err("-- Server Ask-Lock");
 	lock(DBG_SERVER);
-	//logger->dbg("-- Server Locked");
+	//logger->war("-- Server Lock");
 
 	server_t* server = initServer(1);
 
+	logger->err("-- Server Trigger Signal !!!");
 	signalCond();
 	if(server == NULL) {
+		logger->war("-- Server Unlock FAILD INIT");
 		unlock(DBG_SERVER);
 		return NULL;
 	}
 
 
 	if(server->fd < 0) {
+		logger->war("-- Server Unlock FAILD SOCKET");
 		unlock(DBG_SERVER);
 		return NULL;
 	}
 
-	while(game->status < GAME_END) {
-		//logger->dbg("-- Server Unlock");
+	while(game->status <= GAME_END) {
+		//logger->err("-- Server Unlock");
 		unlock(DBG_SERVER);
-	    network_handling(server->fd, server->addr);
 
+	    network_handling(server->fd, server->addr);
 	    //usleep(5);
 
-		//logger->dbg("-- Server Ask-Lock");
+		//logger->err("-- Server Ask-Lock");
 		lock(DBG_SERVER);
-		//logger->dbg("-- Server Locked");
+		//logger->war("-- Server Lock");
 	}
 
-	logger->dbg("-- Free Server");
-	deleteList(server->clients);
-	deleteList(server->commands);
-
-	close(server->fd);
-	free(server);
 
 	logger->dbg("==== SERVER THREAD END ====");
+	//logger->err("-- Server Unlock");
 	unlock(DBG_SERVER);
+	pthread_exit(NULL);
 }

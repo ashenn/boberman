@@ -43,7 +43,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
         exit(EXIT_FAILURE);
     }
 
-    logger->war("New connection !!");
+    logger->inf("New connection !!");
     if(serv->clients->nodeCount >= 4) {
         char motd[6];
         snprintf(motd, 6, "Fail:0");
@@ -58,11 +58,11 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     }
 
 
-    logger->war("Adding New Player: %d", serv->clients->nodeCount+1);
+    logger->inf("Adding New Player: %d", serv->clients->nodeCount+1);
 
     char clientName[12];
-    snprintf(clientName, 12, "PLAYER-%d", serv->clients->nodeCount+1);
-    logger->war("-- Name: %s", clientName);
+    snprintf(clientName, 12, "Player-%d", serv->clients->nodeCount+1);
+    logger->dbg("-- Name: %s", clientName);
 
     client_t* client = malloc(sizeof(client_t));
 
@@ -70,13 +70,13 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
 
     client->id = cliNode->id;
 
-    logger->war("-- id: %d", client->id);
+    logger->dbg("-- id: %d", client->id);
 
     char motd[43];
     snprintf(motd, 43, " ok:%d", client->id);
     motd[0] = 4;
 
-    logger->err("Send Message: %s", motd);
+    logger->dbg("Send Message: %s", motd);
 
     if( send(new_socket, motd, strlen(motd), 0) != strlen(motd) ) {
         logger->err("Faild To Send Welcome Message");
@@ -97,8 +97,11 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     //lock(DBG_SERVER);
     //logger->war("HANDLER: Lock");
 
+    client->name = malloc(strlen(clientName)+1);
+    memset(client->name, 0, strlen(clientName)+1);
+    strcpy(client->name, clientName);
+
     client->fd = new_socket;
-    client->name = clientName;
     client->player = genPlayer(clientName);
     if(serv->clients->nodeCount == 1) {
         initPlayer(client->player);
@@ -189,7 +192,7 @@ void broadcast(char *msg, client_t* ignore) {
     
     sendMsg[0] = length;
 
-    logger->err("Broadcast msg (%d): %s for %d clients", length, sendMsg, nc);
+    logger->dbg("Broadcast msg (%d): %s for %d clients", length, sendMsg, nc);
   
     while((tmp = listIterate(server->clients, tmp)) != NULL) {
         if (tmp->value == ignore) {
@@ -197,8 +200,8 @@ void broadcast(char *msg, client_t* ignore) {
         }
 
         client_t *client = tmp->value;
-        logger->war("Broadcast msg: %s", sendMsg);
-        logger->err("msg Length: %d", length + 2);
+        logger->dbg("Broadcast msg: %s", sendMsg);
+        logger->dbg("msg Length: %d", length + 2);
 
 
         int i = send(client->fd, sendMsg, length + 2, 0);
@@ -207,14 +210,14 @@ void broadcast(char *msg, client_t* ignore) {
           logger->err("Broadcast error for fd : %d / %d", i, length + 2);
         }
         else {
-          logger->err("Broadcast success for fd : %d", client->fd);
+          logger->dbg("Broadcast success for fd : %d", client->fd);
         }
     }
 }
 
 
 void handleCommand(Player* p, char* msg) {
-    logger->err("Handeling Command: %s", msg);
+    logger->inf("Handeling Command: %s", msg);
 
 
     char* resp[3];
@@ -223,12 +226,12 @@ void handleCommand(Player* p, char* msg) {
     char* cmd = resp[0];
     int val = str2int(resp[1]);
 
-    logger->err("CMD: %s Value: %d", cmd, val);
+    logger->dbg("CMD: %s Value: %d", cmd, val);
 
-    logger->err("Calling Command");
+    logger->dbg("Calling Command");
     server_t* server = getServer();
 
-    logger->err("Existing Commands: %d", server->commands->nodeCount);
+    logger->dbg("Existing Commands: %d", server->commands->nodeCount);
     Node* n = getNodeByName(server->commands, cmd);
 
     if(n != NULL) {
@@ -239,7 +242,7 @@ void handleCommand(Player* p, char* msg) {
         }
     }
     else{
-        logger->err("Fail To Find Command: %s", cmd);
+        logger->dbg("Fail To Find Command: %s", cmd);
     }
 
     free(resp[0]);
@@ -255,6 +258,7 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
 
     int i;
     Node* n = NULL;
+    Game* game = getGame();
     //logger->err("-- getting Server");
     server_t* serv = getServer();
 
@@ -266,39 +270,42 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
 
 
         //logger->err("-- Checking fd: %d", fd);
-        if (FD_ISSET( fd , readfds)) {
+        if (!FD_ISSET( fd , readfds)) {
+            continue;
+        }
 
-            //logger->err("-- Getting Message");
-            if ((valread = recv( fd , buffer, MSG_SIZE, 0)) == 0) {
-                //logger->err("-- Faild Deleting User");
-                //getpeername(fd , (struct sockaddr*)&server , (socklen_t*)&addrlen);
-                //Node *n = search_node_by_index(clients, find_client_by_fd(fd)).next;
+        logger->err("-- Getting Message");
+        if ((valread = recv( fd , buffer, MSG_SIZE, 0)) == 0) {
+            logger->war("Client Disconected: %s @%p!!!", client->name, client->player);
 
-                logger->war("Client Disconected: %s !!!", client->name);
-
-                //close( fd );
-                //*(client_socket + i) = 0;
-
-                if(client->player != NULL && client->player->alive) {
-
-                    char playerLeft[43];
-                    snprintf(playerLeft, 43, "playerLeft:%d", client->player->id);
-                    
-                    broadcast(playerLeft, getClient());
-                    
+            if(client->player != NULL) {
+                char playerLeft[43];
+                memset(playerLeft, 0, 43);
+                snprintf(playerLeft, 43, "playerLeft:%d", client->player->id);
+                
+                if(client->player->alive && game->status <= GAME_RUNNING) {
                     killPlayer(client->player);
-                    close(client->fd);
-                    n = n->prev;
-                    deleteNode(serv->clients, client->id);
                 }
-            } else {
-                logger->err("-- Receiving Message");
 
-                logger->err("Received Command: %s", buffer);
-                handleCommand(client->player, buffer);
-                //buffer[valread] = '\0';
-                //read_command(buffer, fd, client_socket);
+                close(client->fd);
+                free(client->name);
+                
+                n = n->prev;
+                deleteNode(serv->clients, client->id);
+                
+                broadcast(playerLeft, getClient());
             }
+            else{
+                logger->war("CLIENT HAS NO PLAYER !!!");
+            }
+        }
+        else {
+            logger->err("-- Receiving Message");
+
+            logger->err("Received Command: %s", buffer);
+            handleCommand(client->player, buffer);
+            //buffer[valread] = '\0';
+            //read_command(buffer, fd, client_socket);
         }
     }
 }
@@ -313,7 +320,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     Game* game = getGame();
     logger->enabled = game->flags & DBG_SERVER;
 
-    if(game->status >= GAME_END) {
+    if(game->status > GAME_END) {
         return 0;
     }
 
@@ -356,10 +363,9 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     struct timeval tv = {0, 15};
     activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 
-    if ((activity < 0) && (errno!=EINTR))
-    {
-        logger->war("Faild To Get Activity From Socket !!!");
-        logger->dbg("==== HANDLE NETWORK FAILD ====");
+    if ((activity < 0) && (errno!=EINTR)) {
+        
+        logger->dbg("-- Handle no Activity");
         return 0;
     }
 

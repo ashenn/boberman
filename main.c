@@ -22,6 +22,10 @@ void* closeApp() {
 	logger->dbg("-- Deleting Players List");
 	free(players);
 
+	logger->dbg("-- Cleaning Bonus");
+	ListManager* bonusList = getBonusList();
+	deleteList(bonusList);
+
 	// Cleaning Objects	
 	logger->dbg("-- Cleaning Objects");
 	clearObjects();
@@ -90,7 +94,7 @@ void signalCond() {
 }
 
 void getWinner() {
-	logger->err("=== GETTING WINNER ===");
+	logger->war("=== GETTING WINNER ===");
 	Node* n = NULL;
 	ListManager* players = getPlayerList();
 
@@ -98,23 +102,27 @@ void getWinner() {
 	Player* winner = NULL;
 	while((n = listIterate(players, n)) != NULL) {
 		p = n->value;
-		logger->war("# %s => %d", p->name, p->alive);
+		logger->war("#%d: %s => %d", p->id, p->name, p->alive);
 
 	    if(p->alive) {
+			logger->err("Found Alive: #%d: %s => %d !!!!", p->id, p->name, p->alive);
 	    	winner = p;
 	    	break;
 	    }
 	}
 
+	char msg[45];
+	memset(msg, 0, 45);
 	if(winner != NULL) {
-		char msg[45];
-		memset(msg, 0, 45);
-		snprintf(msg, 45, "THE WINNER IS %s !!!!", p->name);
-		Object* txt = generateText(msg, "pf", FONT_LG);
-		txt->lifetime = -1;
-		
-		logger->war("Winner Msg: \n %s", msg);
+		snprintf(msg, 45, "THE WINNER IS %s !!!!", winner->name);
 	}
+	else {
+		snprintf(msg, 45, "EVERYBODY IS DEAD LOOSERS !!!!");
+	}
+	
+	Object* txt = generateText(msg, "pf", FONT_LG);
+	txt->lifetime = -1;
+	logger->inf("Winner Msg: \n %s", msg);
 }
 
 int main(int argc, char *argv[])
@@ -164,9 +172,9 @@ int main(int argc, char *argv[])
 
 	pthread_create (&game->renderThread, NULL, render, (void*)NULL);
 
-	//logger->err("INIT: Ask-Lock");
+	//logger->war("INIT: Ask-Lock");
 	lock(DBG_STATE);
-	//logger->err("INIT: Lock");
+	//logger->war("INIT: Lock");
 
 	mainMenu();
 	while(game->status != GAME_QUIT) {
@@ -204,12 +212,14 @@ int main(int argc, char *argv[])
 	
 	logger->err("JOIN RENDER");
 	pthread_join(game->renderThread, NULL);
+
 	if(getServer() != NULL) {
 		logger->err("JOIN SERVER");
 		pthread_join(game->serverThread, NULL);
 	}
 
-	if(getConnexion() != NULL) {
+	Connexion* co = getConnexion();
+	if(co->init) {
 		logger->err("JOIN CLIENT");
 		pthread_join(game->clientThread, NULL);
 	}

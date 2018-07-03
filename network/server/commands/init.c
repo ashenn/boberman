@@ -15,7 +15,6 @@ void init_commands () {
     Node* n = addNodeV(server->commands, "move", arg, 1);
 
 
-
     arg = malloc(sizeof(Arg));    
     arg->function = (void*) broadcastStop;
     
