@@ -14,7 +14,8 @@
 #define GAME_START 3
 #define GAME_RUNNING 4
 #define GAME_END 5
-#define GAME_QUIT 6
+#define GAME_TIMEOUT 6
+#define GAME_QUIT 7
 
 #define NO_FLAG 0
 #define DBG_HIT 1

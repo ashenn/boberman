@@ -20,7 +20,7 @@ void timer() {
 		broadcast(msg, getClient());
 	}
 	else {
-		changeGameStatus(GAME_END);
+		changeGameStatus(GAME_TIMEOUT);
 	}
 }
 
