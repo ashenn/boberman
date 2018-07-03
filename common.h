@@ -65,6 +65,7 @@
 #define LEFT 3
 
 #define WALK_FRAMES 2
+
 #define TICK_FRAMES 5
 #define TICK_REFRESH 4
 

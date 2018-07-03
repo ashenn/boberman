@@ -71,4 +71,6 @@ void launchSate(short status);
 
 void startGame();
 
+void timer();
+
 #endif

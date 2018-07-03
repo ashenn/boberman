@@ -1,6 +1,29 @@
 #include <sys/time.h>
 #include "game.h"
 
+void timer() {
+	Game* game = getGame();
+	if(!game->isServer) {
+		return;
+	}
+
+	static short timeleft = 90;
+	char msg[25];
+	memset(msg, 0, 25);	
+	
+	if(--timeleft > 0) {
+		snprintf(msg, 25, "timeleft:%d", timeleft);
+
+		Object* txt = generateText(msg, "pf", FONT_LG);
+		txt->lifetime = 3;
+		txt->onDelete = timer;
+		broadcast(msg, getClient());
+	}
+	else {
+		changeGameStatus(GAME_END);
+	}
+}
+
 void countDown() {
 	static short cnt = 5;
 

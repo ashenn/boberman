@@ -194,6 +194,7 @@ int main(int argc, char *argv[])
 
 			case GAME_RUNNING:
 				logger->err("#### RUNNING GAME ####");
+				//timer();
 				launchSate(GAME_RUNNING);
 				break;
 
