@@ -3,21 +3,21 @@
 
 void timer() {
 	Game* game = getGame();
-	if(!game->isServer) {
+/*	if(!game->isServer) {
 		return;
-	}
+	} */
 
 	static short timeleft = 90;
 	char msg[25];
-	memset(msg, 0, 25);	
-	
+	memset(msg, 0, 25);
+
 	if(--timeleft > 0) {
-		snprintf(msg, 25, "timeleft:%d", timeleft);
+		snprintf(msg, 25, "%d:%d", timeleft / 60, timeleft % 60);
 
 		Object* txt = generateText(msg, "pf", FONT_LG);
 		txt->lifetime = 3;
 		txt->onDelete = timer;
-		broadcast(msg, getClient());
+	//	broadcast(msg, getClient());
 	}
 	else {
 		changeGameStatus(GAME_TIMEOUT);
@@ -36,20 +36,17 @@ void countDown() {
 	}
 	else if(cnt == -1) {
 		changeGameStatus(GAME_RUNNING);
-		snprintf(msg, 25, "GO !!!"); 
+		//snprintf(msg, 25, "GO !!!");
 	}
 	else if(cnt < -1) {
 		return;
 	}
 	else {
-		snprintf(msg, 25, "%d", cnt); 
+		snprintf(msg, 25, "%d", cnt);
+		Object* txt = generateText(msg, "pf", FONT_LG);
+		txt->lifetime = 3;
+		txt->onDelete = countDown;
 	}
-
-	Object* txt = generateText(msg, "pf", FONT_LG);
-	
-	txt->lifetime = 3;
-	txt->onDelete = countDown;
-
 	cnt--;
 }
 
@@ -106,7 +103,7 @@ void* hostGame() {
 		//logger->war("Host: Un-lock");
 		unlock(DBG_SERVER);
 		//logger->war("Host: Test");
-		
+
 		pthread_create(&game->serverThread, NULL, serverProcess, (void*)NULL);
 
 		//logger->war("Host: WAIT !!!");
@@ -118,7 +115,7 @@ void* hostGame() {
 		//logger->war("Host: Ask-lock");
 		lock(DBG_SERVER);
 		//logger->war("Host: lock");
-		
+
 		serv = getServer();
 
 		if(serv == NULL || serv->fd < 0) {
@@ -135,7 +132,7 @@ void* hostGame() {
 		logger->war("Host: Un-lock");
 		unlock(DBG_SERVER);
 		*/
-		
+
 		loadMap();
 		findGame();
 
@@ -254,7 +251,7 @@ void launchSate(short status) {
 }
 
 void renderMap() {
-	
+
 	/*
 		logger->war("MAP: Ask-Lock");
 		lock(DBG_STATE);
@@ -540,7 +537,7 @@ void changeGameStatus(short status) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_STATE;
 
-	logger->inf("==== Changing Status: %d ====", status);	
+	logger->inf("==== Changing Status: %d ====", status);
 	game->status = status;
 
 	if(game->isServer) {

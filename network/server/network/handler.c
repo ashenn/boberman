@@ -108,7 +108,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     }
 
     broadcast(newPlayer, getClient());
-    
+
     if(serv->clients->nodeCount == 2) {
         sleep(1);
         changeGameStatus(GAME_START);
@@ -189,11 +189,11 @@ void broadcast(char *msg, client_t* ignore) {
 
     memset(sendMsg, 0, length);
     snprintf(sendMsg, length, " %s", msg);
-    
+
     sendMsg[0] = length;
 
     logger->dbg("Broadcast msg (%d): %s for %d clients", length, sendMsg, nc);
-  
+
     while((tmp = listIterate(server->clients, tmp)) != NULL) {
         if (tmp->value == ignore) {
             continue;
@@ -205,7 +205,7 @@ void broadcast(char *msg, client_t* ignore) {
 
 
         int i = send(client->fd, sendMsg, length + 2, 0);
-        
+
         if (i != length + 2) {
           logger->err("Broadcast error for fd : %d / %d", i, length + 2);
         }
@@ -282,17 +282,17 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
                 char playerLeft[43];
                 memset(playerLeft, 0, 43);
                 snprintf(playerLeft, 43, "playerLeft:%d", client->player->id);
-                
+
                 if(client->player->alive && game->status <= GAME_RUNNING) {
                     killPlayer(client->player);
                 }
 
                 close(client->fd);
                 free(client->name);
-                
+
                 n = n->prev;
                 deleteNode(serv->clients, client->id);
-                
+
                 broadcast(playerLeft, getClient());
             }
             else{
@@ -320,7 +320,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     Game* game = getGame();
     logger->enabled = game->flags & DBG_SERVER;
 
-    if(game->status > GAME_END) {
+    if(game->status > GAME_TIMEOUT) {
         return 0;
     }
 
@@ -364,7 +364,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
 
     if ((activity < 0) && (errno!=EINTR)) {
-        
+
         logger->dbg("-- Handle no Activity");
         return 0;
     }
@@ -372,7 +372,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     // logger->err("-- Handeler: Ask-Lock");
     lock(DBG_SERVER);
     // logger->err("-- Handeler: Lock");
-    
+
     logger->dbg("-- Handeling Master Socket");
     handle_master_socket(master_socket_fd,  client_socket, server, &readfds);
 
