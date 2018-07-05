@@ -3,9 +3,9 @@
 
 void timer() {
 	Game* game = getGame();
-/*	if(!game->isServer) {
+	if(game->status >= GAME_TIMEOUT) {
 		return;
-	} */
+	}
 
 	static short timeleft = 90;
 	char msg[25];

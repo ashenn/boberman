@@ -93,6 +93,49 @@ void signalCond() {
 	pthread_cond_signal(&game->cond);
 }
 
+void menuButton() {
+	Button* btnBack = malloc(sizeof(Button));
+		btnBack->z = 2;
+		btnBack->name = "Menu";
+		btnBack->text = "Menu";
+		btnBack->font = "pf";
+		btnBack->color.r = 255;
+		btnBack->color.g = 255;
+		btnBack->color.b = 255;
+
+		btnBack->fontSize = FONT_LG;
+		btnBack->imgPath = "lg-button-red";
+		btnBack->imgHoverPath = NULL;
+		btnBack->imgObj = NULL;
+		btnBack->txtObj = NULL;
+		btnBack->click = (void*) quitGame;
+		btnBack->hover = (void*) buttonHover;
+		btnBack->hasAnim = 1;
+
+		// Define Button Size
+		btnBack->pos.w = LG_BTN_W;
+		btnBack->pos.h = LG_BTN_H;
+
+		// Define Position
+		btnBack->pos.x = SCREEN_W + 5;
+		btnBack->pos.y = 290;
+		//btnBack->pos.y = btnHost->anim->pos.y + (LG_BTN_H  * 1.25);
+
+
+
+		// Define Animation Position
+		btnBack->anim = malloc(sizeof(AnimParam));
+		btnBack->anim->time = 0.7f;
+		btnBack->anim->delay = 0.4f;
+		btnBack->anim->pos.x = percent(50, SCREEN_W) - (LG_BTN_W / 2);
+		btnBack->anim->pos.y = 290;
+		//btnBack->anim->pos.y = btnHost->anim->pos.y + (LG_BTN_H  * 1.25);
+
+		btnBack->anim->pos.w = 0;
+		btnBack->anim->pos.h = 0;
+    generateButton(btnBack);
+}
+
 void gameOver() {
 	char msg[45];
 		memset(msg, 0, 45);
@@ -210,12 +253,14 @@ int main(int argc, char *argv[])
 		  case GAME_TIMEOUT:
 				logger->err("#### GAME TIMEOUT ####");
 				gameOver();
+				menuButton();
 				launchSate(GAME_TIMEOUT);
 				break;
 
 			case GAME_END:
 				logger->err("#### END GAME ####");
 				getWinner();
+				menuButton();
 				launchSate(GAME_END);
 				break;
 		}
