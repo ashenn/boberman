@@ -158,7 +158,6 @@ Player* genPlayer(char* name, short id) {
 		return NULL;
 	}
 
-	logger->war("#### GEN PLAYER %s/%d", name, id);
 
 	enableLogger(DBG_PLAYER);
 

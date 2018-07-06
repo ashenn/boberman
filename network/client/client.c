@@ -1,7 +1,7 @@
 #include "client.h"
 
 void cmdRefresh(char* resp[]) {
-	//logger->war("#### Refreshing Players");
+	//logger->err("#### Refreshing Players");
 
 	//logger->war("#### Getting Players");
 	ListManager* players = getPlayerList();
@@ -44,11 +44,13 @@ void cmdRefresh(char* resp[]) {
 		}
 		memset(infos, 0, 4);
 	}
+	
+	//logger->err("#### REFRESH DONE");
 }
 
 void cmdNewPlayer(int id) {
 	Player* curPlayer = getPlayer();
-	logger->err("New player Recieved : %d (I am %d)", id, curPlayer->id);
+	logger->inf("New player Recieved : %d (I am %d)", id, curPlayer->id);
 
 	if (curPlayer->id == id) {
 		return;
@@ -194,10 +196,10 @@ void cmdBonus(int bId, int pId) {
 void clientCommand(char* msg) {
     //logger->err("Handeling Command: %s", msg);
 
-  	char* resp[5];
-  	memset(resp, 0, 5);
+  	char* resp[6];
+  	memset(resp, 0, 6);
     int z;
-  	for (z = 0; z < 5; ++z){
+  	for (z = 0; z < 6; ++z){
   		resp[z] = 0;
   	}
 
@@ -225,6 +227,8 @@ void clientCommand(char* msg) {
     		//logger->war("t: %s", resp[0]);
     		//logger->war("t: %s", resp[1]);
     		//logger->war("t: %s", resp[2]);
+    		//logger->war("t: %s", resp[3]);
+    		//logger->war("t: %s", resp[4]);
     		
     		//logger->err("CMD REFRESH 2");
         	arg->function(resp);
@@ -242,13 +246,16 @@ void clientCommand(char* msg) {
 	    }
     }
     else{
-        //logger->err("Fail To Find Command: %s", cmd);
+        logger->err("Fail To Find Command: %s", cmd);
     }
 
+    //logger->err("Free Respnonse");
     for (z = 0; resp[z] != 0; ++z){
     	free(resp[z]);
     	resp[z] = 0;
     }
+    
+    //logger->err("### HANDLE DONE");
 }
 
 void initClientCommands(Connexion* co) {
@@ -452,7 +459,6 @@ short findHost() {
 		for(int i = 1; i <= id; i++) {
 			memset(name, 0, 12);
 			snprintf(name, 12, "player-%d", i);
-			logger->war("Adding Player: %d", i);
 			p = genPlayer(name, i);
 		}
 
@@ -514,9 +520,9 @@ void* clientProcess() {
 
 		    logger->dbg("No Activity");
 
-			//logger->war("Client: Ask-Lock");
+			//logger->dbg("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
-			//logger->war("Client: Lock");
+			//logger->dbg("Client: Lock");
 		    continue;
 		}
 
@@ -527,9 +533,9 @@ void* clientProcess() {
 
 			logger->dbg("-- read fd is empty skipping");
 
-			//logger->war("Client: Ask-Lock");
+			//logger->dbg("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
-			//logger->war("Client: Lock");
+			//logger->dbg("Client: Lock");
 
 		    continue;
 		}
@@ -543,9 +549,9 @@ void* clientProcess() {
 			enableLogger(DBG_CLIENT);
 			logger->dbg("-- msg is empty continue...");
 
-			//logger->war("Client: Ask-Lock");
+			//logger->dbg("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
-			//logger->war("Client: Lock");
+			//logger->dbg("Client: Lock");
 	    	continue;
 	    }
 
@@ -556,209 +562,12 @@ void* clientProcess() {
 		//Player *pl = getPlayer();
 		//logger->dbg("%d", pl->id);
 
-		//logger->war("Client: Ask-Lock");
+		//logger->dbg("Client: Ask-Lock");
 	    lock(DBG_CLIENT);
-		//logger->war("Client: Lock");
+		//logger->dbg("Client: Lock");
 		
 		clientCommand(msg);
-
-		/*if (strcmp(resp[0], "newPlayer") == 0) {
-			logger->inf("New player Recieved : %s (I am %d)", resp[1], pl->id);
-			if (pl->id != str2int(resp[1])) {
-				genPlayer("Player-n");
-			}
-		}*/
-
-		/*if (strcmp(resp[0], "playerLeft") == 0) {
-			logger->dbg("Player left Recieved : %s (I am %d)", resp[1], pl->id);
-			ListManager* players = getPlayerList();
-			Node *tmp = NULL;
-			while((tmp = listIterate(players, tmp)) != NULL) {
-				Player *deadPlayer = tmp->value;
-				if (deadPlayer->id == str2int(resp[1]))
-					killPlayer(deadPlayer);
-			}
-		}*/
-
-		/*if (strcmp(resp[0], "playerkilled") == 0) {
-			ListManager* players = getPlayerList();
-			int id = str2int(resp[1]);
-
-			logger->err("player killed Recieved : %d (I am %d)", id, pl->id);
-
-			Node *tmp = NULL;
-			while((tmp = listIterate(players, tmp)) != NULL) {
-				Player *deadPlayer = tmp->value;
-				
-				if (deadPlayer->id == id) {
-					killPlayer(deadPlayer);
-				}
-			}
-		}*/
-
-		/*if (strcmp(resp[0], "breackblock") == 0) {
-			logger->dbg("Break Block By Id: %d", resp[1]);
-			ListManager* blockList = getBlockList();
-
-			int id = str2int(resp[1]);
-			Node* blockNode = getNode(blockList, id);
-
-			if(blockNode != NULL) {
-				Block* block = blockNode->value;
-				Object* o = block->obj;
-
-				logger->dbg("Object Got: %s", o->name);
-
-				breakBlock(block);
-				SDL_Rect bonuPos;
-
-				bonuPos.x = block->obj->pos.x + (BONUS_SIZE / 4);
-				bonuPos.y = block->obj->pos.y + (BONUS_SIZE / 4);
-
-				bonuPos.w = BONUS_SIZE;
-				bonuPos.h = BONUS_SIZE;
-
-				int bonusType = str2int(resp[2]);
-
-
-				generateBonus(bonuPos, bonusType);
-				deleteNode(blockList, block->id);
-			}
-		}*/
-
-		/*if (strcmp(resp[0], "bombPlaced") == 0) {
-			logger->dbg("Bomb Placed By Id: %d", resp[1]);
-			int id = str2int(resp[1]);
-			ListManager* players = getPlayerList();
-			Node* playerNode = getNode(players, id);
-
-
-			if(playerNode != NULL) {
-					Player *player = playerNode->value;
-					if(player != NULL) {
-						placeBomb(player);
-					}
-			}
-		}*/
-
-
-		/*if (strcmp(resp[0], "move") == 0) {
-			int id = str2int(resp[1]);
-			int direction = str2int(resp[2]);
-			logger->dbg("Moving Player #%d: %d", id, direction);
-
-			ListManager* players = getPlayerList();
-			Node* playerNode = getNode(players, id);
-
-			if(playerNode != NULL) {
-				Player *player = playerNode->value;
-				if(player != NULL) {
-
-					playerMove(player, direction);
-				}
-			}
-		}*/
-
-		/*if (strcmp(resp[0], "stop") == 0) {
-			int id = str2int(resp[1]);
-			logger->dbg("Stopping Player #%d", id);
-
-			ListManager* players = getPlayerList();
-			Node* playerNode = getNode(players, id);
-
-			if(playerNode != NULL) {
-				Player *player = playerNode->value;
-				if(player != NULL) {
-					playerStop(player);
-				}
-			}
-		}*/
-
-		/*if (strcmp(resp[0], "status") == 0) {
-			int status = str2int(resp[1]);
-			logger->inf("CHANGING STAUS %d", status);
-			changeGameStatus(status);
-		}*/
-
-		/*if (strcmp(resp[0], "bonus") == 0) {
-			int bId = str2int(resp[1]);
-			int pId = str2int(resp[2]);
-
-			logger->dbg("Bonus #%d Taken By Player #%d", bId, pId);
-
-
-			ListManager* bonusList = getBonusList();
-			logger->dbg("### PRINTING BONUS LIST");
-			//printNodes(bonusList);
-
-			Node* bonusNode = getNode(bonusList, bId);
-
-			if(bonusNode != NULL) {
-				ListManager* players = getPlayerList();
-				Node* playerNode = getNode(players, pId);
-
-				if(playerNode != NULL) {
-					Player* player = playerNode->value;
-					
-					if(player != NULL) {
-						Bonus* bonus = bonusNode->value;
-						logger->dbg("### Applying Bonus");
-						bonus->obj->collision->fnc(bonus->obj, player->object);
-						
-						logger->dbg("### Deleting Bonus");
-						deleteObject(bonus->obj);
-					}
-					else{
-						logger->dbg("### PLAYER IS NULL !!!!");
-					}
-				}
-				else{
-					logger->dbg("### PLAYER NOT FOUND !!!!");
-				}
-
-				deleteNode(bonusList, bonusNode->id);
-			}
-			else{
-				logger->dbg("### BONUS NOT FOUND !!!!");
-			}
-		}*/
-
-
-		/*if (strcmp(resp[0], "refresh") == 0) {
-			logger->dbg("#### Refreshing Players");
-
-			ListManager* players = getPlayerList();
-			int index;
-			for (index = 1; index < 4 && resp[index] != '\0'; ++index) {
-				logger->dbg("#%d: %s", index, resp[index]);
-
-				char* infos[4];
-				memset(infos, 0, 4);
-
-				explode('-', resp[index], 0, 0, infos);
-				int pId = str2int(infos[0]);
-				int x = str2int(infos[1]);
-				int y = str2int(infos[2]);
-
-				logger->dbg("Player #%d\nPosition: %d | %d", pId, x, y);
-				Node* n = getNode(players, pId);
-				if(n != NULL) {
-					logger->dbg("Setting Pos: %d | %d", x, y);
-					Player* p = n->value;
-					p->object->pos.x = x;
-					p->object->pos.y = y;
-
-					logger->dbg("Player Moved Pos: %d | %d", x, y);
-				}
-
-				logger->dbg("Free Params");
-				for (z = 0; infos[z] != 0; ++z){
-					free(infos[z]);
-					infos[z] = 0;
-				}
-				memset(infos, 0, 4);
-			}
-		}*/
+		logger->dbg("== CLIENT SLEEP ==");
 	}
 
 	/*for (z = 0; resp[z] != 0; ++z){

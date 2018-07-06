@@ -85,7 +85,7 @@ void* serverProcess() {
 
 	server_t* server = initServer(1);
 
-	logger->err("-- Server Trigger Signal !!!");
+	//logger->err("-- Server Trigger Signal !!!");
 	signalCond();
 	if(server == NULL) {
 		logger->war("-- Server Unlock FAILD INIT");

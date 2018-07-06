@@ -86,7 +86,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     snprintf(newPlayer, 43, "newPlayer:%d", client->id);
 
 
-    for (int i = 0; i < game->maxPlayer; i++) {
+    for (int i = 0; i < 4; i++) {
         if( *(client_socket + i) == 0 ) {
             *(client_socket + i) = new_socket;
             logger->inf("Adding to list of sockets as %d\n" , i);
@@ -102,8 +102,6 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     memset(client->name, 0, strlen(clientName)+1);
     strcpy(client->name, clientName);
 
-    logger->war("Cur Player Cnt %d", serv->clients->nodeCount);
-    logger->war("Next Player Cnt %d", clientId);
     client->fd = new_socket;
     client->player = genPlayer(clientName, clientId);
 
