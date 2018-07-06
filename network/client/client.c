@@ -217,7 +217,6 @@ void clientCommand(char* msg) {
 
     if(n != NULL) {
         Arg* arg = n->value;
-<<<<<<< HEAD
 	    //logger->err("CMD FOUND");
     	//logger->err("CMD: %s", cmd);
 	    
@@ -231,19 +230,6 @@ void clientCommand(char* msg) {
     		//logger->war("t: %s", resp[4]);
     		
     		//logger->err("CMD REFRESH 2");
-=======
-	    logger->err("CMD FOUND");
-    	logger->err("CMD: %s", cmd);
-
-	    if(arg->function == (void*)cmdRefresh) {
-    		logger->err("CMD REFRESH");
-
-    		logger->war("t: %s", resp[0]);
-    		logger->war("t: %s", resp[1]);
-    		logger->war("t: %s", resp[2]);
-
-    		logger->err("CMD REFRESH 2");
->>>>>>> sl/timer
         	arg->function(resp);
 	    }
 	    else if(resp[2] != 0) {

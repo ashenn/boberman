@@ -94,14 +94,14 @@ void signalCond() {
 }
 
 void backToMenu() {
-	changeGameStatus(GAME_MENU);
+	changeGameStatus(GAME_QUIT);
 }
 
 void menuButton() {
 	Button* btnBack = malloc(sizeof(Button));
 		btnBack->z = 5;
-		btnBack->name = "Menu";
-		btnBack->text = "Back to Menu";
+		btnBack->name = "Quit Game";
+		btnBack->text = "Quit Game";
 		btnBack->font = "pf";
 		btnBack->color.r = 255;
 		btnBack->color.g = 255;
@@ -112,7 +112,7 @@ void menuButton() {
 		btnBack->imgHoverPath = NULL;
 		btnBack->imgObj = NULL;
 		btnBack->txtObj = NULL;
-		btnBack->click = (void*) backToMenu;
+		btnBack->click = (void*) quitGame;
 		btnBack->hover = (void*) buttonHover;
 		btnBack->hasAnim = 1;
 
