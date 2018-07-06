@@ -46,7 +46,7 @@ server_t* getServer() {
 
 void closeServer() {
 	logger->inf("===== Closing Server =====");
-	
+
 	server_t* server = getServer();
 	if(server == NULL) {
 		logger->dbg("Nothing to do");
@@ -65,10 +65,10 @@ void closeServer() {
 	}
 
 	deleteList(server->clients);
-	
+
 	logger->dbg("Closing Socket");
 	close(server->fd);
-	
+
 	logger->dbg("Free Server");
 	free(server);
 }
@@ -100,7 +100,7 @@ void* serverProcess() {
 		return NULL;
 	}
 
-	while(game->status <= GAME_END) {
+	while(game->status <= GAME_TIMEOUT) {
 		//logger->err("-- Server Unlock");
 		unlock(DBG_SERVER);
 

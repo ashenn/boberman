@@ -11,10 +11,10 @@ void enableLogger(int flag) {
 
 void* closeApp() {
 	logger->enabled = 1;
-	logger->inf("==== Closing App ====");	
+	logger->inf("==== Closing App ====");
 	Game* game = getGame();
 
-	// Cleaning Objects	
+	// Cleaning Objects
 	logger->dbg("-- Cleaning Players");
 	clearPlayers();
 	ListManager* players = getPlayerList();
@@ -26,7 +26,7 @@ void* closeApp() {
 	ListManager* bonusList = getBonusList();
 	deleteList(bonusList);
 
-	// Cleaning Objects	
+	// Cleaning Objects
 	logger->dbg("-- Cleaning Objects");
 	clearObjects();
 
@@ -45,7 +45,7 @@ void* closeApp() {
 	logger->dbg("-- Quit SDL");
 	game->status = GAME_QUIT;
 	SDL_Quit();
-	
+
 	logger->dbg("-- Free Game");
 	deleteList(game->flagList);
 	free(game);
@@ -93,6 +93,62 @@ void signalCond() {
 	pthread_cond_signal(&game->cond);
 }
 
+void backToMenu() {
+	changeGameStatus(GAME_MENU);
+}
+
+void menuButton() {
+	Button* btnBack = malloc(sizeof(Button));
+		btnBack->z = 5;
+		btnBack->name = "Menu";
+		btnBack->text = "Back to Menu";
+		btnBack->font = "pf";
+		btnBack->color.r = 255;
+		btnBack->color.g = 255;
+		btnBack->color.b = 255;
+
+		btnBack->fontSize = FONT_LG;
+		btnBack->imgPath = "lg-button-red";
+		btnBack->imgHoverPath = NULL;
+		btnBack->imgObj = NULL;
+		btnBack->txtObj = NULL;
+		btnBack->click = (void*) backToMenu;
+		btnBack->hover = (void*) buttonHover;
+		btnBack->hasAnim = 1;
+
+		// Define Button Size
+		btnBack->pos.w = LG_BTN_W;
+		btnBack->pos.h = LG_BTN_H;
+
+		// Define Position
+		btnBack->pos.x = SCREEN_W + 5;
+		btnBack->pos.y = 290;
+		//btnBack->pos.y = btnHost->anim->pos.y + (LG_BTN_H  * 1.25);
+
+
+
+		// Define Animation Position
+		btnBack->anim = malloc(sizeof(AnimParam));
+		btnBack->anim->time = 0.7f;
+		btnBack->anim->delay = 0.4f;
+		btnBack->anim->pos.x = percent(50, SCREEN_W) - (LG_BTN_W / 2);
+		btnBack->anim->pos.y = 290;
+		//btnBack->anim->pos.y = btnHost->anim->pos.y + (LG_BTN_H  * 1.25);
+
+		btnBack->anim->pos.w = 0;
+		btnBack->anim->pos.h = 0;
+    generateButton(btnBack);
+}
+
+void gameOver() {
+	char msg[45];
+		memset(msg, 0, 45);
+	snprintf(msg, 45, "TIME EXPIRED : GAME OVER");
+
+	Object* txt = generateText(msg, "pf", FONT_LG);
+	txt->lifetime = -1;
+}
+
 void getWinner() {
 	logger->war("=== GETTING WINNER ===");
 	Node* n = NULL;
@@ -111,15 +167,15 @@ void getWinner() {
 	    }
 	}
 
-	char msg[45];
-	memset(msg, 0, 45);
-	if(winner != NULL) {
-		snprintf(msg, 45, "THE WINNER IS %s !!!!", winner->name);
-	}
-	else {
-		snprintf(msg, 45, "EVERYBODY IS DEAD LOOSERS !!!!");
-	}
-	
+		char msg[45];
+		memset(msg, 0, 45);
+		if(winner != NULL) {
+			snprintf(msg, 45, "THE WINNER IS %s !!!!", winner->name);
+		}
+		else {
+			snprintf(msg, 45, "EVERYBODY IS DEAD LOOSERS !!!!");
+		}
+
 	Object* txt = generateText(msg, "pf", FONT_LG);
 	txt->lifetime = -1;
 	logger->inf("Winner Msg: \n %s", msg);
@@ -128,7 +184,7 @@ void getWinner() {
 int main(int argc, char *argv[])
 {
 	logger = initLogger(argc, argv);
-	
+
 	logger->inf("##### START GAME #####");
 
 	TTF_Init();
@@ -139,11 +195,11 @@ int main(int argc, char *argv[])
 
 	logger->inf("-- Init: Window");
 	SDL_Surface* screen = getScreen();
-	
+
 	if(!game->options.ip[0]) {
 		logger->war("Setting Default IP");
 		snprintf(game->options.ip, 16, "127.0.0.1");
-	}	
+	}
 
 	logger->enabled = 1;
 	logger->war("Server Address: %s:%d", game->options.ip, game->options.port);
@@ -194,13 +250,21 @@ int main(int argc, char *argv[])
 
 			case GAME_RUNNING:
 				logger->err("#### RUNNING GAME ####");
-				//timer();
+				timer();
 				launchSate(GAME_RUNNING);
+				break;
+
+		  case GAME_TIMEOUT:
+				logger->err("#### GAME TIMEOUT ####");
+				gameOver();
+				menuButton();
+				launchSate(GAME_TIMEOUT);
 				break;
 
 			case GAME_END:
 				logger->err("#### END GAME ####");
 				getWinner();
+				menuButton();
 				launchSate(GAME_END);
 				break;
 		}
@@ -210,7 +274,7 @@ int main(int argc, char *argv[])
 	game->status = GAME_QUIT;
 	unlock(DBG_STATE);
 	logger->err("WAINTING FOR THREADS END");
-	
+
 	logger->err("JOIN RENDER");
 	pthread_join(game->renderThread, NULL);
 

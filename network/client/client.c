@@ -71,7 +71,7 @@ void cmdPlayerLeft(int id) {
 	Node *tmp = NULL;
 	while((tmp = listIterate(players, tmp)) != NULL) {
 		Player *deadPlayer = tmp->value;
-		
+
 		if (deadPlayer->id == id) {
 			killPlayer(deadPlayer);
 		}
@@ -105,10 +105,10 @@ void cmdBreakBlock(int id, BonusType type) {
 
 void cmdBomb(int id) {
 	logger->dbg("Bomb Placed By Id: %d", id);
-	
+
 	ListManager* players = getPlayerList();
 	Node* playerNode = getNode(players, id);
-	
+
 	if(playerNode != NULL) {
 		Player *player = playerNode->value;
 
@@ -168,12 +168,12 @@ void cmdBonus(int bId, int pId) {
 
 		if(playerNode != NULL) {
 			Player* player = playerNode->value;
-			
+
 			if(player != NULL) {
 				Bonus* bonus = bonusNode->value;
 				logger->dbg("### Applying Bonus");
 				bonus->obj->collision->fnc(bonus->obj, player->object);
-				
+
 				logger->dbg("### Deleting Bonus");
 				deleteObject(bonus->obj);
 			}
@@ -191,7 +191,6 @@ void cmdBonus(int bId, int pId) {
 		logger->dbg("### BONUS NOT FOUND !!!!");
 	}
 }
-
 
 void clientCommand(char* msg) {
     //logger->err("Handeling Command: %s", msg);
@@ -218,6 +217,7 @@ void clientCommand(char* msg) {
 
     if(n != NULL) {
         Arg* arg = n->value;
+<<<<<<< HEAD
 	    //logger->err("CMD FOUND");
     	//logger->err("CMD: %s", cmd);
 	    
@@ -231,6 +231,19 @@ void clientCommand(char* msg) {
     		//logger->war("t: %s", resp[4]);
     		
     		//logger->err("CMD REFRESH 2");
+=======
+	    logger->err("CMD FOUND");
+    	logger->err("CMD: %s", cmd);
+
+	    if(arg->function == (void*)cmdRefresh) {
+    		logger->err("CMD REFRESH");
+
+    		logger->war("t: %s", resp[0]);
+    		logger->war("t: %s", resp[1]);
+    		logger->war("t: %s", resp[2]);
+
+    		logger->err("CMD REFRESH 2");
+>>>>>>> sl/timer
         	arg->function(resp);
 	    }
 	    else if(resp[2] != 0) {
@@ -260,14 +273,14 @@ void clientCommand(char* msg) {
 
 void initClientCommands(Connexion* co) {
 	enableLogger(DBG_CLIENT);
-	
+
 	logger->inf("==== INIT CLIENT COMMANDS ====");
 	co->commands = initListMgr();
 
 	/*  NEW PLAYER  */
 	Arg* arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdNewPlayer;
-	
+
 	logger->dbg("-- New Player");
 	Node * n = addNodeV(co->commands, "newPlayer", arg, 1);
 
@@ -276,7 +289,7 @@ void initClientCommands(Connexion* co) {
 	/*  PLAYER DISCONNECT  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdPlayerLeft;
-	
+
 	logger->dbg("-- Player Left");
 	n = addNodeV(co->commands, "playerLeft", arg, 1);
 
@@ -285,70 +298,68 @@ void initClientCommands(Connexion* co) {
 	/*  PLAYER KILLED  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdPlayerLeft;
-	
+
 	logger->dbg("-- Player Killed");
 	n = addNodeV(co->commands, "playerkilled", arg, 1);
-	
+
 
 
 	/*  Block Break  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdBreakBlock;
-	
+
 	logger->dbg("-- Block Break");
 	n = addNodeV(co->commands, "breackblock", arg, 1);
-	
+
 
 
 	/*  BOMB  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdBomb;
-	
+
 	logger->dbg("-- Place Bomb");
 	n = addNodeV(co->commands, "bombPlaced", arg, 1);
-	
+
 
 
 	/*  MOVE  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdMove;
-	
+
 	logger->dbg("-- Player Move");
 	n = addNodeV(co->commands, "move", arg, 1);
-	
+
 
 
 	/*  STOP  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdStop;
-	
+
 	logger->dbg("-- Player Stop");
 	n = addNodeV(co->commands, "stop", arg, 1);
-	
+
 
 
 	/*  STATUS  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdStatus;
-	
+
 	logger->dbg("-- Change Status");
 	n = addNodeV(co->commands, "status", arg, 1);
-	
+
 
 
 	/*  BONUS  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdBonus;
-	
+
 	logger->dbg("-- Bonus Taken");
 	n = addNodeV(co->commands, "bonus", arg, 1);
-	
-
 
 	/*  REFRESH  */
 	arg = malloc(sizeof(Arg));
 	arg->function = (void*) cmdRefresh;
-	
+
 	logger->dbg("-- Refresh");
 	n = addNodeV(co->commands, "refresh", arg, 1);
 }
@@ -451,7 +462,7 @@ short findHost() {
 	if(getServer() == NULL) {
 		//logger->war("Find: Ask-Lock");
 		lock(DBG_STATE);
-		
+
 		clearObjects();
 
 		char name[12];
