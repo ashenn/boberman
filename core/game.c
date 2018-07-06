@@ -8,15 +8,25 @@ void timer() {
 	}
 
 	static short timeleft = 90;
+	static Object* curTxt = NULL;
 	char msg[25];
 	memset(msg, 0, 25);
 
+	if(game->status >= GAME_END) {
+		if(curTxt != NULL) {
+			curTxt->lifetime = 3;
+			curTxt->onDelete = NULL;
+		}
+		return;
+	}
+
 	if(--timeleft > 0) {
-		snprintf(msg, 25, "%d:%d", timeleft / 60, timeleft % 60);
+		snprintf(msg, 25, "%d:%02d", timeleft / 60, timeleft % 60);
 
 		Object* txt = generateText(msg, "pf", FONT_LG);
 		txt->lifetime = 3;
 		txt->onDelete = timer;
+		curTxt = txt;
 	//	broadcast(msg, getClient());
 	}
 	else {

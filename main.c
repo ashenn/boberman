@@ -93,11 +93,15 @@ void signalCond() {
 	pthread_cond_signal(&game->cond);
 }
 
+void backToMenu() {
+	changeGameStatus(GAME_MENU);
+}
+
 void menuButton() {
 	Button* btnBack = malloc(sizeof(Button));
-		btnBack->z = 2;
+		btnBack->z = 5;
 		btnBack->name = "Menu";
-		btnBack->text = "Menu";
+		btnBack->text = "Back to Menu";
 		btnBack->font = "pf";
 		btnBack->color.r = 255;
 		btnBack->color.g = 255;
@@ -108,7 +112,7 @@ void menuButton() {
 		btnBack->imgHoverPath = NULL;
 		btnBack->imgObj = NULL;
 		btnBack->txtObj = NULL;
-		btnBack->click = (void*) quitGame;
+		btnBack->click = (void*) backToMenu;
 		btnBack->hover = (void*) buttonHover;
 		btnBack->hasAnim = 1;
 
