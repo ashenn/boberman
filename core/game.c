@@ -106,7 +106,7 @@ void* hostGame() {
 		//logger->war("Host: Un-lock");
 		unlock(DBG_SERVER);
 		//logger->war("Host: Test");
-		
+
 		pthread_create(&game->serverThread, NULL, serverProcess, (void*)NULL);
 
 		//logger->war("Host: WAIT !!!");
@@ -329,6 +329,7 @@ Game* getGame() {
 	game = malloc(sizeof(Game));
 
 	game->isServer = 0;
+	game->maxPlayer = 4;
 	game->flags = NO_FLAG;
 	game->status = GAME_MENU;
 	initGameFlags(game);
@@ -565,6 +566,18 @@ void* addDebugFlag(char* flag) {
 	game->flags = game->flags | *((int*) n->value);
 }
 
+void* setMaxPlayer(int max) {
+	if(max < 2 || max > 4) {
+		logger->war("Bad Value For Max Player: %d", max);
+		logger->war("Max Player Set to 4");
+
+		max = 4;
+	}
+
+	Game* game = getGame();
+	game->maxPlayer = max;
+}
+
 void parseGameArgs(int argc, char* argv[]){
 	static Arg arg1 = {
 		.name = "-dbg",
@@ -593,10 +606,20 @@ void parseGameArgs(int argc, char* argv[]){
 		.type="any"
 	};
 
+	static Arg arg4 = {
+		.name = "n",
+		.function = setMaxPlayer,
+		.hasParam = 1,
+		.defParam = NULL,
+		.asInt = 1,
+		.type="num"
+	};
+
 	static  Arg* args[] = {
 		&arg1,
 		&arg2,
 		&arg3,
+		&arg4,
 		NULL
 	};
 

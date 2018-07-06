@@ -5,7 +5,7 @@
 
 Player* getPlayer();
 ListManager* getPlayerList();
-Player* genPlayer(char* name);
+Player* genPlayer(char* name, short id);
 Player* initPlayer(Player* p);
 
 void resetPlayersBomb();

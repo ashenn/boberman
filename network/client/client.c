@@ -57,7 +57,7 @@ void cmdNewPlayer(int id) {
 	char name[15];
 	memset(name, 0, 15);
 	snprintf(name, 15, "Player-%d", id);
-	genPlayer(name);
+	genPlayer(name, id);
 }
 
 void cmdPlayerLeft(int id) {
@@ -216,27 +216,27 @@ void clientCommand(char* msg) {
 
     if(n != NULL) {
         Arg* arg = n->value;
-	    logger->err("CMD FOUND");
-    	logger->err("CMD: %s", cmd);
+	    //logger->err("CMD FOUND");
+    	//logger->err("CMD: %s", cmd);
 	    
 	    if(arg->function == (void*)cmdRefresh) {
-    		logger->err("CMD REFRESH");
+    		//logger->err("CMD REFRESH");
     		
-    		logger->war("t: %s", resp[0]);
-    		logger->war("t: %s", resp[1]);
-    		logger->war("t: %s", resp[2]);
+    		//logger->war("t: %s", resp[0]);
+    		//logger->war("t: %s", resp[1]);
+    		//logger->war("t: %s", resp[2]);
     		
-    		logger->err("CMD REFRESH 2");
+    		//logger->err("CMD REFRESH 2");
         	arg->function(resp);
 	    }
 	    else if(resp[2] != 0) {
-	    	logger->err("Double Values");
+	    	//logger->err("Double Values");
     		int val = str2int(resp[1]);
 	    	int val2 = str2int(resp[2]);
         	arg->function(val, val2);
 	    }
 	    else{
-	    	logger->err("Single Values");
+	    	//logger->err("Single Values");
     		int val = str2int(resp[1]);
         	arg->function(val);
 	    }
@@ -444,7 +444,6 @@ short findHost() {
 	if(getServer() == NULL) {
 		//logger->war("Find: Ask-Lock");
 		lock(DBG_STATE);
-		//logger->war("Find: Lock");
 		
 		clearObjects();
 
@@ -453,7 +452,8 @@ short findHost() {
 		for(int i = 1; i <= id; i++) {
 			memset(name, 0, 12);
 			snprintf(name, 12, "player-%d", i);
-			p = genPlayer(name);
+			logger->war("Adding Player: %d", i);
+			p = genPlayer(name, i);
 		}
 
 		initPlayer(p);

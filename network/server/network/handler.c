@@ -58,10 +58,11 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     }
 
 
-    logger->inf("Adding New Player: %d", serv->clients->nodeCount+1);
+    short clientId = serv->clients->nodeCount+1;
+    logger->inf("Adding New Player: %d", clientId);
 
     char clientName[12];
-    snprintf(clientName, 12, "Player-%d", serv->clients->nodeCount+1);
+    snprintf(clientName, 12, "Player-%d", clientId);
     logger->dbg("-- Name: %s", clientName);
 
     client_t* client = malloc(sizeof(client_t));
@@ -85,7 +86,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     snprintf(newPlayer, 43, "newPlayer:%d", client->id);
 
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < game->maxPlayer; i++) {
         if( *(client_socket + i) == 0 ) {
             *(client_socket + i) = new_socket;
             logger->inf("Adding to list of sockets as %d\n" , i);
@@ -101,15 +102,18 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     memset(client->name, 0, strlen(clientName)+1);
     strcpy(client->name, clientName);
 
+    logger->war("Cur Player Cnt %d", serv->clients->nodeCount);
+    logger->war("Next Player Cnt %d", clientId);
     client->fd = new_socket;
-    client->player = genPlayer(clientName);
+    client->player = genPlayer(clientName, clientId);
+
     if(serv->clients->nodeCount == 1) {
         initPlayer(client->player);
     }
 
     broadcast(newPlayer, getClient());
     
-    if(serv->clients->nodeCount == 2) {
+    if(serv->clients->nodeCount == game->maxPlayer) {
         sleep(1);
         changeGameStatus(GAME_START);
     }
@@ -274,7 +278,7 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
             continue;
         }
 
-        logger->err("-- Getting Message");
+        logger->dbg("-- Getting Message");
         if ((valread = recv( fd , buffer, MSG_SIZE, 0)) == 0) {
             logger->war("Client Disconected: %s @%p!!!", client->name, client->player);
 
@@ -300,9 +304,9 @@ void handle_client_sockets(int *client_socket, fd_set *readfds, struct sockaddr_
             }
         }
         else {
-            logger->err("-- Receiving Message");
+            logger->dbg("-- Receiving Message");
 
-            logger->err("Received Command: %s", buffer);
+            logger->dbg("Received Command: %s", buffer);
             handleCommand(client->player, buffer);
             //buffer[valread] = '\0';
             //read_command(buffer, fd, client_socket);

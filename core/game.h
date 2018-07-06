@@ -43,6 +43,7 @@ struct GameOptions {
 
 typedef struct Game Game;
 struct Game {
+	short maxPlayer;
 	short status;
 	short isServer;
 	unsigned int flags;

@@ -151,14 +151,14 @@ void updatePlayerClip(Player* p) {
 	logger->dbg("Player Clip: x: %d, y: %d, w: %d, h: %d, ", p->clip.x, p->clip.y, p->clip.w, p->clip.h);
 }
 
-Player* genPlayer(char* name) {
+Player* genPlayer(char* name, short id) {
 
 	static int cnt = 0;
 	if(cnt >= 4) {
 		return NULL;
 	}
 
-	logger->inf("#### GEN PLAYER %s/%d", name, cnt);
+	logger->war("#### GEN PLAYER %s/%d", name, id);
 
 	enableLogger(DBG_PLAYER);
 
@@ -210,7 +210,12 @@ Player* genPlayer(char* name) {
 
 	logger->dbg("-- loading image");
 	AssetMgr* ast = getAssets();
-	SDL_Surface* img = ast->getImg("player");
+	char imgPath[16];
+	memset(imgPath, 0, 16);
+	snprintf(imgPath, 16, "player/player-%d", id);
+	logger->dbg("-- Player image: %s", imgPath);
+
+	SDL_Surface* img = ast->getImg(imgPath);
 
 	logger->dbg("-- Creating Object");
 	SDL_Rect pos = {0,0, PLAYER_W, PLAYER_H};
