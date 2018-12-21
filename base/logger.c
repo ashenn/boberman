@@ -215,6 +215,9 @@ Log* initLogger(int argc, char *argv[]){
 	parseLogArgs();
 	parseArgs(logger->args, argc, argv);
 
+	logger->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
+	logger->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+
 	if (!logger->f)
 	{
 		setLogFile(logger, "./journal.log");
@@ -225,9 +228,6 @@ Log* initLogger(int argc, char *argv[]){
 		logger->lvl = 2;
 		logger->inf("No Log lvl: Lvl is set to WARNING");
 	}
-
-	logger->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
-	logger->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 	return logger;
 }
