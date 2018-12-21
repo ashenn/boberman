@@ -183,6 +183,7 @@ void getWinner() {
 
 int main(int argc, char *argv[])
 {
+	fprintf(stderr, "MAIN PID %d\n", getpid());
 	logger = initLogger(argc, argv);
 
 	logger->inf("##### START GAME #####");
