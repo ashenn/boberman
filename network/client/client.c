@@ -13,7 +13,7 @@ void cmdRefresh(char* resp[]) {
 	//logger->war("#### TEST3");
 
 	int index;
-	for (index = 1; index < 4 && resp[index] != NULL; ++index) {
+	for (index = 1; index < 4 && resp[index] != '\0'; ++index) {
 		//logger->war("#%d", index);
 		//logger->war("%s", resp[index]);
 
