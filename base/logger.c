@@ -42,7 +42,9 @@ void logg(short lvl, char* msg, va_list* args){
 		return;
 	}
 
+	fprintf(stderr, "Ask-Lock Logger: %d\n", getpid());
 	pthread_mutex_lock(&logger->mutex);
+	fprintf(stderr, "Lock Logger: %d\n", getpid());
 	
 	char message[10000];
 	char* l = logger->lvls[lvl];
@@ -56,6 +58,7 @@ void logg(short lvl, char* msg, va_list* args){
 		log2file(l, message);
 	}
 
+	fprintf(stderr, "Un-Lock Logger: %d\n", getpid());
 	pthread_mutex_unlock(&logger->mutex);
 }
 

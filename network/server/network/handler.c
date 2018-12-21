@@ -29,7 +29,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     server_t* serv = getServer();
 
     logger->enabled = game->flags & DBG_SERVER;
-    logger->inf("==== HANDLE MASTER SOCKET ====");
+    //logger->inf("==== HANDLE MASTER SOCKET ====");
 
     if (!FD_ISSET(master_socket_fd, readfds)) {
         return;
@@ -43,12 +43,12 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
         exit(EXIT_FAILURE);
     }
 
-    logger->inf("New connection !!");
+    logger->err("New connection !!");
     if(serv->clients->nodeCount >= 4 || game->status != GAME_LOBY) {
         char motd[7];
         memset(motd, 0, 7);
         snprintf(motd, 7, "Fail:0");
-        logger->dbg("Send Message: %s", motd);
+        logger->err("Send Message: %s", motd);
 
 
         if( send(new_socket, motd, strlen(motd), 0) != strlen(motd) ) {
@@ -60,11 +60,11 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
 
 
     short clientId = serv->clients->nodeCount+1;
-    logger->inf("Adding New Player: %d", clientId);
+    logger->err("Adding New Player: %d", clientId);
 
     char clientName[12];
     snprintf(clientName, 12, "Player-%d", clientId);
-    logger->dbg("-- Name: %s", clientName);
+    logger->err("-- Name: %s", clientName);
 
     client_t* client = malloc(sizeof(client_t));
 
@@ -72,13 +72,13 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
 
     client->id = cliNode->id;
 
-    logger->dbg("-- id: %d", client->id);
+    logger->err("-- id: %d", client->id);
 
     char motd[43];
     snprintf(motd, 43, " ok:%d", client->id);
     motd[0] = 4;
 
-    logger->dbg("Send Message: %s", motd);
+    logger->err("Send Message: %s", motd);
 
     if( send(new_socket, motd, strlen(motd), 0) != strlen(motd) ) {
         logger->err("Faild To Send Welcome Message");
@@ -90,7 +90,7 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
     for (int i = 0; i < 4; i++) {
         if( *(client_socket + i) == 0 ) {
             *(client_socket + i) = new_socket;
-            logger->inf("Adding to list of sockets as %d\n" , i);
+            logger->err("Adding to list of sockets as %d\n" , i);
             break;
         }
     }
@@ -326,7 +326,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
         return 0;
     }
 
-    logger->inf("==== HANDLE NETWORK ====");
+    //logger->inf("==== HANDLE NETWORK ====");
 
     if(client_socket == NULL) {
         logger->inf("==== INIT CLIENTS SOCKETS ====");
@@ -342,25 +342,25 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     }
 
 
-    logger->dbg("-- Reset fd");
+    //logger->dbg("-- Reset fd");
     //clear the socket set
     FD_ZERO(&readfds);
 
     //add master socket to set
-    logger->dbg("-- Set Master fd");
-    logger->dbg("-- test");
+    //logger->dbg("-- Set Master fd");
+    //logger->dbg("-- test");
 
-    logger->dbg("-- test %d", master_socket_fd);
+    //logger->dbg("-- test %d", master_socket_fd);
     FD_SET(master_socket_fd, &readfds);
-    logger->dbg("-- test DONE");
+    //logger->dbg("-- test DONE");
 
-    logger->dbg("-- Update Max Sd: %d", master_socket_fd);
+    //logger->dbg("-- Update Max Sd: %d", master_socket_fd);
     max_sd = master_socket_fd;
 
-    logger->dbg("-- Add Clients");
+    //logger->dbg("-- Add Clients");
     max_sd = add_child_socket_to_set(max_sd, client_socket, &readfds);
 
-    logger->dbg("-- Fetching Activity");
+    //logger->dbg("-- Fetching Activity");
 
     struct timeval tv = {0, 15};
     activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
@@ -375,14 +375,14 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     lock(DBG_SERVER);
     // logger->err("-- Handeler: Lock");
 
-    logger->dbg("-- Handeling Master Socket");
+    //logger->dbg("-- Handeling Master Socket");
     handle_master_socket(master_socket_fd,  client_socket, server, &readfds);
 
-    logger->dbg("-- Handeling Clients Socket");
+    //logger->dbg("-- Handeling Clients Socket");
     handle_client_sockets(client_socket, &readfds, server);
     // logger->err("-- Handeler: Un-Lock");
     unlock(DBG_SERVER);
 
-    logger->dbg("==== HANDLE NETWORK DONE ====");
+    //logger->dbg("==== HANDLE NETWORK DONE ====");
     return 1;
 }

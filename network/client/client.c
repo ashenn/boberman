@@ -366,8 +366,8 @@ Connexion* initConnexion(short init) {
 	Game* game = getGame();
 	enableLogger(DBG_CLIENT);
 
-	logger->inf("==== Setting Client Connexion ====");
-	logger->dbg("-- Client Socket");
+	logger->err("==== Setting Client Connexion ====");
+	logger->err("-- Client Socket");
 	connexion.fd = socket(AF_INET, SOCK_STREAM, 0);
 
 	connexion.client.sin_family = AF_INET;
@@ -377,13 +377,13 @@ Connexion* initConnexion(short init) {
 	bind(connexion.fd, (struct sockaddr *) &connexion.client, sizeof(connexion.client));
 
 
-	logger->dbg("-- Server Socket");
+	logger->err("-- Server Socket");
 	connexion.server.sin_family = AF_INET;
 	connexion.server.sin_port = htons(game->options.port);
 	connexion.server.sin_addr.s_addr = inet_addr(game->options.ip);
 
 
-	logger->dbg("-- Connecting To Server");
+	logger->err("-- Connecting To Server");
 	if (connect(connexion.fd, (struct sockaddr *) &connexion.server, sizeof(connexion.server)) == -1) {
 	    logger->err("Faild To Connect To Server");
 	    return NULL;
@@ -392,7 +392,7 @@ Connexion* initConnexion(short init) {
 	connexion.init = 1;
 	initClientCommands(&connexion);
 
-	logger->dbg("-- Connection SUCCESS");
+	logger->err("-- Connection SUCCESS");
 	return &connexion;
 }
 
@@ -502,7 +502,7 @@ void* clientProcess() {
 		}
   		memset(resp, 0, 5);
 
-		logger->dbg("-- Resetting fd");
+		//logger->dbg("-- Resetting fd");
 
 		FD_ZERO(&readfds);
 		FD_SET(0, &readfds);
@@ -510,13 +510,13 @@ void* clientProcess() {
 		int max_sd = co->fd;
 
 		enableLogger(DBG_CLIENT);
-		logger->dbg("-- Getting Activity");
+		//logger->dbg("-- Getting Activity");
 		int activity = select(max_sd + 1, &readfds, NULL, NULL, &tv);
 
 		if ((activity < 0) && (errno != EINTR)) {
 			enableLogger(DBG_CLIENT);
 
-		    logger->dbg("No Activity");
+		    //logger->dbg("No Activity");
 
 			//logger->dbg("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
@@ -525,11 +525,11 @@ void* clientProcess() {
 		}
 
 		enableLogger(DBG_CLIENT);
-		logger->dbg("-- Checking fd");
+		//logger->dbg("-- Checking fd");
 		if (!FD_ISSET(co->fd, &readfds)) {
 			enableLogger(DBG_CLIENT);
 
-			logger->dbg("-- read fd is empty skipping");
+			//logger->dbg("-- read fd is empty skipping");
 
 			//logger->dbg("Client: Ask-Lock");
 	    	lock(DBG_CLIENT);
