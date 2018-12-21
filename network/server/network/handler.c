@@ -45,8 +45,9 @@ void handle_master_socket(int master_socket_fd, int *client_socket, struct socka
 
     logger->inf("New connection !!");
     if(serv->clients->nodeCount >= 4 || game->status != GAME_LOBY) {
-        char motd[6];
-        snprintf(motd, 6, "Fail:0");
+        char motd[7];
+        memset(motd, 0, 7);
+        snprintf(motd, 7, "Fail:0");
         logger->dbg("Send Message: %s", motd);
 
 

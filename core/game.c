@@ -109,47 +109,54 @@ void* hostGame() {
 	Game* game = getGame();
 	server_t* serv = getServer();
 
-	if(serv == NULL) {
-		//logger->war("Host: Un-lock");
-		unlock(DBG_SERVER);
-		//logger->war("Host: Test");
-
-		pthread_create(&game->serverThread, NULL, serverProcess, (void*)NULL);
-
-		//logger->war("Host: WAIT !!!");
-		lock(DBG_SERVER);
-		waitCond();
-		unlock(DBG_SERVER);
-		//logger->war("Host: WAIT DONE !!!");
-
-		//logger->war("Host: Ask-lock");
-		lock(DBG_SERVER);
-		//logger->war("Host: lock");
-
-		serv = getServer();
-
-		if(serv == NULL || serv->fd < 0) {
-			unlock(DBG_SERVER);
-			logger->err("-- faild");
-			return NULL;
-		}
-
-		game->isServer = 1;
-		clearObjects();
-		setServerIp("127.0.0.1");
-
-		/*
-		logger->war("Host: Un-lock");
-		unlock(DBG_SERVER);
-		*/
-
-		loadMap();
-		findGame();
-
-		//logger->war("Host: Ask-lock");
-		lock(DBG_SERVER);
-		//logger->war("Host: lock");
+	if(serv != NULL) {
+		return NULL;
 	}
+
+	AssetMgr* ast = getAssets();
+	logger->err("==== CLEARING IMAGES ====");
+	ast->clearImgs();
+
+	//logger->war("Host: Un-lock");
+	unlock(DBG_SERVER);
+	//logger->war("Host: Test");
+
+	pthread_create(&game->serverThread, NULL, serverProcess, (void*)NULL);
+
+	//logger->war("Host: WAIT !!!");
+	lock(DBG_SERVER);
+	waitCond();
+	unlock(DBG_SERVER);
+	//logger->war("Host: WAIT DONE !!!");
+
+	//logger->war("Host: Ask-lock");
+	lock(DBG_SERVER);
+	//logger->war("Host: lock");
+
+	serv = getServer();
+
+	if(serv == NULL || serv->fd < 0) {
+		unlock(DBG_SERVER);
+		logger->err("-- faild");
+		return NULL;
+	}
+
+	game->isServer = 1;
+	clearObjects();
+	setServerIp("127.0.0.1");
+
+	/*
+	logger->war("Host: Un-lock");
+	unlock(DBG_SERVER);
+	*/
+
+	loadMap();
+	findGame();
+
+	//logger->war("Host: Ask-lock");
+	lock(DBG_SERVER);
+	//logger->war("Host: lock");
+	return NULL;
 }
 
 void refreshPlayers() {
@@ -271,12 +278,12 @@ void renderMap() {
 	Game* game = getGame();
 
 	logger->enabled = game->flags & DBG_MAP;
+	AssetMgr* ast = getAssets();
 
 	logger->inf("==== LOADING MAP ====");
-
-	AssetMgr* ast = getAssets();
 	SDL_Surface* bg = ast->getImg("map");
 	addSimpleObject("Background", bg, NULL, 1);
+	
 
 	generateWalls();
 
@@ -336,7 +343,7 @@ Game* getGame() {
 	game = malloc(sizeof(Game));
 
 	game->isServer = 0;
-	game->maxPlayer = 4;
+	game->maxPlayer = 2;
 	game->flags = NO_FLAG;
 	game->status = GAME_MENU;
 	initGameFlags(game);

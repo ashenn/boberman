@@ -13,7 +13,7 @@ void cmdRefresh(char* resp[]) {
 	//logger->war("#### TEST3");
 
 	int index;
-	for (index = 1; index < 4 && resp[index] != '\0'; ++index) {
+	for (index = 1; index < 4 && resp[index] != NULL; ++index) {
 		//logger->war("#%d", index);
 		//logger->war("%s", resp[index]);
 
@@ -195,9 +195,10 @@ void cmdBonus(int bId, int pId) {
 void clientCommand(char* msg) {
     //logger->err("Handeling Command: %s", msg);
 
+    int z;
   	char* resp[6];
   	memset(resp, 0, 6);
-    int z;
+
   	for (z = 0; z < 6; ++z){
   		resp[z] = 0;
   	}
