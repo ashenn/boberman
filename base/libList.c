@@ -1,4 +1,56 @@
 #include "libList.h"
+#include <pthread.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <assert.h>
+
+
+void lockList(ListManager* lst) {
+	pid_t curTH = getpid();
+	// fprintf(stdout, "LOCKING LIST: %d / %d \n", (int) curTH, (int) lst->pid);
+
+	if (curTH != lst->pid) {
+		pthread_mutex_lock(&lst->mutex);
+		lst->pid = curTH;
+	}
+	else {
+		// fprintf(stdout, "LOCKING LIST IN SAME THREAD: %d \n", (int) lst->pid);
+		//assert(0);
+	}
+	
+}
+
+
+void unlockList(ListManager* lst) {
+	//fprintf(stdout, "UN-LOCKING LIST: %d \n", (int) getpid());
+	lst->pid = -1;
+	pthread_mutex_unlock(&lst->mutex);
+}
+
+void lockNode(Node* n) {
+	pid_t curTH = getpid();
+	//fprintf(stdout, "LOCKING Node: %d \n", (int) curTH);
+	//fprintf(stdout, "CURRENT Node: %d \n", (int) n->pid);
+
+	if (curTH != n->pid) {
+		pthread_mutex_lock(&n->mutex);
+		n->pid = curTH;
+	}
+	else {
+		// fprintf(stdout, "LOCKING NODE IN SAME THREAD: %d \n", (int) n->pid);
+		//assert(0);
+	}
+
+}
+
+void unlockNode(Node* n) {
+	//fprintf(stdout, "UN-LOCKING NODE: %d \n", (int) getpid());
+	n->pid = -1;
+	pthread_mutex_unlock(&n->mutex);
+}
+
 
 /**
  * Initialize A list
@@ -14,6 +66,9 @@ ListManager* initListMgr(){
 	lstMgr->nodeCount = 0;
 	lstMgr->first = NULL;
 	lstMgr->last = NULL;
+
+	lstMgr->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
+	lstMgr->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 	return lstMgr;
 }
@@ -34,6 +89,8 @@ void* addNode(ListManager* lstMgr, void* params){
 		return NULL;
 	}
 
+	lockList(lstMgr);
+
 	newNode->name = malloc(strlen(name)+1);
 	strcpy(newNode->name, name);
 
@@ -42,6 +99,9 @@ void* addNode(ListManager* lstMgr, void* params){
 	newNode->lstMgr = lstMgr;
 	newNode->value = NULL;
 	newNode->del = NULL;
+	
+	newNode->cond = (pthread_cond_t) PTHREAD_COND_INITIALIZER;
+	newNode->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 	if (!lstMgr->nodeCount) // Is the first node
 	{
@@ -59,6 +119,8 @@ void* addNode(ListManager* lstMgr, void* params){
 	}
 
 	lstMgr->nodeCount++;
+	unlockList(lstMgr);
+
 	return newNode;
 }
 
@@ -92,6 +154,8 @@ void printNode(Node* node){
 		return;
 	}
 
+	lockNode(node);
+
 	printf("id: %d \n", node->id);
 	printf("name: %s \n", node->name);
 	
@@ -111,6 +175,7 @@ void printNode(Node* node){
 		}
 	}
 
+	unlockNode(node);
 }
 
 /**
@@ -120,6 +185,8 @@ void printNode(Node* node){
 void printNodes(ListManager* lstMgr){
 	Node* currentNode;
 	currentNode = NULL;
+
+	lockList(lstMgr);
 
 	int i;
 	for (i = 0; i < lstMgr->nodeCount; ++i)
@@ -135,6 +202,8 @@ void printNodes(ListManager* lstMgr){
 		printNode(currentNode);
 		printf("\n");
 	}
+
+	unlockList(lstMgr);
 }
 
 /**
@@ -145,6 +214,8 @@ void printNodes(ListManager* lstMgr){
  */
 Node* getNode(ListManager* lstMgr, int id){
 	Node* currentNode = NULL;
+
+	lockList(lstMgr);
 
 	int i;
 	for (i = 0; i < lstMgr->nodeCount; ++i)
@@ -162,6 +233,8 @@ Node* getNode(ListManager* lstMgr, int id){
 			return currentNode;
 		}
 	}
+
+	unlockList(lstMgr);
 
 	return NULL;
 }
@@ -181,6 +254,8 @@ Node* getNodeByName(ListManager* lstMgr, char* name){
 		return NULL;
 	}
 
+	lockList(lstMgr);
+
 	int i;
 	for (i = 0; i < lstMgr->nodeCount; ++i)
 	{
@@ -194,10 +269,12 @@ Node* getNodeByName(ListManager* lstMgr, char* name){
 
 		if (!strcmp(currentNode->name, name))
 		{
+			unlockList(lstMgr);
 			return currentNode;
 		}
 	}
 
+	unlockList(lstMgr);
 	// printf("## Error: Node with name: %s not found", name);
 
 	return NULL;
@@ -242,6 +319,9 @@ Node* deleteNodeNoFree(ListManager* lstMgr, int id){
 		return NULL;
 	}
 
+
+	lockList(lstMgr);
+	lockNode(node);
 	Node* prev = node->prev;
 	Node* next = node->next;
 
@@ -270,6 +350,8 @@ Node* deleteNodeNoFree(ListManager* lstMgr, int id){
 		lstMgr->last = NULL;
 	}
 
+	unlockNode(node);
+	unlockList(lstMgr);
 	return node;
 }
 
@@ -285,6 +367,8 @@ void* deleteNode(ListManager* lstMgr, int id){
 		return NULL;
 	}
 
+	lockList(lstMgr);
+	lockNode(node);
 	if (node->del != NULL) {
 		node->del(node->value);
 	}
@@ -293,7 +377,10 @@ void* deleteNode(ListManager* lstMgr, int id){
 	}
 
 	free(node->name);
+	unlockNode(node);
 	free(node);
+
+	unlockList(lstMgr);
 
 	return NULL;
 }
@@ -306,12 +393,15 @@ void* deleteNode(ListManager* lstMgr, int id){
  * @return         1
  */
 int setValue(Node* node, void* value, short asAlloc){
+	lockNode(node);
 	if (node->valIsAlloc && node->value != NULL){
 		free(node->value);
 	}
 
 	node->value = value;
 	node->valIsAlloc = asAlloc;
+
+	unlockNode(node);
 	return 1;
 }
 
@@ -328,6 +418,7 @@ int* getIds(ListManager* lstMgr, int* ids){
 
 	int i=0;
 	Node* currentNode = NULL;
+	lockList(lstMgr);
 
 	do{
 		if (currentNode == NULL){
@@ -336,12 +427,15 @@ int* getIds(ListManager* lstMgr, int* ids){
 		else{
 			currentNode = currentNode->next;
 		}
+		lockNode(currentNode);
 
 		ids[i] = currentNode->id;
 				
 		i++;
+		unlockNode(currentNode);
 	}while(lstMgr->last != currentNode);
 
+	unlockList(lstMgr);
 	return ids;
 }
 
@@ -372,14 +466,22 @@ void deleteList(ListManager* lstMgr){
 }
 
 Node* listIterate(ListManager* list, Node* n) {	
+	lockList(list);
 	if (list->first == NULL){
+		unlockList(list);
 		return NULL;
 	}
 	else if (n == NULL) {
 		n = list->first;
+		lockNode(n);
+		unlockList(list);
 		return n;
-	} 
+	}
+	else{
+		unlockNode(n);
+	}
 
+	unlockList(list);
 	if (n->next == NULL) {
 		return NULL;
 	}
@@ -388,18 +490,26 @@ Node* listIterate(ListManager* list, Node* n) {
 }
 
 Node* listRevIterate(ListManager* list, Node* n) {
+	lockList(list);
 	if (list->last == NULL){
+		unlockList(list);
 		return NULL;
 	}
 	else if (n == NULL) {
 		n = list->last;
+		lockNode(n);
+		unlockList(list);
 		return n;
 	} 
-
+	else {
+		unlockNode(n);
+	}
 	if (n->prev == NULL) {
+		unlockList(list);
 		return NULL;
 	}
 
+	unlockList(list);
 	return n->prev;
 }
 

@@ -23,6 +23,10 @@ struct Node{
 	Node* prev;
 
 	void* (*del)(void*);
+	
+	pid_t pid;
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
 };
 
 struct ListManager
@@ -32,6 +36,11 @@ struct ListManager
 
 	Node* first;
 	Node* last;	
+	
+	pid_t pid;
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
+
 };
 
 ListManager* initListMgr();
