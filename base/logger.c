@@ -43,6 +43,8 @@ void logg(short lvl, char* msg, va_list* args){
 	}
 
 	fprintf(stderr, "Ask-Lock Logger: %d\n", getpid());
+	fprintf(stderr, "MSG: %s\n", msg);
+	
 	pthread_mutex_lock(&logger->mutex);
 	fprintf(stderr, "Lock Logger: %d\n", getpid());
 	
