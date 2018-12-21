@@ -114,8 +114,6 @@ void* hostGame() {
 	}
 
 	AssetMgr* ast = getAssets();
-	logger->err("==== CLEARING IMAGES ====");
-	ast->clearImgs();
 
 	//logger->war("Host: Un-lock");
 	unlock(DBG_SERVER);
@@ -143,6 +141,8 @@ void* hostGame() {
 
 	game->isServer = 1;
 	clearObjects();
+	logger->err("==== CLEARING IMAGES ====");
+	ast->clearImgs();
 	setServerIp("127.0.0.1");
 
 	/*
