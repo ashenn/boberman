@@ -23,14 +23,30 @@ Object* getObjectByCollision(Collision* col2, short blocking, Object* ignore) {
 	enableLogger(DBG_HIT);
 	logger->inf("==== SEARCH COLLISION ====");
 	while((n = listIterate(objects, n)) != NULL) {
+		if (n == NULL || n->value == NULL)
+		{
+			continue;
+		}
+
 		o = (Object*) n->value;
+		if (o == NULL)
+		{
+			continue;
+		}
+
 		if (o == ignore) {
 			continue;
 		}
 		logger->dbg("-- Obj: %s", o->name);
 
 		Collision* col = o->collision;
-		if (col == NULL || !col->enabled || (blocking != -1 && blocking != col->blocking)) {
+		if (col == NULL) {
+			continue;
+			
+		} else if(!col->enabled) {
+			continue;
+		} 
+		else if((blocking != -1 && blocking != col->blocking)) {
 			continue;
 		}
 
@@ -118,11 +134,33 @@ void handleHits() {
 	short deleted = 0;
 	Game* game = getGame();
 
+	// logger->err("==== Verifying Hits ====");
 	while((n = listIterate(objects, n)) != NULL) {
+	    // logger->err("### LOOP TOP ###");
 		deleted = 0;
+		if (n == NULL || n->value == NULL)
+		{
+			continue;
+		}
+
 	    o = (Object*) n->value;
+
+	    if (o == NULL) {
+	    	continue;
+	    }
+
 		Collision* col = o->collision;
-	    if (col == NULL || !col->enabled || col->fnc == NULL) {
+	    if (col == NULL){
+		    logger->err("+++ Node: %s", n->name);
+		    logger->err("+++ Object: %s", o->name);
+		    logger->err("Collision Is NULL");
+	    	continue;
+	    }
+	    else if(!col->enabled) {
+	    	continue;
+	    	
+	    }
+	    else if(col->fnc == NULL) {
 	    	continue;
 	    }
 

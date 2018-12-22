@@ -331,7 +331,7 @@ int network_handling (int master_socket_fd, struct sockaddr_in server) {
     if(client_socket == NULL) {
         logger->inf("==== INIT CLIENTS SOCKETS ====");
 
-        client_socket =  malloc(sizeof(int));
+        client_socket =  malloc(sizeof(int) * 4);
 
         int a = 0;
         for (a = 0; a < 4; a++) {

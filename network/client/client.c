@@ -489,18 +489,20 @@ void* clientProcess() {
 
 
 	int z;
-  	char* resp[5];
-  	memset(resp, 0, 5);
+  	// char* resp[5];
+  	// memset(resp, 0, 5);
 	while(game->status < GAME_QUIT) {
 		//logger->war("Client: Un-Lock");
 	    unlock(DBG_CLIENT);
 		enableLogger(DBG_CLIENT);
 
+		/*
 		for (z = 0; resp[z] != 0; ++z){
 			free(resp[z]);
 			resp[z] = 0;
 		}
   		memset(resp, 0, 5);
+  		*/
 
 		//logger->dbg("-- Resetting fd");
 

@@ -93,6 +93,7 @@ void clearObjects() {
 		while((n = listIterate(objects, n)) != NULL) {
 			logger->dbg("-- Deleting");
 			logger->dbg("-- Deleting: %s", n->name);
+
 		    deleteObject(n->value);
 		    n = NULL;
 		}
@@ -150,6 +151,8 @@ short addChild(Object* obj, Object* child) {
 		child->parent = obj->parent;
 	}
 
+	child->id = n->id;
+
 	logger->dbg("-- nodeID: %d", n->id);
 	logger->dbg("==== Child %s Added to %s ====", child->name, obj->name);
 	return 1;
@@ -175,6 +178,7 @@ Object* genObject(char* name, void* comp, SDL_Rect* pos, short z, void* click, v
 	Object* obj = malloc(sizeof(Object));
 
 	obj->z = z;
+	obj->id = 0;
 	obj->visible = 1;
 	obj->enabled = 1;
 	obj->lifetime = -1;
@@ -274,8 +278,13 @@ void deleteObject(Object* obj) {
 	Game* game = getGame();
 	logger->enabled = game->flags & DBG_OBJ;
 
-	logger->inf("===== Deleting Object ====");
-	logger->dbg("--name: %s", obj->name);
+
+	if (strcmp(obj->name, "Timer"))
+	{
+		logger->war("===== Deleting Object ====");
+		logger->war("--name: %s", obj->name);
+	}
+	
 	Node* layer = getNode(getLayers(), obj->z);
 
 	if (obj->onDelete != NULL) {
@@ -294,7 +303,7 @@ void deleteObject(Object* obj) {
 				free(child->clip);
 			}
 
-			logger->dbg("-- child: %s", child->name);
+			logger->dbg("-- child: #%d => %s", childNode->id, child->name);
 			deleteObject(child);
 
 			logger->dbg("-- delete Node");
@@ -327,14 +336,14 @@ void deleteObject(Object* obj) {
 		free(obj->collision);
 	}
 
-	logger->dbg("-- Delete Object");
+	logger->err("-- Delete Object: %s", obj->name);
 	free(obj->name);
 	obj->name = NULL;
 
 	ListManager* objects = getObjectList();
 	deleteNode(objects, obj->id);
 
-	logger->dbg("===== DELETE OBJECT DONE ====");
+	logger->err("===== DELETE OBJECT DONE ====");
 }
 
 Object* generateText(char* text, char* fontName, int fontSize) {
@@ -363,7 +372,7 @@ Object* generateText(char* text, char* fontName, int fontSize) {
 		SCREEN_W,
 		SCREEN_H,
 	};
-	Object *object = addSimpleObject("Info", txt, &rect, 3);
+	Object *object = addSimpleObject("Timer", txt, &rect, 3);
 	object->lifetime = 5;
 	return object;
 }

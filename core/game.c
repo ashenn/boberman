@@ -450,8 +450,8 @@ Button** getMenu() {
 
 		// Define Animation Position
 		btnHost->anim = malloc(sizeof(AnimParam));
-		btnHost->anim->time = 0.7f;
-		btnHost->anim->delay = 0.2f;
+		btnHost->anim->time = 0.1f;
+		btnHost->anim->delay = 0.0f;
 		btnHost->anim->pos.x = percent(50, SCREEN_W) - (LG_BTN_W / 2);
 		//btnHost->anim->pos.y = 230;
 		btnHost->anim->pos.y = btnJoin->anim->pos.y + (LG_BTN_H  * 1.25);

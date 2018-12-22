@@ -1,4 +1,4 @@
-CC	=	gcc
+CC	=	gcc -g
 NAME	=	bomberman
 SRC	=	main.c                  \
                 base/basic.c            \
