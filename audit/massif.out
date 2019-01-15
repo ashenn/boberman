@@ -1,0 +1,929 @@
+desc: (none)
+cmd: ./bomberman
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=4451756238
+mem_heap_B=2862634
+mem_heap_extra_B=20774
+mem_stacks_B=0
+heap_tree=detailed
+n7: 2862634 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 2000288 0x488E313: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 1993600 0x48FFEF9: IMG_LoadPNG_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+   n1: 1993600 0x48FB8C0: IMG_LoadTyped_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+    n2: 1993600 0x10DD1D: getImg (asset.c:17)
+     n1: 1920000 0x1104B4: mainMenu (game.c:541)
+      n0: 1920000 0x10AF8C: main (main.c:236)
+     n1: 73600 0x112B7A: generateButton (object.c:403)
+      n1: 73600 0x11050B: mainMenu (game.c:547)
+       n0: 73600 0x10AF8C: main (main.c:236)
+  n0: 6688 in 1 place, below massif's threshold (1.00%)
+ n1: 472368 0x5475D57: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 472368 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 472368 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 472368 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 472368 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 472368 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 472368 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 472368 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 472368 0x10AD3D: main (main.c:192)
+ n0: 231426 in 215 places, all below massif's threshold (1.00%)
+ n1: 52488 0x54758EA: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 52488 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 52488 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 52488 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 52488 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 52488 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 52488 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 52488 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 52488 0x10AD3D: main (main.c:192)
+ n1: 42304 0x655458F: xcb_connect_to_fd (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+  n1: 42304 0x65586E0: xcb_connect_to_display_with_auth_info (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+   n1: 42304 0x544ACD0: _XConnectXCB (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 42304 0x543B890: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+     n0: 42304 in 3 places, all below massif's threshold (1.00%)
+ n1: 32768 0x543BB94: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n0: 32768 in 3 places, all below massif's threshold (1.00%)
+ n1: 30992 0x4B198D8: TTF_OpenFontIndexRW (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+  n1: 30992 0x10DF53: getFont (asset.c:52)
+   n1: 30992 0x112C04: generateButton (object.c:412)
+    n1: 30992 0x11050B: mainMenu (game.c:547)
+     n0: 30992 0x10AF8C: main (main.c:236)
+#-----------
+snapshot=2
+#-----------
+time=7811076569
+mem_heap_B=2861976
+mem_heap_extra_B=20680
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=10513125826
+mem_heap_B=2862024
+mem_heap_extra_B=20712
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=13799402851
+mem_heap_B=2861976
+mem_heap_extra_B=20680
+mem_stacks_B=0
+heap_tree=detailed
+n7: 2861976 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 2000288 0x488E313: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 1993600 0x48FFEF9: IMG_LoadPNG_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+   n1: 1993600 0x48FB8C0: IMG_LoadTyped_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+    n2: 1993600 0x10DD1D: getImg (asset.c:17)
+     n1: 1920000 0x1104B4: mainMenu (game.c:541)
+      n0: 1920000 0x10AF8C: main (main.c:236)
+     n1: 73600 0x112B7A: generateButton (object.c:403)
+      n1: 73600 0x11050B: mainMenu (game.c:547)
+       n0: 73600 0x10AF8C: main (main.c:236)
+  n0: 6688 in 1 place, below massif's threshold (1.00%)
+ n1: 472368 0x5475D57: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 472368 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 472368 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 472368 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 472368 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 472368 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 472368 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 472368 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 472368 0x10AD3D: main (main.c:192)
+ n0: 230768 in 215 places, all below massif's threshold (1.00%)
+ n1: 52488 0x54758EA: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 52488 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 52488 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 52488 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 52488 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 52488 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 52488 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 52488 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 52488 0x10AD3D: main (main.c:192)
+ n1: 42304 0x655458F: xcb_connect_to_fd (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+  n1: 42304 0x65586E0: xcb_connect_to_display_with_auth_info (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+   n1: 42304 0x544ACD0: _XConnectXCB (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 42304 0x543B890: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+     n0: 42304 in 3 places, all below massif's threshold (1.00%)
+ n1: 32768 0x543BB94: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n0: 32768 in 3 places, all below massif's threshold (1.00%)
+ n1: 30992 0x4B198D8: TTF_OpenFontIndexRW (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+  n1: 30992 0x10DF53: getFont (asset.c:52)
+   n1: 30992 0x112C04: generateButton (object.c:412)
+    n1: 30992 0x11050B: mainMenu (game.c:547)
+     n0: 30992 0x10AF8C: main (main.c:236)
+#-----------
+snapshot=5
+#-----------
+time=15990251836
+mem_heap_B=2861976
+mem_heap_extra_B=20680
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=19349552860
+mem_heap_B=2861976
+mem_heap_extra_B=20680
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=24023375589
+mem_heap_B=2861976
+mem_heap_extra_B=20680
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=27528990552
+mem_heap_B=2861976
+mem_heap_extra_B=20680
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=31911799236
+mem_heap_B=2948299
+mem_heap_extra_B=20869
+mem_stacks_B=0
+heap_tree=detailed
+n8: 2948299 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 2037088 0x488E313: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 2030400 0x48FFEF9: IMG_LoadPNG_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+   n1: 2030400 0x48FB8C0: IMG_LoadTyped_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+    n3: 2030400 0x10DD1D: getImg (asset.c:17)
+     n1: 1920000 0x1104B4: mainMenu (game.c:541)
+      n0: 1920000 0x10AF8C: main (main.c:236)
+     n1: 73600 0x112B7A: generateButton (object.c:403)
+      n1: 73600 0x11050B: mainMenu (game.c:547)
+       n0: 73600 0x10AF8C: main (main.c:236)
+     n1: 36800 0x113ECB: buttonHover (view.c:371)
+      n1: 36800 0x10EDB3: EventMouseMove (event.c:164)
+       n1: 36800 0x10EF31: handleEvents (event.c:210)
+        n1: 36800 0x10F7F4: launchSate (game.c:247)
+         n1: 36800 0x110535: mainMenu (game.c:550)
+          n0: 36800 0x10AF8C: main (main.c:236)
+  n0: 6688 in 1 place, below massif's threshold (1.00%)
+ n1: 472368 0x5475D57: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 472368 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 472368 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 472368 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 472368 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 472368 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 472368 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 472368 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 472368 0x10AD3D: main (main.c:192)
+ n0: 239107 in 214 places, all below massif's threshold (1.00%)
+ n1: 52488 0x54758EA: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 52488 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 52488 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 52488 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 52488 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 52488 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 52488 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 52488 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 52488 0x10AD3D: main (main.c:192)
+ n1: 42304 0x655458F: xcb_connect_to_fd (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+  n1: 42304 0x65586E0: xcb_connect_to_display_with_auth_info (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+   n1: 42304 0x544ACD0: _XConnectXCB (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 42304 0x543B890: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+     n0: 42304 in 3 places, all below massif's threshold (1.00%)
+ n2: 41184 0x5A2FED0: png_malloc_warn (in /usr/lib/x86_64-linux-gnu/libpng16.so.16.34.0)
+  n1: 32768 0x6ECADAA: inflate (in /lib/x86_64-linux-gnu/libz.so.1.2.11)
+   n1: 32768 0x5A4131B: ??? (in /usr/lib/x86_64-linux-gnu/libpng16.so.16.34.0)
+    n1: 32768 0x5A33B31: png_read_row (in /usr/lib/x86_64-linux-gnu/libpng16.so.16.34.0)
+     n1: 32768 0x5A35778: png_read_image (in /usr/lib/x86_64-linux-gnu/libpng16.so.16.34.0)
+      n1: 32768 0x48FFFC2: IMG_LoadPNG_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+       n1: 32768 0x48FB8C0: IMG_LoadTyped_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+        n2: 32768 0x10DD1D: getImg (asset.c:17)
+         n1: 32768 0x113ECB: buttonHover (view.c:371)
+          n1: 32768 0x10EDB3: EventMouseMove (event.c:164)
+           n1: 32768 0x10EF31: handleEvents (event.c:210)
+            n1: 32768 0x10F7F4: launchSate (game.c:247)
+             n1: 32768 0x110535: mainMenu (game.c:550)
+              n0: 32768 0x10AF8C: main (main.c:236)
+         n0: 0 in 2 places, all below massif's threshold (1.00%)
+  n0: 8416 in 2 places, all below massif's threshold (1.00%)
+ n1: 32768 0x543BB94: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n0: 32768 in 3 places, all below massif's threshold (1.00%)
+ n1: 30992 0x4B198D8: TTF_OpenFontIndexRW (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+  n1: 30992 0x10DF53: getFont (asset.c:52)
+   n1: 30992 0x112C04: generateButton (object.c:412)
+    n1: 30992 0x11050B: mainMenu (game.c:547)
+     n0: 30992 0x10AF8C: main (main.c:236)
+#-----------
+snapshot=10
+#-----------
+time=34634069856
+mem_heap_B=2284755
+mem_heap_extra_B=39589
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=38577273152
+mem_heap_B=2961004
+mem_heap_extra_B=40708
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=41386592051
+mem_heap_B=2967416
+mem_heap_extra_B=40888
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=46068318819
+mem_heap_B=2977328
+mem_heap_extra_B=41176
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=50611199474
+mem_heap_B=3069511
+mem_heap_extra_B=41849
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=52486113945
+mem_heap_B=3072799
+mem_heap_extra_B=41737
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=55744427827
+mem_heap_B=3081134
+mem_heap_extra_B=41922
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=58159099486
+mem_heap_B=3089149
+mem_heap_extra_B=42067
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=61148893648
+mem_heap_B=3096732
+mem_heap_extra_B=42108
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=64917803396
+mem_heap_B=3105158
+mem_heap_extra_B=41722
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=68619152563
+mem_heap_B=3120793
+mem_heap_extra_B=42735
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=73748633318
+mem_heap_B=3128672
+mem_heap_extra_B=42216
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=77529174656
+mem_heap_B=3139352
+mem_heap_extra_B=42184
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=79795610588
+mem_heap_B=3148843
+mem_heap_extra_B=42557
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=83425419340
+mem_heap_B=3160500
+mem_heap_extra_B=42700
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=85655906405
+mem_heap_B=3164810
+mem_heap_extra_B=42846
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=88612926874
+mem_heap_B=3175038
+mem_heap_extra_B=42666
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=90796695074
+mem_heap_B=3184472
+mem_heap_extra_B=42928
+mem_stacks_B=0
+heap_tree=detailed
+n9: 3184472 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 2119536 0x488E313: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 2046120 0x48FFEF9: IMG_LoadPNG_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+   n1: 2046120 0x48FB8C0: IMG_LoadTyped_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+    n5: 2046120 0x10DD1D: getImg (asset.c:17)
+     n1: 1306800 0x115B13: genPlayer (player.c:217)
+      n1: 1306800 0x1197BF: handle_master_socket (handler.c:107)
+       n1: 1306800 0x11A41B: network_handling (handler.c:379)
+        n1: 1306800 0x11AA90: serverProcess (server.c:107)
+         n1: 1306800 0x4D26162: start_thread (pthread_create.c:486)
+          n0: 1306800 0x4E59DED: clone (clone.S:95)
+     n1: 480000 0x10F91B: renderMap (game.c:284)
+      n0: 480000 0x10AFDE: main (main.c:244)
+     n1: 182880 0x117FA0: generateBlocks (map.c:135)
+      n1: 182880 0x117F23: generateWalls (map.c:126)
+       n1: 182880 0x10F946: renderMap (game.c:288)
+        n0: 182880 0x10AFDE: main (main.c:244)
+     n1: 76440 0x117820: placeBomb (bomb.c:545)
+      n1: 76440 0x119E02: handleCommand (handler.c:242)
+       n1: 76440 0x11A141: handle_client_sockets (handler.c:308)
+        n1: 76440 0x11A442: network_handling (handler.c:382)
+         n1: 76440 0x11AA90: serverProcess (server.c:107)
+          n1: 76440 0x4D26162: start_thread (pthread_create.c:486)
+           n0: 76440 0x4E59DED: clone (clone.S:95)
+     n0: 0 in 3 places, all below massif's threshold (1.00%)
+  n1: 73416 0x4B1A370: TTF_RenderUNICODE_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+   n2: 73416 0x4B1A738: TTF_RenderText_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+    n2: 66728 0x112964: generateText (object.c:363)
+     n2: 57608 0x10F0C0: timer (game.c:26)
+      n1: 55784 0x1125A5: deleteObject (object.c:292)
+       n1: 55784 0x111943: clearOutdatedObjects (object.c:24)
+        n1: 55784 0x10F700: tick (game.c:201)
+         n1: 55784 0x113B7E: render (view.c:289)
+          n1: 55784 0x4D26162: start_thread (pthread_create.c:486)
+           n0: 55784 0x4E59DED: clone (clone.S:95)
+      n0: 1824 in 1 place, below massif's threshold (1.00%)
+     n0: 9120 in 2 places, all below massif's threshold (1.00%)
+    n0: 6688 in 1 place, below massif's threshold (1.00%)
+ n1: 472368 0x5475D57: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 472368 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 472368 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 472368 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 472368 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 472368 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 472368 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 472368 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 472368 0x10AD3D: main (main.c:192)
+ n0: 303548 in 240 places, all below massif's threshold (1.00%)
+ n2: 73080 0x10BC07: addNode (libList.c:86)
+  n1: 72744 0x10BDD9: addNodeV (libList.c:137)
+   n0: 72744 in 40 places, all below massif's threshold (1.00%)
+  n0: 336 in 1 place, below massif's threshold (1.00%)
+ n1: 52488 0x54758EA: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 52488 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 52488 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 52488 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 52488 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 52488 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 52488 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 52488 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 52488 0x10AD3D: main (main.c:192)
+ n1: 45056 0x488BDF7: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n2: 45056 0x488E241: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+   n1: 43008 0x4B1A370: TTF_RenderUNICODE_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+    n2: 43008 0x4B1A738: TTF_RenderText_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+     n2: 39936 0x112964: generateText (object.c:363)
+      n1: 32768 0x10F0C0: timer (game.c:26)
+       n0: 32768 in 2 places, all below massif's threshold (1.00%)
+      n0: 7168 in 2 places, all below massif's threshold (1.00%)
+     n0: 3072 in 1 place, below massif's threshold (1.00%)
+   n0: 2048 in 1 place, below massif's threshold (1.00%)
+ n1: 43324 0x488C7A6: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 43324 0x488D648: SDL_LowerBlit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+   n1: 43324 0x488D908: SDL_UpperBlit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+    n1: 43324 0x1137B0: printObject (view.c:172)
+     n2: 43324 0x11391C: renderObject (view.c:195)
+      n1: 40252 0x113A75: renderObjectList (view.c:239)
+       n1: 40252 0x113B92: render (view.c:295)
+        n1: 40252 0x4D26162: start_thread (pthread_create.c:486)
+         n0: 40252 0x4E59DED: clone (clone.S:95)
+      n0: 3072 in 1 place, below massif's threshold (1.00%)
+ n1: 42304 0x655458F: xcb_connect_to_fd (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+  n1: 42304 0x65586E0: xcb_connect_to_display_with_auth_info (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+   n1: 42304 0x544ACD0: _XConnectXCB (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 42304 0x543B890: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+     n0: 42304 in 3 places, all below massif's threshold (1.00%)
+ n1: 32768 0x543BB94: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n0: 32768 in 3 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=28
+#-----------
+time=93791889108
+mem_heap_B=3191562
+mem_heap_extra_B=42782
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=96629126095
+mem_heap_B=3202687
+mem_heap_extra_B=43489
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=99473290900
+mem_heap_B=3213818
+mem_heap_extra_B=43470
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=101766263728
+mem_heap_B=3218664
+mem_heap_extra_B=43008
+mem_stacks_B=0
+heap_tree=detailed
+n9: 3218664 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 2137624 0x488E313: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 2046120 0x48FFEF9: IMG_LoadPNG_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+   n1: 2046120 0x48FB8C0: IMG_LoadTyped_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+    n5: 2046120 0x10DD1D: getImg (asset.c:17)
+     n1: 1306800 0x115B13: genPlayer (player.c:217)
+      n1: 1306800 0x1197BF: handle_master_socket (handler.c:107)
+       n1: 1306800 0x11A41B: network_handling (handler.c:379)
+        n1: 1306800 0x11AA90: serverProcess (server.c:107)
+         n1: 1306800 0x4D26162: start_thread (pthread_create.c:486)
+          n0: 1306800 0x4E59DED: clone (clone.S:95)
+     n1: 480000 0x10F91B: renderMap (game.c:284)
+      n0: 480000 0x10AFDE: main (main.c:244)
+     n1: 182880 0x117FA0: generateBlocks (map.c:135)
+      n1: 182880 0x117F23: generateWalls (map.c:126)
+       n1: 182880 0x10F946: renderMap (game.c:288)
+        n0: 182880 0x10AFDE: main (main.c:244)
+     n1: 76440 0x117820: placeBomb (bomb.c:545)
+      n1: 76440 0x119E02: handleCommand (handler.c:242)
+       n1: 76440 0x11A141: handle_client_sockets (handler.c:308)
+        n1: 76440 0x11A442: network_handling (handler.c:382)
+         n1: 76440 0x11AA90: serverProcess (server.c:107)
+          n1: 76440 0x4D26162: start_thread (pthread_create.c:486)
+           n0: 76440 0x4E59DED: clone (clone.S:95)
+     n0: 0 in 3 places, all below massif's threshold (1.00%)
+  n1: 91504 0x4B1A370: TTF_RenderUNICODE_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+   n2: 91504 0x4B1A738: TTF_RenderText_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+    n2: 84816 0x112964: generateText (object.c:363)
+     n2: 75696 0x10F0C0: timer (game.c:26)
+      n1: 73872 0x1125A5: deleteObject (object.c:292)
+       n1: 73872 0x111943: clearOutdatedObjects (object.c:24)
+        n1: 73872 0x10F700: tick (game.c:201)
+         n1: 73872 0x113B7E: render (view.c:289)
+          n1: 73872 0x4D26162: start_thread (pthread_create.c:486)
+           n0: 73872 0x4E59DED: clone (clone.S:95)
+      n0: 1824 in 1 place, below massif's threshold (1.00%)
+     n0: 9120 in 2 places, all below massif's threshold (1.00%)
+    n0: 6688 in 1 place, below massif's threshold (1.00%)
+ n1: 472368 0x5475D57: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 472368 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 472368 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 472368 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 472368 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 472368 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 472368 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 472368 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 472368 0x10AD3D: main (main.c:192)
+ n0: 304428 in 240 places, all below massif's threshold (1.00%)
+ n2: 70896 0x10BC07: addNode (libList.c:86)
+  n1: 70560 0x10BDD9: addNodeV (libList.c:137)
+   n0: 70560 in 40 places, all below massif's threshold (1.00%)
+  n0: 336 in 1 place, below massif's threshold (1.00%)
+ n1: 54272 0x488BDF7: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n2: 54272 0x488E241: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+   n1: 52224 0x4B1A370: TTF_RenderUNICODE_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+    n2: 52224 0x4B1A738: TTF_RenderText_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+     n2: 49152 0x112964: generateText (object.c:363)
+      n2: 41984 0x10F0C0: timer (game.c:26)
+       n1: 40960 0x1125A5: deleteObject (object.c:292)
+        n1: 40960 0x111943: clearOutdatedObjects (object.c:24)
+         n1: 40960 0x10F700: tick (game.c:201)
+          n1: 40960 0x113B7E: render (view.c:289)
+           n1: 40960 0x4D26162: start_thread (pthread_create.c:486)
+            n0: 40960 0x4E59DED: clone (clone.S:95)
+       n0: 1024 in 1 place, below massif's threshold (1.00%)
+      n0: 7168 in 2 places, all below massif's threshold (1.00%)
+     n0: 3072 in 1 place, below massif's threshold (1.00%)
+   n0: 2048 in 1 place, below massif's threshold (1.00%)
+ n1: 52488 0x54758EA: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 52488 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 52488 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 52488 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 52488 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 52488 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 52488 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 52488 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 52488 0x10AD3D: main (main.c:192)
+ n1: 51516 0x488C7A6: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 51516 0x488D648: SDL_LowerBlit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+   n1: 51516 0x488D908: SDL_UpperBlit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+    n1: 51516 0x1137B0: printObject (view.c:172)
+     n2: 51516 0x11391C: renderObject (view.c:195)
+      n1: 48444 0x113A75: renderObjectList (view.c:239)
+       n1: 48444 0x113B92: render (view.c:295)
+        n1: 48444 0x4D26162: start_thread (pthread_create.c:486)
+         n0: 48444 0x4E59DED: clone (clone.S:95)
+      n0: 3072 in 1 place, below massif's threshold (1.00%)
+ n1: 42304 0x655458F: xcb_connect_to_fd (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+  n1: 42304 0x65586E0: xcb_connect_to_display_with_auth_info (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+   n1: 42304 0x544ACD0: _XConnectXCB (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 42304 0x543B890: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+     n0: 42304 in 3 places, all below massif's threshold (1.00%)
+ n1: 32768 0x543BB94: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n0: 32768 in 3 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=32
+#-----------
+time=104603810369
+mem_heap_B=3227123
+mem_heap_extra_B=42949
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=107414144387
+mem_heap_B=3234423
+mem_heap_extra_B=42913
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=110245975621
+mem_heap_B=3246217
+mem_heap_extra_B=42983
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=113528583458
+mem_heap_B=3258597
+mem_heap_extra_B=43155
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=116349107042
+mem_heap_B=3266660
+mem_heap_extra_B=43188
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=120268478290
+mem_heap_B=3283073
+mem_heap_extra_B=43399
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=123084481734
+mem_heap_B=3294327
+mem_heap_extra_B=43329
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=125916256571
+mem_heap_B=3306493
+mem_heap_extra_B=44171
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=129455870451
+mem_heap_B=3316239
+mem_heap_extra_B=43129
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=132289101575
+mem_heap_B=3326775
+mem_heap_extra_B=43009
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=136532945995
+mem_heap_B=3350328
+mem_heap_extra_B=43840
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=139397199928
+mem_heap_B=3358662
+mem_heap_extra_B=43370
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=142220017475
+mem_heap_B=3369239
+mem_heap_extra_B=43353
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=144857207835
+mem_heap_B=3389040
+mem_heap_extra_B=44200
+mem_stacks_B=0
+heap_tree=detailed
+n8: 3389040 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 2223808 0x488E313: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 2046120 0x48FFEF9: IMG_LoadPNG_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+   n1: 2046120 0x48FB8C0: IMG_LoadTyped_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+    n5: 2046120 0x10DD1D: getImg (asset.c:17)
+     n1: 1306800 0x115B13: genPlayer (player.c:217)
+      n1: 1306800 0x1197BF: handle_master_socket (handler.c:107)
+       n1: 1306800 0x11A41B: network_handling (handler.c:379)
+        n1: 1306800 0x11AA90: serverProcess (server.c:107)
+         n1: 1306800 0x4D26162: start_thread (pthread_create.c:486)
+          n0: 1306800 0x4E59DED: clone (clone.S:95)
+     n1: 480000 0x10F91B: renderMap (game.c:284)
+      n0: 480000 0x10AFDE: main (main.c:244)
+     n1: 182880 0x117FA0: generateBlocks (map.c:135)
+      n1: 182880 0x117F23: generateWalls (map.c:126)
+       n1: 182880 0x10F946: renderMap (game.c:288)
+        n0: 182880 0x10AFDE: main (main.c:244)
+     n1: 76440 0x117820: placeBomb (bomb.c:545)
+      n1: 76440 0x119E02: handleCommand (handler.c:242)
+       n1: 76440 0x11A141: handle_client_sockets (handler.c:308)
+        n1: 76440 0x11A442: network_handling (handler.c:382)
+         n1: 76440 0x11AA90: serverProcess (server.c:107)
+          n1: 76440 0x4D26162: start_thread (pthread_create.c:486)
+           n0: 76440 0x4E59DED: clone (clone.S:95)
+     n0: 0 in 3 places, all below massif's threshold (1.00%)
+  n1: 177688 0x4B1A370: TTF_RenderUNICODE_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+   n2: 177688 0x4B1A738: TTF_RenderText_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+    n2: 171000 0x112964: generateText (object.c:363)
+     n2: 161880 0x10F0C0: timer (game.c:26)
+      n1: 160056 0x1125A5: deleteObject (object.c:292)
+       n1: 160056 0x111943: clearOutdatedObjects (object.c:24)
+        n1: 160056 0x10F700: tick (game.c:201)
+         n1: 160056 0x113B7E: render (view.c:289)
+          n1: 160056 0x4D26162: start_thread (pthread_create.c:486)
+           n0: 160056 0x4E59DED: clone (clone.S:95)
+      n0: 1824 in 1 place, below massif's threshold (1.00%)
+     n0: 9120 in 2 places, all below massif's threshold (1.00%)
+    n0: 6688 in 1 place, below massif's threshold (1.00%)
+ n1: 472368 0x5475D57: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 472368 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 472368 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 472368 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 472368 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 472368 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 472368 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 472368 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 472368 0x10AD3D: main (main.c:192)
+ n0: 342396 in 241 places, all below massif's threshold (1.00%)
+ n1: 98304 0x488BDF7: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n2: 98304 0x488E241: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+   n1: 96256 0x4B1A370: TTF_RenderUNICODE_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+    n2: 96256 0x4B1A738: TTF_RenderText_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+     n2: 93184 0x112964: generateText (object.c:363)
+      n2: 86016 0x10F0C0: timer (game.c:26)
+       n1: 84992 0x1125A5: deleteObject (object.c:292)
+        n1: 84992 0x111943: clearOutdatedObjects (object.c:24)
+         n1: 84992 0x10F700: tick (game.c:201)
+          n1: 84992 0x113B7E: render (view.c:289)
+           n1: 84992 0x4D26162: start_thread (pthread_create.c:486)
+            n0: 84992 0x4E59DED: clone (clone.S:95)
+       n0: 1024 in 1 place, below massif's threshold (1.00%)
+      n0: 7168 in 2 places, all below massif's threshold (1.00%)
+     n0: 3072 in 1 place, below massif's threshold (1.00%)
+   n0: 2048 in 1 place, below massif's threshold (1.00%)
+ n1: 95548 0x488C7A6: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 95548 0x488D648: SDL_LowerBlit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+   n1: 95548 0x488D908: SDL_UpperBlit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+    n1: 95548 0x1137B0: printObject (view.c:172)
+     n2: 95548 0x11391C: renderObject (view.c:195)
+      n1: 92476 0x113A75: renderObjectList (view.c:239)
+       n1: 92476 0x113B92: render (view.c:295)
+        n1: 92476 0x4D26162: start_thread (pthread_create.c:486)
+         n0: 92476 0x4E59DED: clone (clone.S:95)
+      n0: 3072 in 1 place, below massif's threshold (1.00%)
+ n2: 61824 0x10BC07: addNode (libList.c:86)
+  n1: 61488 0x10BDD9: addNodeV (libList.c:137)
+   n0: 61488 in 40 places, all below massif's threshold (1.00%)
+  n0: 336 in 1 place, below massif's threshold (1.00%)
+ n1: 52488 0x54758EA: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 52488 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 52488 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 52488 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 52488 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 52488 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 52488 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 52488 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 52488 0x10AD3D: main (main.c:192)
+ n1: 42304 0x655458F: xcb_connect_to_fd (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+  n1: 42304 0x65586E0: xcb_connect_to_display_with_auth_info (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+   n1: 42304 0x544ACD0: _XConnectXCB (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 42304 0x543B890: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+     n0: 42304 in 3 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=46
+#-----------
+time=147676772373
+mem_heap_B=3398809
+mem_heap_extra_B=43567
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=151145676962
+mem_heap_B=3472346
+mem_heap_extra_B=43766
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=154202653159
+mem_heap_B=3558584
+mem_heap_extra_B=44024
+mem_stacks_B=0
+heap_tree=peak
+n9: 3558584 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 2327200 0x488E313: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 2119720 0x48FFEF9: IMG_LoadPNG_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+   n1: 2119720 0x48FB8C0: IMG_LoadTyped_RW (in /usr/lib/x86_64-linux-gnu/libSDL_image-1.2.so.0.8.4)
+    n7: 2119720 0x10DD1D: getImg (asset.c:17)
+     n1: 1306800 0x115B13: genPlayer (player.c:217)
+      n1: 1306800 0x1197BF: handle_master_socket (handler.c:107)
+       n1: 1306800 0x11A41B: network_handling (handler.c:379)
+        n1: 1306800 0x11AA90: serverProcess (server.c:107)
+         n1: 1306800 0x4D26162: start_thread (pthread_create.c:486)
+          n0: 1306800 0x4E59DED: clone (clone.S:95)
+     n1: 480000 0x10F91B: renderMap (game.c:284)
+      n0: 480000 0x10AFDE: main (main.c:244)
+     n1: 182880 0x117FA0: generateBlocks (map.c:135)
+      n1: 182880 0x117F23: generateWalls (map.c:126)
+       n1: 182880 0x10F946: renderMap (game.c:288)
+        n0: 182880 0x10AFDE: main (main.c:244)
+     n1: 76440 0x117820: placeBomb (bomb.c:545)
+      n1: 76440 0x119E02: handleCommand (handler.c:242)
+       n1: 76440 0x11A141: handle_client_sockets (handler.c:308)
+        n1: 76440 0x11A442: network_handling (handler.c:382)
+         n1: 76440 0x11AA90: serverProcess (server.c:107)
+          n1: 76440 0x4D26162: start_thread (pthread_create.c:486)
+           n0: 76440 0x4E59DED: clone (clone.S:95)
+     n2: 36800 0x112B7A: generateButton (object.c:403)
+      n1: 36800 0x10AA56: menuButton (main.c:140)
+       n0: 36800 0x10B070: main (main.c:261)
+      n0: 0 in 1 place, below massif's threshold (1.00%)
+     n1: 36800 0x113ECB: buttonHover (view.c:371)
+      n1: 36800 0x10EDB3: EventMouseMove (event.c:164)
+       n1: 36800 0x10EF31: handleEvents (event.c:210)
+        n2: 36800 0x10F7F4: launchSate (game.c:247)
+         n0: 36800 0x10B07A: main (main.c:262)
+         n0: 0 in 1 place, below massif's threshold (1.00%)
+     n0: 0 in 1 place, below massif's threshold (1.00%)
+  n1: 207480 0x4B1A370: TTF_RenderUNICODE_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+   n2: 207480 0x4B1A738: TTF_RenderText_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+    n2: 195624 0x112964: generateText (object.c:363)
+     n2: 172368 0x10F0C0: timer (game.c:26)
+      n1: 170544 0x1125A5: deleteObject (object.c:292)
+       n1: 170544 0x111943: clearOutdatedObjects (object.c:24)
+        n1: 170544 0x10F700: tick (game.c:201)
+         n1: 170544 0x113B7E: render (view.c:289)
+          n1: 170544 0x4D26162: start_thread (pthread_create.c:486)
+           n0: 170544 0x4E59DED: clone (clone.S:95)
+      n0: 1824 in 1 place, below massif's threshold (1.00%)
+     n0: 23256 in 3 places, all below massif's threshold (1.00%)
+    n0: 11856 in 1 place, below massif's threshold (1.00%)
+ n1: 472368 0x5475D57: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 472368 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 472368 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 472368 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 472368 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 472368 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 472368 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 472368 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 472368 0x10AD3D: main (main.c:192)
+ n0: 355868 in 242 places, all below massif's threshold (1.00%)
+ n1: 105472 0x488BDF7: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n2: 105472 0x488E241: SDL_CreateRGBSurface (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+   n1: 103424 0x4B1A370: TTF_RenderUNICODE_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+    n2: 103424 0x4B1A738: TTF_RenderText_Solid (in /usr/lib/x86_64-linux-gnu/libSDL_ttf-2.0.so.0.10.1)
+     n2: 99328 0x112964: generateText (object.c:363)
+      n2: 91136 0x10F0C0: timer (game.c:26)
+       n1: 90112 0x1125A5: deleteObject (object.c:292)
+        n1: 90112 0x111943: clearOutdatedObjects (object.c:24)
+         n1: 90112 0x10F700: tick (game.c:201)
+          n1: 90112 0x113B7E: render (view.c:289)
+           n1: 90112 0x4D26162: start_thread (pthread_create.c:486)
+            n0: 90112 0x4E59DED: clone (clone.S:95)
+       n0: 1024 in 1 place, below massif's threshold (1.00%)
+      n0: 8192 in 3 places, all below massif's threshold (1.00%)
+     n0: 4096 in 1 place, below massif's threshold (1.00%)
+   n0: 2048 in 1 place, below massif's threshold (1.00%)
+ n1: 103740 0x488C7A6: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+  n1: 103740 0x488D648: SDL_LowerBlit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+   n1: 103740 0x488D908: SDL_UpperBlit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+    n1: 103740 0x1137B0: printObject (view.c:172)
+     n2: 103740 0x11391C: renderObject (view.c:195)
+      n1: 99644 0x113A75: renderObjectList (view.c:239)
+       n1: 99644 0x113B92: render (view.c:295)
+        n1: 99644 0x4D26162: start_thread (pthread_create.c:486)
+         n0: 99644 0x4E59DED: clone (clone.S:95)
+      n0: 4096 in 1 place, below massif's threshold (1.00%)
+ n2: 57960 0x10BC07: addNode (libList.c:86)
+  n1: 57624 0x10BDD9: addNodeV (libList.c:137)
+   n0: 57624 in 40 places, all below massif's threshold (1.00%)
+  n0: 336 in 1 place, below massif's threshold (1.00%)
+ n1: 52488 0x54758EA: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+  n1: 52488 0x5473AB5: _XimLocalOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+   n1: 52488 0x5472106: _XimOpenIM (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 52488 0x489F284: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+     n1: 52488 0x489FE4F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+      n1: 52488 0x4890467: SDL_VideoInit (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+       n1: 52488 0x48697B2: SDL_InitSubSystem (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+        n1: 52488 0x4869872: SDL_Init (in /usr/lib/x86_64-linux-gnu/libSDL-1.2.so.0.11.4)
+         n0: 52488 0x10AD3D: main (main.c:192)
+ n1: 42304 0x655458F: xcb_connect_to_fd (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+  n1: 42304 0x65586E0: xcb_connect_to_display_with_auth_info (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
+   n1: 42304 0x544ACD0: _XConnectXCB (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+    n1: 42304 0x543B890: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+     n0: 42304 in 3 places, all below massif's threshold (1.00%)
+ n1: 41184 0x5A2FED0: png_malloc_warn (in /usr/lib/x86_64-linux-gnu/libpng16.so.16.34.0)
+  n0: 41184 in 3 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=49
+#-----------
+time=157034493966
+mem_heap_B=3509550
+mem_heap_extra_B=43898
+mem_stacks_B=0
+heap_tree=empty

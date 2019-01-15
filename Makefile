@@ -1,4 +1,4 @@
-CC	=	gcc -g
+CC	=	gcc -g -W -Wall -fPIC
 NAME	=	bomberman
 SRC	=	main.c                  \
                 base/basic.c            \
