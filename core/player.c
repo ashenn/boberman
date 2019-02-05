@@ -211,7 +211,7 @@ Player* genPlayer(char* name, short id) {
 	AssetMgr* ast = getAssets();
 	char imgPath[16];
 	memset(imgPath, 0, 16);
-	snprintf(imgPath, 16, "player/player-%d", id);
+	snprintf(imgPath, 16, "player/player-1");
 	logger->dbg("-- Player image: %s", imgPath);
 
 	SDL_Surface* img = ast->getImg(imgPath);
